@@ -1,0 +1,73 @@
+/* Estilos de input y select */
+input::placeholder, select::placeholder {
+    font-family: 'Montserrat';
+    font-weight: 900;
+}
+
+.form-section-bg{
+    display: block;
+    min-height: 832px;
+}
+.my-container-bg{
+  background-image: url('./content/bg.png');
+  background-size: cover; /* Ajusta el tamaño de la imagen para cubrir toda el área */
+  background-position: center; /* Centra la imagen en el contenedor */
+  background-repeat: no-repeat; /* Evita que la imagen se repita */
+  text-align: center;
+}
+
+/* Estilos del formulario */
+.container-data {
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    margin: auto;
+}
+
+.container-data h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    margin-bottom: 20px;
+}
+
+.container-data label {
+    display: block;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    margin: 10px 0 5px;
+}
+
+.container-data input[type="email"], 
+.container-data input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.container-data button {
+    width: 100%;
+    padding: 10px;
+    background-color: #7F5B41;
+    color: #FBF7F2;
+    border: none;
+    border-radius: 4px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.container-data button:hover {
+    background-color: #B2987E;
+}
+
+.my-container-bg{
+    background-image: url('../content/bg.png');
+    background-size: cover; /* Ajusta el tamaño de la imagen para cubrir toda el área */
+    background-position: center; /* Centra la imagen en el contenedor */
+    background-repeat: no-repeat; /* Evita que la imagen se repita */
+    text-align: center;
+  }

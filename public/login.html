@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="style/style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;700;800&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="./style/estilosformularios.css">
+</head>
+<body>
+    <div id="menu"></div>
+    <div class="my-container-bg">
+        <div class="form-section-bg">
+            <div class="container-data">
+                <h2 id="user_name">Ingresa</h2>
+                <form id="loginForm">
+                    <input type="email" id="email" name="email" placeholder="Email" required><br><br>
+
+                    <input type="password" id="password" name="password" placeholder="Contraseña" required><br><br>
+
+                    <button type="submit">Iniciar Sesión</button>
+                </form>
+                <span><a href="register.html"> Si no tienes cuenta Registrate Aqui</a></span>
+            </div>
+        </div>
+    </div>
+    <div id="sidebar-container"></div>
+    <div id="footer"></div>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.token) {
+                    localStorage.setItem('token', data.token);
+                    window.location.href = '/profile';
+                } else {
+                    alert('Login fallido: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error durante el login:', error);
+                alert('Error durante el login: ' + error.message);
+            });
+        });
+
+        function loadComponent(id, url, callback) {
+            fetch(url)
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById(id).innerHTML = data;
+                    if (callback) callback();
+                })
+                .catch(error => console.error('Error loading component:', error));
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            loadComponent('menu', 'menu.html', initializeMenu);
+            loadComponent('footer', 'footer.html');
+            loadComponent('sidebar-container', 'sidebar.html');
+
+            function initializeMenu() {
+                const toggleButton = document.getElementById('navbar-toggle');
+                const closeButton = document.getElementById('close-button');
+                const fullscreenMenu = document.getElementById('fullscreen-menu');
+
+                if (toggleButton && closeButton && fullscreenMenu) {
+                    toggleButton.addEventListener('click', () => {
+                        fullscreenMenu.classList.add('open');
+                    });
+
+                    closeButton.addEventListener('click', () => {
+                        fullscreenMenu.classList.remove('open');
+                    });
+                }
+            }
+        });
+    </script>
+    <script src="./js/sidebar.js"></script>
+
+</body>
+</html>

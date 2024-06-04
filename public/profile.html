@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil de Usuario</title>
+    <link rel="stylesheet" href="style/style.css">
+    <link rel="stylesheet" href="style/profile.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css' rel='stylesheet' />
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js'></script>
+</head>
+<body>
+    <div id="menu"></div>
+    <div id="sidebar-container"></div>
+    <div class="my-container-bg">
+        <div class="container-data">
+            <h1 id="user_name">Bienvenid@, [Nombre del Usuario]</h1>
+            <a id="logout" href="#" onclick="logout()">Logout</a>
+            <div id="profile-picture-container">
+                <img id="profile_picture" src="ruta/a/la/foto/de/perfil.jpg" alt="Foto de perfil">
+            </div>
+        </div>
+
+        <div id="horariosPopup" class="popup">
+            <div class="popup-content">
+                <button onclick="cerrarHorariosPopup()" class="close-button">&times;</button>
+                <h2>Horarios Disponibles</h2>
+                <div id="horariosContenido"></div>
+            </div>
+        </div>
+
+        <div id="clases_disponibles"></div>
+        <h2 class="color-ajuste margin-ajuste">Tus Horarios Disponibles</h2>
+
+        <div id="calendario" class="calendar-container"></div>
+        <h2 class="color-ajuste">Tus Próximas Clases</h2>
+        <h4 class="color-ajuste margin-ajuste">Puedes reagendar tus clases máximo 2 veces</h4>
+        <div id="proximas_clases" class="toggle-content active"></div>
+
+        <div id="reservaPopup" class="popup">
+            <div class="popup-content">
+                <button onclick="cerrarPopup()" class="close-button">&times;</button>
+                <h2 class="color-ajuste">Reservar Clase</h2>
+                <input type="hidden" id="claseId">
+                <p class="color-ajuste">Detalles de la clase y opciones para confirmar la reserva.</p>
+                <div class="checkbox-container">
+                    <input type="checkbox" id="aceptoTerminos" required>
+                    <label for="aceptoTerminos">Acepto <a href="#" target="_blank">términos y condiciones</a></label>
+                </div>
+                <button class="my-button-reservas" onclick="cerrarPopup()">Cerrar</button>
+                <button id="confirmarReservaBtn" class="my-button-reservas" onclick="confirmarReserva()">Reservar Clase Ahora</button>
+            </div>
+        </div>
+
+        <div id="confirmationModal" class="modal">
+            <div class="modal-content">
+                <h2>Felicitaciones!</h2>
+                <p id="confirmationText">Tu clase ha sido reservada.</p>
+                <button onclick="cerrarYRecargar()">Cerrar</button>
+            </div>
+        </div>
+
+        <div id="errorModal" class="modal">
+            <div class="modal-content">
+                <h2>Lo sentimos!</h2>
+                <p id="errorText">Solo puedes registrarte una vez por clase, recuerda que puedes reagendar con 24 horas de anticipación.</p>
+                <button onclick="cerrarErrorModal()">Volver</button>
+            </div>
+        </div>
+
+        <div id="sameDayErrorModal" class="modal">
+            <div class="modal-content">
+                <h2>Lo sentimos!</h2>
+                <p id="sameDayErrorText">Ya tienes una clase registrada en esta fecha.</p>
+                <button onclick="cerrarSameDayErrorModal()">Volver</button>
+            </div>
+        </div>
+
+        <div id="dateErrorModal" class="modal">
+            <div class="modal-content">
+                <h2>Lo sentimos!</h2>
+                <p id="dateErrorText">No se pueden reservar clases para fechas anteriores al día siguiente.</p>
+                <button onclick="cerrarDateErrorModal()">Volver</button>
+            </div>
+        </div>
+
+        <div id="reagendarPopup" class="modal">
+            <div class="modal-content">
+                <button onclick="cerrarReagendarPopup()" class="close-button">&times;</button>
+                <h2>Reagendar Clase</h2>
+                <div id="claseActualMensaje" style="margin-bottom: 20px;"></div>
+                <div id="fechasReagendar"></div>
+            </div>
+        </div>
+    </div>
+    <div id="footer"></div>
+
+    <!-- Cargar scripts externos -->
+    <script src="js/fetchData.js"></script>
+    <script src="js/modals.js"></script>
+    <script src="js/calendar.js"></script>
+    <script src="js/profile.js"></script>
+    <script src="js/horarios.js"></script>
+    <script src="js/reagendar.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/init.js"></script>
+    <script src="./js/sidebar.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Administración</title>
+    <style>
+        .class-container {
+            margin-bottom: 20px;
+        }
+        .user-list {
+            margin-left: 20px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        img.comprobante {
+            max-width: 100px;
+            max-height: 100px;
+        }
+        .container-bg{
+            margin: 40px;
+        }
+    </style>
+    <link rel="stylesheet" href="style/style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;700;800&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div id="menu"></div>
+    <div class="container-bg">
+        <h1>Panel de Administración</h1>
+        <input type="date" id="fecha_clases" />
+        <button onclick="cargarClasesUsuarios()">Cargar Clases</button>
+        <div id="clases_usuarios"></div>
+    
+        <h2>Usuarios</h2>
+        <div id="filtros">
+            <h3>Selecciona los campos a mostrar:</h3>
+            <div style="display: block;">
+                <input type="checkbox" value="nombre" checked> <span>Nombre</span>
+                <input type="checkbox" value="email" checked> Email
+                <input type="checkbox" value="fecha_registro"> Fecha Registro
+                <input type="checkbox" value="paquete"> Paquete
+                <input type="checkbox" value="clases_disponibles"> Clases Disponibles
+                <input type="checkbox" value="telefono"> Teléfono
+                <input type="checkbox" value="motivacion"> Motivación
+                <input type="checkbox" value="fecha_nacimiento"> Fecha Nacimiento
+                <input type="checkbox" value="genero"> Género
+                <input type="checkbox" value="comprobante_pago"> Comprobante Pago
+                <input type="checkbox" value="rol"> Rol
+            </div>
+        </div>
+        <button onclick="cargarUsuarios()">Cargar Usuarios</button>
+        <div id="usuarios">
+            <table id="tabla_usuarios">
+                <thead>
+                    <tr id="tabla_cabecera">
+                        <!-- Aquí se insertarán los encabezados de la tabla -->
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Aquí se insertarán las filas de usuarios -->
+                </tbody>
+            </table>
+            <button onclick="guardarCambiosUsuarios()">Guardar Cambios</button>
+        </div>
+
+    </div>
+    
+
+    <div id="footer"></div>
+
+    <script>
+        function fetchData(url, options = {}) {
+            const token = localStorage.getItem('token');
+            console.log('Token:', token);  // Verificar si el token está presente
+            options.headers = {
+                ...options.headers,
+                'Authorization': 'Bearer ' + token
+            };
+            return fetch(url, options)
+                .then(response => {
+                    if (!response.ok) {
+                        if (response.status === 401) {
+                            // Token inválido, redirigir a la página de inicio de sesión
+                            alert('Sesión expirada o no autorizada. Por favor, inicia sesión nuevamente.');
+                            localStorage.removeItem('token');
+                            window.location.href = '/login';
+                        }
+                        return response.json().then(error => {
+                            throw new Error(error.message || 'Error desconocido');
+                        });
+                    }
+                    return response.json();
+                });
+        }
+
+        function cargarClasesUsuarios() {
+    const fecha = document.getElementById('fecha_clases').value;
+    fetchData(`/admin/clases-usuarios?fecha=${fecha}`)
+        .then(clasesConUsuarios => {
+            const contenedor = document.getElementById('clases_usuarios');
+            contenedor.innerHTML = clasesConUsuarios.map(clase => {
+                return `
+                    <div class="class-container">
+                        <h2>Clase: ${new Date(clase.fecha_hora).toLocaleString()}</h2>
+                        <p>Cupos Disponibles: ${clase.cupos_disponibles}</p>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Email</th>
+                                    <th>Teléfono</th>
+                                    <th>Asistencia</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${clase.usuarios.map(usuario => `
+                                    <tr>
+                                        <td>${usuario.nombre}</td>
+                                        <td>${usuario.email}</td>
+                                        <td>${usuario.telefono}</td>
+                                        <td><input type="checkbox" name="asistencia_${usuario.id}" data-usuario-id="${usuario.id}" data-clase-id="${clase.id}"></td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                        <button onclick="enviarAsistencia(${clase.id})">Enviar Asistencia</button>
+                    </div>
+                `;
+            }).join('');
+        })
+        .catch(error => console.error('Error al cargar clases y usuarios:', error));
+}
+
+
+        function cargarUsuarios() {
+            const selectedFields = Array.from(document.querySelectorAll('#filtros input[type=checkbox]:checked'))
+                .map(checkbox => checkbox.value);
+
+            fetchData('/admin/usuarios')
+                .then(usuarios => {
+                    const thead = document.getElementById('tabla_cabecera');
+                    const tbody = document.querySelector('#tabla_usuarios tbody');
+
+                    // Limpiar encabezados y filas anteriores
+                    thead.innerHTML = '';
+                    tbody.innerHTML = '';
+
+                    // Agregar encabezados según campos seleccionados
+                    thead.innerHTML = selectedFields.map(field => `<th>${field.charAt(0).toUpperCase() + field.slice(1)}</th>`).join('');
+
+                    // Agregar filas de usuarios según campos seleccionados
+                    tbody.innerHTML = usuarios.map(usuario => {
+                        return `
+                            <tr>
+                                ${selectedFields.map(field => {
+                                    if (field === 'comprobante_pago') {
+                                        return `<td><img class="comprobante" src="/path/to/comprobantes/${usuario[field]}" alt="Comprobante de Pago"></td>`;
+                                    } else {
+                                        return `<td><input type="text" value="${usuario[field]}" data-field="${field}" data-id="${usuario.id}"></td>`;
+                                    }
+                                }).join('')}
+                            </tr>
+                        `;
+                    }).join('');
+                })
+                .catch(error => console.error('Error al cargar usuarios:', error));
+        }
+
+        function enviarAsistencia(claseId) {
+            const checkboxes = document.querySelectorAll(`input[data-clase-id="${claseId}"]`);
+            const asistencia = Array.from(checkboxes).map(checkbox => ({
+                usuarioId: checkbox.getAttribute('data-usuario-id'),
+                asistio: checkbox.checked
+            }));
+
+            fetchData('/admin/asistencia', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ claseId, asistencia })
+            })
+                .then(response => {
+                    alert('Asistencia enviada correctamente');
+                })
+                .catch(error => {
+                    console.error('Error al enviar asistencia:', error);
+                    alert('Error al enviar asistencia');
+                });
+        }
+
+        function guardarCambiosUsuarios() {
+            const inputs = document.querySelectorAll('#tabla_usuarios input[data-field]');
+            const cambios = Array.from(inputs).map(input => ({
+                id: input.getAttribute('data-id'),
+                field: input.getAttribute('data-field'),
+                value: input.value
+            }));
+
+            fetchData('/admin/actualizar-usuarios', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ cambios })
+            })
+                .then(response => {
+                    alert('Cambios guardados correctamente');
+                })
+                .catch(error => {
+                    console.error('Error al guardar cambios:', error);
+                    alert('Error al guardar cambios');
+                });
+        }
+
+        function loadComponent(id, url, callback) {
+            fetch(url)
+                .then(response => response.text())
+                .then(data => {
+                    const element = document.getElementById(id);
+                    if (element) {
+                        element.innerHTML = data;
+                        if (callback) callback();
+                    } else {
+                        console.error(`Elemento con id "${id}" no encontrado.`);
+                    }
+                })
+                .catch(error => console.error('Error loading component:', error));
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            loadComponent('menu', 'menu.html', initializeMenu);
+            loadComponent('footer', 'footer.html');
+            loadComponent('sidebar-container', 'sidebar.html');
+
+            function initializeMenu() {
+                const toggleButton = document.getElementById('navbar-toggle');
+                const closeButton = document.getElementById('close-button');
+                const fullscreenMenu = document.getElementById('fullscreen-menu');
+
+                if (toggleButton && closeButton && fullscreenMenu) {
+                    toggleButton.addEventListener('click', () => {
+                        fullscreenMenu.classList.add('open');
+                    });
+
+                    closeButton.addEventListener('click', () => {
+                        fullscreenMenu.classList.remove('open');
+                    });
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>

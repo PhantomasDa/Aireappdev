@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Aire Pilates</title>
+    <link rel="stylesheet" href="style/style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;700;800&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css' rel='stylesheet' />
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js'></script>
+    
+</head>
+<body>
+    <div id="sidebar-container"></div>
+    <div id="menu"></div>
+
+    <main>
+        <div class="slider">
+            <img src="content/slider.png" alt="Pilates en Quito" class="slider-image">
+            <div class="slider-text">
+                <h1>Pilates en Quito</h1>
+                <p>Fuerza y flexibilidad</p>
+                <a href="login.html" class="reserve-button">Reservar clase</a>
+            </div>
+        </div>
+        
+        <section class="about">
+            <h2>Aire Pilates</h2>
+            <p>Somos un estudio de pilates especializado en pilates springboard y mat, nuestras clases son personalizadas con un máximo de 4 personas por clase. Estamos ubicados en la ciudad de Quito, sector La Carolina. Ofrecemos clases online todos los martes y viernes <a href="#">aquí</a>.</p>
+        </section>
+        
+        <section class="carousel">
+            <div class="carousel-container">
+                <button class="carousel-button prev" id="prevBtn">&#10094;</button>
+                <div class="carousel-images">
+                    <img src="content/carrusel1.png" alt="Image 1">
+                    <img src="content/carrusel1.png" alt="Image 2">
+                    <img src="content/carrusel1.png" alt="Image 3">
+                    <img src="content/carrusel1.png" alt="Image 4">
+                    <img src="content/carrusel1.png" alt="Image 5">
+                </div>
+                <button class="carousel-button next" id="nextBtn">&#10095;</button>
+            </div>
+            <div class="carousel-dots">
+                <span class="dot active"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+            </div>
+        </section>
+
+        
+
+        <section class="about">
+            <h2>Calendario</h2>
+            <p>Reserva tus clases personalizadas en nuestras aplicación. Entra y selecciona el horario disponible, Recuerda que tenemos un máximo de 4 cupos por clase.</p>
+            <div id="calendar"></div>
+            <a href="login.html" class="reserve-button">Reservar clases</a>
+        </section>
+
+
+        <section class="products">
+            <h2 class="about">Kit pilatero</h2>
+            <div class="product-carousel">
+                <div class="product-card">
+                    <img src="content/producto.png" alt="Producto 1">
+                    <h3>Producto 1</h3>
+                    <p>$99.50 <span class="original-price">$1128.00</span></p>
+                    <a href="#" class="add-to-cart-button">Agregar al carrito</a>
+                </div>
+                <div class="product-card">
+                    <img src="content/producto.png" alt="Producto 2">
+                    <h3>Producto 2</h3>
+                    <p>$99.50 <span class="original-price">$1128.00</span></p>
+                    <a href="#" class="add-to-cart-button">Agregar al carrito</a>
+                </div>
+                <div class="product-card">
+                    <img src="content/producto.png" alt="Producto 3">
+                    <h3>Producto 3</h3>
+                    <p>$99.50 <span class="original-price">$1128.00</span></p>
+                    <a href="#" class="add-to-cart-button">Agregar al carrito</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="about">
+            <h2>Ubicación</h1>
+            <p>Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto.</p>
+            <iframe class="mapas" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3762.594950850017!2d-99.16707328509522!3d19.432622486886826!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1ff401ede7777%3A0x743f8c29269cbef0!2sParque%20Iztacc%C3%ADhuatl%20(Jos%C3%A9%20Mariano%20Moci%C3%B1o)!5e0!3m2!1sen!2smx!4v1620271996430!5m2!1sen!2smx" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            <button class="reserve-button">Ver mapa</button>
+        </section>
+
+        <section class="blogs">
+            <h2>Blogs</h2>
+            <p>Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto.</p>
+            <div class="blog-post">
+                <img src="content/blog1.png" alt="Blog 1">
+                <p>Granny gives everyone the finger, and other tips from OFFF Barcelona</p>
+            </div>
+            <div class="blog-post">
+                <img src="content/blog1.png" alt="Blog 2">
+                <p>Hello world, or, in other words, why this blog exists</p>
+            </div>
+            <div class="blog-post">
+                <img src="content/blog1.png" alt="Blog 3">
+                <p>Here are some things you should know regarding how we work</p>
+            </div>
+        </section>
+        
+
+
+        <section class="subscribe">
+            <div class="subscribe-bar"></div>
+            <h2>suscribete</h2>
+            <p>If you want relevant updates occasionally, sign up for the private newsletter. Your email is never shared.</p>
+            <form class="subscribe-form">
+                <input type="email" placeholder="Enter your email..." required>
+                <button type="submit">SIGN UP</button>
+            </form>
+        </section>
+        
+
+        
+        
+    </main>
+    
+        <div id="footer"></div>
+    </div>
+   
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            function loadComponent(id, url, callback) {
+                fetch(url)
+                    .then(response => response.text())
+                    .then(data => {
+                        document.getElementById(id).innerHTML = data;
+                        if (callback) callback();
+                    })
+                    .catch(error => console.error('Error loading component:', error));
+            }
+    
+            function initializeMenu() {
+                const toggleButton = document.getElementById('navbar-toggle');
+                const closeButton = document.getElementById('close-button');
+                const fullscreenMenu = document.getElementById('fullscreen-menu');
+    
+                if (toggleButton && closeButton && fullscreenMenu) {
+                    toggleButton.addEventListener('click', () => {
+                        fullscreenMenu.classList.add('open');
+                    });
+    
+                    closeButton.addEventListener('click', () => {
+                        fullscreenMenu.classList.remove('open');
+                    });
+                }
+            }
+    
+            loadComponent('menu', 'menu.html', initializeMenu);
+            loadComponent('footer', 'footer.html');
+            loadComponent('sidebar-container', 'sidebar.html');
+    
+            document.addEventListener("DOMContentLoaded", function() {
+                const toggleButton = document.getElementById('navbar-toggle');
+                const navbarLinks = document.getElementById('navbar-links');
+    
+                toggleButton.addEventListener('click', () => {
+                    for (let i = 0; i < navbarLinks.children.length; i++) {
+                        navbarLinks.children[i].style.display = navbarLinks.children[i].style.display === 'block' ? 'none' : 'block';
+                    }
+                });
+            });
+    
+            document.addEventListener("DOMContentLoaded", function() {
+                let index = 0;
+                const images = document.querySelectorAll(".carousel-images img");
+                const dots = document.querySelectorAll(".carousel-dots .dot");
+    
+                function showImage(n) {
+                    if (n >= images.length) {
+                        index = 0;
+                    } else if (n < 0) {
+                        index = images.length - 1;
+                    } else {
+                        index = n;
+                    }
+    
+                    images.forEach((img, i) => {
+                        img.style.transform = `translateX(-${index * 100}%)`;
+                        dots[i].classList.remove("active");
+                    });
+                    dots[index].classList.add("active");
+                }
+    
+                document.getElementById("prevBtn").addEventListener("click", () => {
+                    showImage(index - 1);
+                });
+    
+                document.getElementById("nextBtn").addEventListener("click", () => {
+                    showImage(index + 1);
+                });
+    
+                dots.forEach((dot, i) => {
+                    dot.addEventListener("click", () => {
+                        showImage(i);
+                    });
+                });
+    
+                showImage(index);
+    
+                // Inicializar FullCalendar
+                var calendarEl = document.getElementById('calendar');
+                var calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: 'dayGridMonth',
+                    locale: 'es'
+                });
+                calendar.render();
+            });
+        });
+
+        
+    </script>
+<script src="./js/sidebar.js"></script>
+
+
+
+
+</body>
+</html>

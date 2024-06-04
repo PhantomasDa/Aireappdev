@@ -1,0 +1,139 @@
+/* Estilos generales */
+body {
+    font-family: 'Montserrat', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #FBF7F2;
+    color: #14110F;
+}
+
+
+.color-ajuste, #user_name {
+    color: black;
+}
+
+/* Contenedor del perfil */
+#profile_container {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+}
+
+#profile_picture {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+#logout {
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/* Calendario */
+.calendar-container {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+#calendario {
+    max-width: 100%;
+    max-height: 60vh;
+    margin: 0 auto;
+}
+
+.selected-date {
+    background-color: #ffcc00;
+}
+
+/* Popups y modales */
+.popup, .modal {
+    display: none;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    overflow-y: auto;
+}
+
+.popup-content, .modal-content {
+    background-color: white;
+    width: 90%;
+    max-width: 500px;
+    margin: 100px auto;
+    padding: 20px;
+    border-radius: 10px;
+    position: relative;
+}
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+#reservaPopup {
+    bottom: -100%;
+    transition: bottom 0.3s;
+}
+
+#horariosPopup, #confirmationModal, #errorModal, #sameDayErrorModal, #dateErrorModal, #reagendarPopup {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+#reagendarPopup .fecha-container {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+#reagendarPopup .fecha-container > * {
+    margin-bottom: 5px;
+}
+
+#reagendarPopup .fecha-container button {
+    width: 100px;
+    padding: 5px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+#reagendarPopup .fecha-container div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.fecha {
+    font-weight: bold;
+}
+
+@media (max-width: 600px) {
+    .popup-content, .modal-content {
+        width: 95%;
+        padding: 10px;
+    }
+
+    .close-button {
+        font-size: 24px;
+    }
+
+    #calendario {
+        max-width: 100%;
+    }
+}
