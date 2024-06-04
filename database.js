@@ -8,8 +8,14 @@ const pool = mysql.createPool({
   connectTimeout: 10000 // Ajuste de tiempo de espera en milisegundos
 });
 
+// Probar la conexión al iniciar la aplicación
+pool.getConnection((err, connection) => {
+  if (err) {
+    console.error('Error de conexión a la base de datos:', err);
+  } else {
+    console.log('Conexión exitosa a la base de datos');
+    connection.release(); // Liberar la conexión si es exitosa
+  }
+});
+
 module.exports = pool.promise();
-
-
-
-
