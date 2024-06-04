@@ -1,10 +1,10 @@
 const mysql = require('mysql2');
 
 const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
+  host: monorail.proxy.rlwy.net,
+  user: root,
+  password: rYINgliljKscMNNaWvuFzWkYMhKtbjXh,
+  database: railway,
   connectTimeout: 10000 // Aumentar el tiempo de espera a 20 segundos
 });
 
