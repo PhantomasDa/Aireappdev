@@ -8,7 +8,7 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
-  connectTimeout: 10000 // Aumenta el tiempo de espera a 10 segundos
+  connectTimeout: 100000 // Aumenta el tiempo de espera a 10 segundos
 });
 
 // Probar la conexión al iniciar la aplicación
