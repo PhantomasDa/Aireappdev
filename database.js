@@ -1,16 +1,21 @@
-import {createPool} from 'mysql2/promise'
-import {
-  DB_HOST,
-  DB_NAME,
-  DB_PASSWORD,
-  DB_USER,
-  DB_PORT
-} from './config.js'
+const mysql = require('mysql2');
 
-export const pool = createPool({
-  user: DB_USER,
-  password: DB_PASSWORD,
-  host: DB_HOST,
-  port: DB_PORT,
-  database: DB_NAME
-})
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  port: process.env.DB_PORT,
+});
+
+// Probar la conexión al iniciar la aplicación
+pool.getConnection((err, connection) => {
+  if (err) {
+    console.error('Error de conexión a la base de datos:', err);
+  } else {
+    console.log('Conexión exitosa a la base de datos');
+    connection.release(); // Liberar la conexión si es exitosa
+  }
+});
+
+module.exports = pool.promise();
