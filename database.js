@@ -1,31 +1,16 @@
-const mysql = require('mysql2');
+import {createPool} from 'mysql2/promise'
+import {
+  DB_HOST,
+  DB_NAME,
+  DB_PASSWORD,
+  DB_USER,
+  DB_PORT
+} from './config.js'
 
-const pool = mysql.createPool({
-  host: "monorail.proxy.rlwy.net",
-  user: "root",
-  password: "rYINgliljKscMNNaWvuFzWkYMhKtbjXh",
-  database: "railway",
-  connectTimeout: 30000 // Aumentar el tiempo de espera a 30 segundos
-});
-
-// Probar la conexión al iniciar la aplicación
-pool.getConnection((err, connection) => {
-  if (err) {
-    console.error('Error de conexión a la base de datos:', err);
-    // Mensajes adicionales para diagnóstico
-    if (err.code === 'ETIMEDOUT') {
-      console.error('Error: La conexión ha superado el tiempo de espera. Verifica la red y el servidor de la base de datos.');
-    } else if (err.code === 'ECONNREFUSED') {
-      console.error('Error: La conexión fue rechazada. Asegúrate de que el servidor de la base de datos esté funcionando y permita conexiones.');
-    } else if (err.code === 'ER_ACCESS_DENIED_ERROR') {
-      console.error('Error: Acceso denegado. Verifica las credenciales de la base de datos.');
-    } else {
-      console.error('Error desconocido:', err);
-    }
-  } else {
-    console.log('Conexión exitosa a la base de datos');
-    connection.release(); // Liberar la conexión si es exitosa
-  }
-});
-
-module.exports = pool.promise();
+export const pool = createPool({
+  user: DB_USER,
+  password: DB_PASSWORD,
+  host: DB_HOST,
+  port: DB_PORT,
+  database: DB_NAME
+})
