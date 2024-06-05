@@ -5,6 +5,7 @@ const pool = mysql.createPool({
   user: "root",
   password: "rYINgliljKscMNNaWvuFzWkYMhKtbjXh",
   database: "railway",
+  connectTimeout: 30000 // Aumentar el tiempo de espera a 30 segundos
 });
 
 // Probar la conexión al iniciar la aplicación
