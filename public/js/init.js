@@ -1,12 +1,12 @@
-// init.js
-
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM fully loaded and parsed');
     initPage();
     setupMenuToggle();
     checkAuthAndLoadProfile();
 });
 
 function initPage() {
+    console.log('Initializing page...');
     actualizarClasesDisponibles();
     cargarProximasClases();
     cargarNombreUsuario();
@@ -14,11 +14,13 @@ function initPage() {
 }
 
 function setupMenuToggle() {
+    console.log('Setting up menu toggle...');
     loadComponent('menu', 'menu.html', initializeMenu);
     loadComponent('footer', 'footer.html');
-    loadComponent('sidebar-container', 'sidebar.html'); // Asegúrate de que este ID existe en tu HTML
+    loadComponent('sidebar-container', 'sidebar.html'); // Asegúrate de que este ID exista en tu HTML
 
     function initializeMenu() {
+        console.log('Initializing menu...');
         const toggleButton = document.getElementById('navbar-toggle');
         const closeButton = document.getElementById('close-button');
         const fullscreenMenu = document.getElementById('fullscreen-menu');
@@ -36,13 +38,14 @@ function setupMenuToggle() {
 }
 
 function checkAuthAndLoadProfile() {
+    console.log('Checking authentication...');
     const token = localStorage.getItem('token');
     if (!token) {
         window.location.href = '/login.html';
         return;
     }
 
-    fetch('http://localhost:3000/profile', {
+    fetch('/profile', {
         method: 'GET',
         headers: {
             'Authorization': 'Bearer ' + token
@@ -57,7 +60,7 @@ function checkAuthAndLoadProfile() {
     })
     .then(data => {
         if (data) {
-            console.log(data);
+            console.log('Profile data:', data);
             // Aquí puedes agregar el código para mostrar la información del usuario en la página
         }
     })

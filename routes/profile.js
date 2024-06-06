@@ -82,9 +82,9 @@ router.post('/reagendar', verifyToken, async (req, res) => {
             return res.status(400).send({ message: 'Has superado el número de veces que puedes reagendar esta clase' });
         }
 
-        // Verificar si ya hay una clase agendada el mismo día
+        // Verificar si ya hay una clase agendada el mismo día en la tabla Reservas
         const [existingClasses] = await db.execute(`
-            SELECT * FROM Clases 
+            SELECT * FROM Reservas 
             WHERE usuario_id = ? AND DATE(fecha_hora) = DATE(?)
         `, [req.user.id, nuevaFecha]);
 
@@ -142,6 +142,7 @@ router.post('/reagendar', verifyToken, async (req, res) => {
         res.status(500).send({ message: 'Error en el servidor', error: error.message });
     }
 });
+
 
 
 // Obtener horarios disponibles filtrados por fecha
@@ -260,5 +261,32 @@ router.get('/fechas-reagendar/:claseId', verifyToken, (req, res) => {
 router.get('/profile', isAuthenticated, (req, res) => {
     res.render('profile', { user: req.session.user });
 });
+router.get('/disponibilidad-clases', verifyToken, async (req, res) => {
+    const { month, year } = req.query;
+
+    try {
+        const [clases] = await db.execute(`
+            SELECT DATE(fecha_hora) as fecha, SUM(cupos_disponibles) as cupos_disponibles
+            FROM Clases
+            WHERE MONTH(fecha_hora) = ? AND YEAR(fecha_hora) = ?
+            GROUP BY DATE(fecha_hora)
+        `, [month, year]);
+
+        console.log('Clases disponibles:', clases); // Depurar resultados de la consulta
+        res.json(clases);
+    } catch (error) {
+        console.error('Error obteniendo disponibilidad de clases:', error);
+        res.status(500).json({ message: 'Error obteniendo disponibilidad de clases' });
+    }
+});
+
+
+
+
+
+
+
+
+
 
 module.exports = router;

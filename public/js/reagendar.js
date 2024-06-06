@@ -78,5 +78,49 @@ function confirmarReagendar(claseId, nuevaFecha) {
             console.error('Error al verificar las clases del mismo día:', error);
             alert('Error al verificar las clases del mismo día: ' + error.message);
         });
+}function confirmarReagendar(claseId, nuevaFecha) {
+    fetchData(`/perfil/proximas-clases`)
+        .then(clases => {
+            const nuevaFechaObj = new Date(nuevaFecha);
+            const mismoDia = clases.some(clase => {
+                const claseFechaObj = new Date(clase.fecha_hora);
+                return claseFechaObj.toDateString() === nuevaFechaObj.toDateString();
+            });
+
+            if (mismoDia) {
+                alert('No puedes reagendar para el mismo día en que ya tienes una clase.');
+                return;
+            }
+
+            // Procede con la solicitud de reagendar si no hay clases el mismo día
+            fetch('/perfil/reagendar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                },
+                body: JSON.stringify({ claseId, nuevaFecha: nuevaFechaObj.toISOString() })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(error => { throw new Error(error.message); });
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert(data.message);
+                cerrarReagendarPopup();
+                cargarProximasClases(); // Asegúrate de que esta función esté disponible globalmente o impórtala si es necesario.
+            })
+            .catch(error => {
+                console.error('Error al reagendar la clase:', error);
+                alert('Error al reagendar la clase: ' + error.message);
+            });
+        })
+        .catch(error => {
+            console.error('Error al verificar las clases del mismo día:', error);
+            alert('Error al verificar las clases del mismo día: ' + error.message);
+        });
 }
+
 

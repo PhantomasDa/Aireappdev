@@ -14,7 +14,7 @@ function cargarProximasClases() {
         .then(clases => {
             const proximasClasesDiv = document.getElementById('proximas_clases');
             proximasClasesDiv.innerHTML = clases.length === 0 
-                ? '<p>No tienes clases reservadas.</p>' 
+                ? '<p style="color:black">No tienes clases reservadas.</p>' 
                 : clases.map((clase, index) => {
                     const fechaClase = new Date(clase.fecha_hora);
                     const opcionesFecha = { weekday: 'long', month: 'long', day: 'numeric' };
@@ -27,18 +27,25 @@ function cargarProximasClases() {
         })
         .catch(error => console.error('Error al cargar las próximas clases:', error));
 }
-
 function actualizarClasesDisponibles() {
     fetchData('/perfil/clases-disponibles')
         .then(data => {
             const clasesDisponibles = data.clases_disponibles;
             document.getElementById('clases_disponibles').textContent = `Número de clases disponibles: ${clasesDisponibles}`;
+
+            const ahora = new Date();
+            const opcionesFecha = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const opcionesHora = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+            const fechaFormateada = ahora.toLocaleDateString('es-ES', opcionesFecha);
+            const horaFormateada = ahora.toLocaleTimeString('es-ES', opcionesHora);
+            document.getElementById('informacion_extra').textContent = `Hoy ${fechaFormateada}, ${horaFormateada} :)` ;
         })
         .catch(error => {
             console.error('Error al cargar las clases disponibles:', error);
             document.getElementById('clases_disponibles').textContent = 'Error al cargar las clases disponibles';
         });
 }
+
 
 function manejarErrorReserva(error) {
     console.error('Error al reservar la clase:', error);
@@ -114,36 +121,3 @@ document.addEventListener('DOMContentLoaded', () => {
     const proximasClasesContainer = document.getElementById('proximas_clases');
     proximasClasesContainer.parentNode.insertBefore(header, proximasClasesContainer);
 });
-
-async function marcarDisponibilidad(start, end) {
-    const month = start.getMonth() + 1;
-    const year = start.getFullYear();
-    try {
-        const response = await fetch(`/profile/disponibilidad-clases?month=${month}&year=${year}`, {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
-        });
-        if (!response.ok) {
-            throw new Error('Error en la solicitud al servidor');
-        }
-        const disponibilidad = await response.json();
-
-        const dias = document.querySelectorAll('.fc-daygrid-day');
-        dias.forEach(dia => {
-            const dateStr = dia.getAttribute('data-date');
-            const fecha = disponibilidad.find(d => d.fecha === dateStr);
-            if (fecha) {
-                if (fecha.cupos_disponibles > 0) {
-                    dia.classList.add('cupos-disponibles');
-                } else {
-                    dia.classList.add('sin-cupos');
-                }
-            } else {
-                dia.classList.add('sin-actividades');
-            }
-        });
-    } catch (error) {
-        console.error('Error obteniendo disponibilidad de clases:', error);
-    }
-}

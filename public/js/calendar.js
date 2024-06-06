@@ -42,7 +42,7 @@ async function marcarDisponibilidad(start, end) {
     const month = start.getMonth() + 1;
     const year = start.getFullYear();
     try {
-        const response = await fetch(`/disponibilidad-clases?month=${month}&year=${year}`, {
+        const response = await fetch(`/profile/disponibilidad-clases?month=${month}&year=${year}`, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
             }
@@ -51,22 +51,30 @@ async function marcarDisponibilidad(start, end) {
             throw new Error('Error en la solicitud al servidor');
         }
         const disponibilidad = await response.json();
+        console.log('Disponibilidad recibida:', disponibilidad); // Depurar respuesta
 
         const dias = document.querySelectorAll('.fc-daygrid-day');
         dias.forEach(dia => {
             const dateStr = dia.getAttribute('data-date');
-            const fecha = disponibilidad.find(d => d.fecha === dateStr);
+            console.log('Fecha del día en el calendario:', dateStr); // Depurar fechas de los días
+            
+            const fecha = disponibilidad.find(d => moment(d.fecha).format('YYYY-MM-DD') === dateStr);
             if (fecha) {
-                if (fecha.cupos_disponibles > 0) {
+                console.log(`Fecha: ${dateStr}, Cupos disponibles: ${fecha.cupos_disponibles}`); // Depurar datos de cupos
+                if (parseInt(fecha.cupos_disponibles) > 0) {
                     dia.classList.add('cupos-disponibles');
+                    console.log(`Fecha ${dateStr} con cupos disponibles`); // Depurar cupos disponibles
                 } else {
-                    dia.classList.add('sin-cupos');
+                    dia.classList.add('sin-actividades');
+                    console.log(`Fecha ${dateStr} sin cupos`); // Depurar sin cupos
                 }
             } else {
                 dia.classList.add('sin-actividades');
+                console.log(`Fecha ${dateStr} sin actividades`); // Depurar sin actividades
             }
         });
     } catch (error) {
         console.error('Error obteniendo disponibilidad de clases:', error);
     }
 }
+

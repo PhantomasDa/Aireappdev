@@ -382,14 +382,74 @@ cursor: pointer;
     margin-right: 30px;
 }
 
-.cupos-disponibles {
-    background-color: #90EE90 !important; /* Verde */
+.fc-daygrid-day.cupos-disponibles {
+    background-color: #90EE90 ; /* Verde */
 }
 
-.sin-cupos {
-    background-color: #FF6347 !important; /* Rojo */
+.fc-daygrid-day.sin-cupos {
+    background-color: #FF6347 ; /* Rojo */
 }
 
-.sin-actividades {
-    background-color: #D3D3D3 !important; /* Gris */
+.fc-daygrid-day.sin-actividades {
+    background-color: #D3D3D3 ; /* Gris */
+}
+
+#calendar-legend {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.legend-color {
+    width: 20px;
+    height: 15px;
+    display: inline-block;
+}
+
+.legend-color.cupos-disponibles {
+    background-color: #d4edda; /* Verde */
+}
+
+.legend-color.sin-actividades {
+    background-color: #D3D3D3; /* Gris */
+}
+
+
+/* Estilos para pantallas grandes */
+@media only screen and (min-width: 1024px) {
+    .popup.desktop-popup {
+        display: none;
+    }
+
+    .desktop-popup.active {
+        display: block;
+        position: fixed;
+        top: 20%;
+        left: 50%;
+        transform: translate(-50%, -20%);
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        z-index: 2;
+        width: 40%;
+        max-width: 600px;
+        max-height: 80vh; /* Ajusta la altura máxima */
+        overflow-y: auto; /* Habilita el desplazamiento vertical */
+    }
+
+    .popup-content {
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+    .modal-content--oculto{
+        display: none;
+    }
 }
