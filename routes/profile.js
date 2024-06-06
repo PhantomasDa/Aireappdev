@@ -82,6 +82,17 @@ router.post('/reagendar', verifyToken, async (req, res) => {
             return res.status(400).send({ message: 'Has superado el número de veces que puedes reagendar esta clase' });
         }
 
+        // Verificar si ya hay una clase agendada el mismo día
+        const [existingClasses] = await db.execute(`
+            SELECT * FROM Clases 
+            WHERE usuario_id = ? AND DATE(fecha_hora) = DATE(?)
+        `, [req.user.id, nuevaFecha]);
+
+        if (existingClasses.length > 0) {
+            console.log('Error: Ya tienes una clase registrada en esta fecha');
+            return res.status(400).send({ message: 'No puedes reagendar para el mismo día en que ya tienes una clase.' });
+        }
+
         const nuevaFechaSimplificada = new Date(nuevaFecha);
         nuevaFechaSimplificada.setSeconds(0, 0);
 
