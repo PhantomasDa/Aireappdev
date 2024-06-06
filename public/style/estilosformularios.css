@@ -71,3 +71,28 @@ input::placeholder, select::placeholder {
     background-repeat: no-repeat; /* Evita que la imagen se repita */
     text-align: center;
   }
+
+
+  
+
+  label {
+    display: block;
+}
+   
+
+#progress-container {
+    width: 100%;
+    background-color: #f3f3f3;
+    border-radius: 25px;
+}
+
+#progress-bar {
+    width: 0%;
+    height: 15px;
+    background-color: #4caf50;
+    
+    text-align: center;
+    line-height: 15px;
+    color: white;
+    transition: width 0.4s;
+}

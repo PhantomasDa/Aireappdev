@@ -10,78 +10,15 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;700;800&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
-<style>
-    label {
-    display: block;
-}
-    input::placeholder, select::placeholder {
-        font-family: 'Montserrat';
-        font-weight: 900;
-    }
-
-.package-option {
-    padding: 10px;
-    margin: 5px;
-    border: 1px solid #ccc;
-    cursor: pointer;
-}
-
-.package-option.selected {
-    background-color: #f0f0f0;
-    border-color: #000;
-}
-
-#packageDescription {
-    margin-top: 20px;
-}
-
-#packageDescription h3 {
-    margin-bottom: 10px;
-}
-
-#packageDescription p {
-    font-size: 16px;
-    line-height: 1.5;
-}
-#packageText
-{
-    color: #000;
-}
-.form-section-bg{
-    display: block;
-    min-height: 832px;
-}
-.my-container-bg{
-  background-image: url('./content/bg.png');
-  background-size: cover; /* Ajusta el tamaño de la imagen para cubrir toda el área */
-  background-position: center; /* Centra la imagen en el contenedor */
-  background-repeat: no-repeat; /* Evita que la imagen se repita */
-    text-align: center;
-}
-/* Estilos generales para el campo de fecha */
-input[type="date"] {
-    width: 100%;
-    padding: 10px;
-    margin: 5px 0;
-    box-sizing: border-box;
-    font-size: 16px;
-}
-
-/* Estilos específicos para dispositivos móviles */
-@media (max-width: 600px) {
-    input[type="date"] {
-        font-size: 14px;
-    }
-}
-
-
-
-</style>
 <body>
     <div id="menu"></div>
+    <div id="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+    
     <div class="my-container-bg">
         <div class="form-section-bg" id="registerForm1">
-            <h2 style="margin: 50px 10px 30px 10px;">Registro de Usuario</h2>
+            <h2 style="margin: 50px 10px 30px 10px; color:white;">Registro de Usuario</h2>
             <form id="registerForm1Form">
                 <input type="text" id="nombre" name="nombre" placeholder=" Nombre"  required><br>
                 <span id="nombreError" class="error"></span><br>
@@ -255,10 +192,19 @@ input[type="date"] {
     <div id="footer"></div>
     <div id="sidebar-container"></div>
 
-    <script src="scripts/menu.js"></script>
-    <script src="scripts/register.js"></script>
+
     <script>
-        function submitForm() {
+function updateProgressBar(step) {
+    const totalSteps = 8; // Actualiza este número si tienes más o menos pasos
+    const percentage = (step / totalSteps) * 100;
+    const progressBar = document.getElementById('progress-bar');
+    progressBar.style.width = percentage + '%';
+    progressBar.textContent = Math.round(percentage) + '%';
+}
+
+        
+
+function submitForm() {
     const nombre = document.getElementById('nombre').value;
     const email = document.getElementById('email').value;
     const telefono = document.getElementById('telefono').value;
@@ -324,6 +270,9 @@ input[type="date"] {
             document.getElementById('registerForm1').style.display = 'none';
             document.getElementById('registerForm2').style.display = 'block';
             document.getElementById('userId2').value = data.userId; // Asignar el userId al segundo formulario
+
+            // Actualizar barra de progreso
+            updateProgressBar(2); // Cambiar a 2 para el segundo paso
         }
     })
     .catch(error => {
@@ -332,151 +281,164 @@ input[type="date"] {
     });
 }
 
+       
+function submitForm2() {
+    const form = document.getElementById('registerForm2Form');
+    const formData = new FormData(form);
 
-        function submitForm2() {
-            const form = document.getElementById('registerForm2Form');
-            const formData = new FormData(form);
-
-            fetch('/register/step2', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => {
-                if (!response.ok) {
-                    return response.json().then(err => { throw new Error(err.message); });
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.message !== 'Foto de perfil actualizada exitosamente') {
-                    document.getElementById('fotoPerfilError').textContent = data.message;
-                } else {
-                    // Avanzar al siguiente paso
-                    document.getElementById('registerForm2').style.display = 'none';
-                    document.getElementById('registerForm3').style.display = 'block';
-                    document.getElementById('userId3').value = document.getElementById('userId2').value; // Asignar el userId al tercer formulario
-                }
-            })
-            .catch(error => {
-                console.error('Error durante la subida de la foto de perfil:', error);
-                document.getElementById('fotoPerfilError').textContent = 'Error durante la subida de la foto de perfil';
-            });
+    fetch('/register/step2', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => { throw new Error(err.message); });
         }
+        return response.json();
+    })
+    .then(data => {
+        if (data.message !== 'Foto de perfil actualizada exitosamente') {
+            document.getElementById('fotoPerfilError').textContent = data.message;
+        } else {
+            // Avanzar al siguiente paso
+            document.getElementById('registerForm2').style.display = 'none';
+            document.getElementById('registerForm3').style.display = 'block';
+            document.getElementById('userId3').value = document.getElementById('userId2').value; // Asignar el userId al tercer formulario
 
-        function submitForm3() {
-            const userId = document.getElementById('userId3').value;
-            const pregunta1 = document.getElementById('pregunta1').value;
-            const pregunta2 = document.getElementById('pregunta2').value;
-            const pregunta3 = document.getElementById('pregunta3').value;
-            const pregunta4 = document.getElementById('pregunta4').value;
-
-            if (!pregunta1 || !pregunta2 || !pregunta3 || !pregunta4) {
-                // Asegúrate de que todas las preguntas sean respondidas
-                return;
-            }
-
-            fetch('/register/step3', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ userId, pregunta1, pregunta2, pregunta3, pregunta4 })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    return response.json().then(err => { throw new Error(err.message); });
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.message !== 'Cuestionario guardado exitosamente') {
-                    document.getElementById('cuestionarioError').textContent = data.message;
-                } else {
-                    // Avanzar al siguiente paso
-                    document.getElementById('registerForm3').style.display = 'none';
-                    document.getElementById('registerForm4').style.display = 'block';
-                    document.getElementById('userId4').value = document.getElementById('userId3').value; // Asignar el userId al cuarto formulario
-                }
-            })
-            .catch(error => {
-                console.error('Error durante el cuestionario:', error);
-                document.getElementById('cuestionarioError').textContent = 'Error durante el cuestionario';
-            });
+            // Actualizar barra de progreso
+            updateProgressBar(3); // Cambiar a 3 para el tercer paso
         }
+    })
+    .catch(error => {
+        console.error('Error durante la subida de la foto de perfil:', error);
+        document.getElementById('fotoPerfilError').textContent = 'Error durante la subida de la foto de perfil';
+    });
+}
 
-        function submitForm4() {
-            const userId = document.getElementById('userId4').value;
-            const lesiones = document.getElementById('lesiones').value;
-            const motivacion = document.getElementById('motivacion').value;
+function submitForm3() {
+    const userId = document.getElementById('userId3').value;
+    const pregunta1 = document.getElementById('pregunta1').value;
+    const pregunta2 = document.getElementById('pregunta2').value;
+    const pregunta3 = document.getElementById('pregunta3').value;
+    const pregunta4 = document.getElementById('pregunta4').value;
 
-            fetch('/register/step4', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ userId, lesiones, motivacion })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    return response.json().then(err => { throw new Error(err.message); });
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.message !== 'Registro completado exitosamente') {
-                    document.getElementById('finalError').textContent = data.message;
-                } else {
-                    // Avanzar al siguiente paso
-                    document.getElementById('registerForm4').style.display = 'none';
-                    document.getElementById('registerForm5').style.display = 'block';
-                    document.getElementById('userId5').value = document.getElementById('userId4').value; // Asignar el userId al quinto formulario
-                }
-            })
-            .catch(error => {
-                console.error('Error durante la finalización del registro:', error);
-                document.getElementById('finalError').textContent = 'Error durante la finalización del registro';
-            });
+    if (!pregunta1 || !pregunta2 || !pregunta3 || !pregunta4) {
+        // Asegúrate de que todas las preguntas sean respondidas
+        return;
+    }
+
+    fetch('/register/step3', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId, pregunta1, pregunta2, pregunta3, pregunta4 })
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => { throw new Error(err.message); });
         }
+        return response.json();
+    })
+    .then(data => {
+        if (data.message !== 'Cuestionario guardado exitosamente') {
+            document.getElementById('cuestionarioError').textContent = data.message;
+        } else {
+            // Avanzar al siguiente paso
+            document.getElementById('registerForm3').style.display = 'none';
+            document.getElementById('registerForm4').style.display = 'block';
+            document.getElementById('userId4').value = document.getElementById('userId3').value; // Asignar el userId al cuarto formulario
 
-        function submitForm5() {
-            const modalidad = document.getElementById('modalidad').value;
-            const userId = document.getElementById('userId5').value;
-
-            if (!modalidad) {
-                document.getElementById('modalidadError').textContent = 'Por favor, seleccione una modalidad.';
-                return;
-            }
-
-            const modalidad_online = (modalidad === 'online') ? 'si' : 'no';
-            const modalidad_presencial = (modalidad === 'presencial') ? 'si' : 'no';
-
-            fetch('/register/step5', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ userId, modalidad_online, modalidad_presencial })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    return response.json().then(err => { throw new Error(err.message); });
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.message !== 'Modalidad guardada exitosamente') {
-                    document.getElementById('modalidadError').textContent = data.message;
-                } else {
-                    document.getElementById('registerForm5').style.display = 'none';
-                    document.getElementById('registerForm6').style.display = 'block';
-                    document.getElementById('userId6').value = document.getElementById('userId5').value;
-                }
-            })
-            .catch(error => {
-                console.error('Error durante la selección de modalidad:', error);
-                document.getElementById('modalidadError').textContent = 'Error durante la selección de modalidad';
-            });
+            // Actualizar barra de progreso
+            updateProgressBar(4); // Cambiar a 4 para el cuarto paso
         }
+    })
+    .catch(error => {
+        console.error('Error durante el cuestionario:', error);
+        document.getElementById('cuestionarioError').textContent = 'Error durante el cuestionario';
+    });
+}
+
+function submitForm4() {
+    const userId = document.getElementById('userId4').value;
+    const lesiones = document.getElementById('lesiones').value;
+    const motivacion = document.getElementById('motivacion').value;
+
+    fetch('/register/step4', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId, lesiones, motivacion })
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => { throw new Error(err.message); });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.message !== 'Registro completado exitosamente') {
+            document.getElementById('finalError').textContent = data.message;
+        } else {
+            // Avanzar al siguiente paso
+            document.getElementById('registerForm4').style.display = 'none';
+            document.getElementById('registerForm5').style.display = 'block';
+            document.getElementById('userId5').value = document.getElementById('userId4').value; // Asignar el userId al quinto formulario
+
+            // Actualizar barra de progreso
+            updateProgressBar(5); // Cambiar a 5 para el quinto paso
+        }
+    })
+    .catch(error => {
+        console.error('Error durante la finalización del registro:', error);
+        document.getElementById('finalError').textContent = 'Error durante la finalización del registro';
+    });
+}
+
+function submitForm5() {
+    const modalidad = document.getElementById('modalidad').value;
+    const userId = document.getElementById('userId5').value;
+
+    if (!modalidad) {
+        document.getElementById('modalidadError').textContent = 'Por favor, seleccione una modalidad.';
+        return;
+    }
+
+    const modalidad_online = (modalidad === 'online') ? 'si' : 'no';
+    const modalidad_presencial = (modalidad === 'presencial') ? 'si' : 'no';
+
+    fetch('/register/step5', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId, modalidad_online, modalidad_presencial })
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => { throw new Error(err.message); });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.message !== 'Modalidad guardada exitosamente') {
+            document.getElementById('modalidadError').textContent = data.message;
+        } else {
+            document.getElementById('registerForm5').style.display = 'none';
+            document.getElementById('registerForm6').style.display = 'block';
+            document.getElementById('userId6').value = document.getElementById('userId5').value;
+
+            // Actualizar barra de progreso
+            updateProgressBar(6); // Cambiar a 6 para el sexto paso
+        }
+    })
+    .catch(error => {
+        console.error('Error durante la selección de modalidad:', error);
+        document.getElementById('modalidadError').textContent = 'Error durante la selección de modalidad';
+    });
+}
+
 
         function selectPackage(paquete) {
     document.getElementById('paquete').value = paquete;
@@ -522,6 +484,9 @@ function submitForm6() {
             document.getElementById('registerForm6').style.display = 'none';
             document.getElementById('registerForm7').style.display = 'block';
             document.getElementById('usuario_id_billing').value = document.getElementById('userId6').value;
+
+            // Actualizar barra de progreso
+            updateProgressBar(7); // Cambiar a 7 para el séptimo paso
         }
     })
     .catch(error => {
@@ -530,14 +495,22 @@ function submitForm6() {
     });
 }
 
+function submitBillingForm() {
+    const usuario_id = document.getElementById('usuario_id_billing').value;
+    const cedula_ruc = document.getElementById('cedula_ruc').value;
+    const direccion1 = document.getElementById('direccion1').value;
+    const direccion2 = document.getElementById('direccion2').value;
+    const telefono = document.getElementById('telefono_billing').value;
+    const nombre_completo = document.getElementById('nombre_completo').value;
+    const razon_social = document.getElementById('razon_social').value;
+    const otro_dato = document.getElementById('otro_dato').value;
 
-function submitForm6() {
-    const form = document.getElementById('registerForm6Form');
-    const formData = new FormData(form);
-
-    fetch('/register/step6', {
+    fetch('/register/billing', {
         method: 'POST',
-        body: formData
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ usuario_id, cedula_ruc, direccion1, direccion2, telefono, nombre_completo, razon_social, otro_dato })
     })
     .then(response => {
         if (!response.ok) {
@@ -546,56 +519,23 @@ function submitForm6() {
         return response.json();
     })
     .then(data => {
-        if (data.message !== 'Verificación de pago exitosa') {
-            document.getElementById('comprobantePagoError').textContent = data.message;
+        if (data.message !== 'Datos de facturación guardados exitosamente') {
+            document.getElementById('billingError').textContent = data.message;
         } else {
-            document.getElementById('registerForm6').style.display = 'none';
-            document.getElementById('registerForm7').style.display = 'block';
-            document.getElementById('usuario_id_billing').value = document.getElementById('userId6').value;
+            // Registro completado
+            window.location.href = '/login';
+            alert('Registro completado. Por favor, ingresa con tu usuario y clave.');
+
+            // Actualizar barra de progreso
+            updateProgressBar(8); // Cambiar a 8 para el paso final
         }
     })
     .catch(error => {
-        console.error('Error durante la verificación del pago:', error);
-        document.getElementById('comprobantePagoError').textContent = 'Error durante la verificación del pago';
+        console.error('Error durante la inserción de datos de facturación:', error);
+        document.getElementById('billingError').textContent = 'Error durante la inserción de datos de facturación';
     });
 }
-        function submitBillingForm() {
-            const usuario_id = document.getElementById('usuario_id_billing').value;
-            const cedula_ruc = document.getElementById('cedula_ruc').value;
-            const direccion1 = document.getElementById('direccion1').value;
-            const direccion2 = document.getElementById('direccion2').value;
-            const telefono = document.getElementById('telefono_billing').value;
-            const nombre_completo = document.getElementById('nombre_completo').value;
-            const razon_social = document.getElementById('razon_social').value;
-            const otro_dato = document.getElementById('otro_dato').value;
 
-            fetch('/register/billing', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ usuario_id, cedula_ruc, direccion1, direccion2, telefono, nombre_completo, razon_social, otro_dato })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    return response.json().then(err => { throw new Error(err.message); });
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.message !== 'Datos de facturación guardados exitosamente') {
-                    document.getElementById('billingError').textContent = data.message;
-                } else {
-                    // Registro completado
-                    window.location.href = '/login';
-                    alert('Registro completado. Por favor, ingresa con tu usuario y clave.');
-                }
-            })
-            .catch(error => {
-                console.error('Error durante la inserción de datos de facturación:', error);
-                document.getElementById('billingError').textContent = 'Error durante la inserción de datos de facturación';
-            });
-        }
 
         function loadComponent(id, url, callback) {
             fetch(url)
