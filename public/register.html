@@ -47,7 +47,7 @@
                     <option value=""> Genero</option>
                     <option value="hombre"> Hombre</option>
                     <option value="mujer">Mujer</option>
-                    <option value="otro"> Otro</option>
+                    <option value="otro">Prefiero no decir</option>
                 </select><br>
                 <span id="generoError" class="error"></span><br>
             
@@ -224,7 +224,7 @@ function submitForm() {
         return;
     }
 
-    if (telefono.length < 10) {
+    if (telefono.length < 8) {
         document.getElementById('telefonoError').textContent = 'Por favor, ingrese un teléfono válido.';
         return;
     }
