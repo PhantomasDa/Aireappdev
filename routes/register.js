@@ -75,36 +75,14 @@ router.post('/step2', upload.single('foto_perfil'), [
         res.status(500).json({ message: 'Error al actualizar foto de perfil' });
     }
 });
-
-// Paso 3: Guardar Cuestionario
+// Paso 3: Guardar Cuestionario y Datos Relevantes
 router.post('/step3', [
     body('userId').isInt(),
     body('pregunta1').isIn(['si', 'no']),
     body('pregunta2').isIn(['si', 'no']),
     body('pregunta3').isIn(['si', 'no']),
-    body('pregunta4').isIn(['si', 'no'])
-], async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-    }
-
-    const { userId, pregunta1, pregunta2, pregunta3, pregunta4 } = req.body;
-
-    try {
-        await db.execute('UPDATE Usuarios SET pregunta1 = ?, pregunta2 = ?, pregunta3 = ?, pregunta4 = ? WHERE id = ?', [pregunta1, pregunta2, pregunta3, pregunta4, userId]);
-
-        res.status(200).json({ message: 'Cuestionario guardado exitosamente' });
-    } catch (error) {
-        console.error('Error al guardar cuestionario:', error);
-        res.status(500).json({ message: 'Error al guardar cuestionario' });
-    }
-});
-
-// Paso 4: Guardar Lesiones y Motivaciones
-router.post('/step4', [
-    body('userId').isInt(),
-    body('lesiones').isLength({ min: 1 }).trim().escape(),
+    body('pregunta4').isIn(['si', 'no']),
+    body('lesiones').optional({ checkFalsy: true }).trim().escape(),
     body('motivacion').isLength({ min: 1 }).trim().escape()
 ], async (req, res) => {
     const errors = validationResult(req);
@@ -112,33 +90,34 @@ router.post('/step4', [
         return res.status(400).json({ errors: errors.array() });
     }
 
-    const { userId, lesiones, motivacion } = req.body;
+    const { userId, pregunta1, pregunta2, pregunta3, pregunta4, lesiones, motivacion } = req.body;
 
     try {
-        await db.execute('UPDATE Usuarios SET lesiones = ?, motivacion = ? WHERE id = ?', [lesiones, motivacion, userId]);
+        await db.execute('UPDATE Usuarios SET pregunta1 = ?, pregunta2 = ?, pregunta3 = ?, pregunta4 = ?, lesiones = ?, motivacion = ? WHERE id = ?', 
+            [pregunta1, pregunta2, pregunta3, pregunta4, lesiones, motivacion, userId]);
 
-        res.status(200).json({ message: 'Registro completado exitosamente' });
+        res.status(200).json({ message: 'Cuestionario y datos relevantes guardados exitosamente' });
     } catch (error) {
-        console.error('Error al guardar lesiones y motivaciones:', error);
-        res.status(500).json({ message: 'Error al guardar lesiones y motivaciones' });
+        console.error('Error al guardar cuestionario y datos relevantes:', error);
+        res.status(500).json({ message: 'Error al guardar cuestionario y datos relevantes' });
     }
 });
+
 
 // Paso 5: Guardar Modalidad
 router.post('/step5', [
     body('userId').isInt(),
-    body('modalidad_online').isIn(['si', 'no']).optional(),
-    body('modalidad_presencial').isIn(['si', 'no']).optional()
+    body('modalidad').isIn(['online', 'presencial'])
 ], async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
 
-    const { userId, modalidad_online, modalidad_presencial } = req.body;
+    const { userId, modalidad } = req.body;
 
     try {
-        await db.execute('UPDATE Usuarios SET modalidad_online = ?, modalidad_presencial = ? WHERE id = ?', [modalidad_online, modalidad_presencial, userId]);
+        await db.execute('UPDATE Usuarios SET modalidad = ? WHERE id = ?', [modalidad, userId]);
 
         res.status(200).json({ message: 'Modalidad guardada exitosamente' });
     } catch (error) {
@@ -147,17 +126,24 @@ router.post('/step5', [
     }
 });
 
-// Paso 6: Guardar Paquete y Comprobante de Pago
+// Paso 6: Guardar Paquete, Comprobante de Pago y Datos de Facturación
 router.post('/step6', upload.single('comprobante_pago'), [
     body('userId').isInt(),
-    body('paquete').isIn(['Paquete basico', 'Paquete completo', 'Paquete premium'])
+    body('paquete').isIn(['Paquete básico', 'Paquete completo', 'Paquete premium']),
+    body('cedula_ruc').optional().trim().escape(),
+    body('direccion1').optional().trim().escape(),
+    body('direccion2').optional().trim().escape(),
+    body('telefono').optional().trim().escape(),
+    body('nombre_completo').optional().trim().escape(),
+    body('razon_social').optional().trim().escape(),
+    body('otro_dato').optional().trim().escape()
 ], async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
 
-    const { userId, paquete } = req.body;
+    const { userId, paquete, cedula_ruc, direccion1, direccion2, telefono, nombre_completo, razon_social, otro_dato } = req.body;
     const comprobantePago = req.file ? req.file.filename : null;
 
     if (!comprobantePago) {
@@ -166,7 +152,7 @@ router.post('/step6', upload.single('comprobante_pago'), [
 
     let clasesDisponibles;
     switch (paquete) {
-        case 'Paquete basico':
+        case 'Paquete básico':
             clasesDisponibles = 4;
             break;
         case 'Paquete completo':
@@ -182,38 +168,15 @@ router.post('/step6', upload.single('comprobante_pago'), [
     try {
         await db.execute('UPDATE Usuarios SET paquete = ?, comprobante_pago = ?, clases_disponibles = ? WHERE id = ?', [paquete, comprobantePago, clasesDisponibles, userId]);
 
+        if (cedula_ruc && direccion1 && telefono && nombre_completo) {
+            await db.execute('INSERT INTO Datos_de_facturacion (usuario_id, cedula_ruc, direccion1, direccion2, telefono, nombre_completo, razon_social, otro_dato) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', 
+                [userId, cedula_ruc, direccion1, direccion2, telefono, nombre_completo, razon_social, otro_dato]);
+        }
+
         res.status(200).json({ message: 'Verificación de pago exitosa' });
     } catch (error) {
-        console.error('Error al guardar paquete y comprobante de pago:', error);
-        res.status(500).json({ message: 'Error al guardar paquete y comprobante de pago' });
-    }
-});
-
-// Paso 7: Guardar Datos de Facturación
-router.post('/billing', [
-    body('usuario_id').isInt(),
-    body('cedula_ruc').isLength({ min: 1 }).trim().escape(),
-    body('direccion1').isLength({ min: 1 }).trim().escape(),
-    body('direccion2').optional().trim().escape(),
-    body('telefono').isLength({ min: 8 }).trim().escape(),
-    body('nombre_completo').isLength({ min: 1 }).trim().escape(),
-    body('razon_social').optional().trim().escape(),
-    body('otro_dato').optional().trim().escape()
-], async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-    }
-
-    const { usuario_id, cedula_ruc, direccion1, direccion2, telefono, nombre_completo, razon_social, otro_dato } = req.body;
-
-    try {
-        await db.execute('INSERT INTO Datos_de_facturacion (usuario_id, cedula_ruc, direccion1, direccion2, telefono, nombre_completo, razon_social, otro_dato) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', [usuario_id, cedula_ruc, direccion1, direccion2, telefono, nombre_completo, razon_social, otro_dato]);
-
-        res.status(200).json({ message: 'Datos de facturación guardados exitosamente' });
-    } catch (error) {
-        console.error('Error al insertar datos de facturación:', error);
-        res.status(500).json({ message: 'Error al insertar datos de facturación' });
+        console.error('Error al guardar paquete, comprobante de pago y datos de facturación:', error);
+        res.status(500).json({ message: 'Error al guardar paquete, comprobante de pago y datos de facturación' });
     }
 });
 
