@@ -20,10 +20,10 @@
         <div class="form-section-bg" id="registerForm1">
             <h2 style="margin: 50px 10px 30px 10px; color:white;">Registro de Usuario</h2>
             <form id="registerForm1Form">
-                <input type="text" id="nombre" name="nombre" placeholder=" Nombre"  required><br>
+                <input type="text" id="nombre" name="nombre" placeholder=" Nombre Completo"  required><br>
                 <span id="nombreError" class="error"></span><br>
             
-                <input type="email" id="email" name="email" placeholder="Email"  required><br>
+                <input type="email" id="email" name="email" placeholder="Correo electrónico"  required><br>
                 <span id="emailError" class="error"></span><br>
             
                 <input type="tel" id="telefono" name="telefono" placeholder=" Teléfono" required><br>
@@ -32,12 +32,12 @@
                 <input type="password" id="password" name="password" placeholder=" Contraseña"  required><br>
                 <span id="passwordError" class="error"></span><br>
 
-                <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirmar clave"  required><br>
+                <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirmar Contraseña"  required><br>
                     <span id="confirmPasswordError" class="error"></span><br>
          
                     
 
-                    <label for="fecha_nacimiento">Fecha de Nacimiento:</label>
+                    <label for="fecha_nacimiento" style="color: white; max-width: 100%;">Fecha de Nacimiento:</label>
                         <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required><br>
                         <span id="fechaNacimientoError" class="error"></span><br>
 
@@ -59,7 +59,7 @@
             <h2>Sube tu Foto de Perfil</h2>
             <form id="registerForm2Form" enctype="multipart/form-data">
                 <input type="hidden" id="userId2" name="userId">
-                <label for="foto_perfil">Foto de Perfil:</label>
+                <label for="foto_perfil">Comparte una foto desde tu carrete o tomate una foto para tu perfil pilßatero</label>
                 <input type="file" id="foto_perfil" name="foto_perfil" required><br><br>
                 <span id="fotoPerfilError" class="error"></span><br>
                 
@@ -69,6 +69,8 @@
 
         <div class="form-section-bg" id="registerForm3" style="display: none;">
             <h2>Cuestionario</h2>
+            <label>Completa las siguientes preguntas que nos ayudaran con informacion necesaria para comenzar con nuestras clases de pilates</label><br>
+
             <form id="registerForm3Form">
                 <input type="hidden" id="userId3" name="userId">
                 <label for="pregunta1">¿Has practicado Pilates antes?</label><br>
@@ -92,7 +94,7 @@
                     <option value="no">No</option>
                 </select><br><br>
 
-                <label for="pregunta4">¿Sigues alguna dieta o plan de alimentación que debamos tener en cuenta para tu entrenamiento?</label><br>
+                <label for="pregunta4">¿Sigues algun plan de alimentación que debamos tener en cuenta para tu entrenamiento?</label><br>
                 <select id="pregunta4" name="pregunta4" required>
                     <option value="">Seleccione</option>
                     <option value="si">Sí</option>
@@ -118,7 +120,7 @@
         </div>
 
         <div class="form-section-bg" id="registerForm5" style="display: none;">
-            <h2>Escoger Modalidad</h2>
+            <h2>Como quieres Pilatear</h2>
             <form id="registerForm5Form">
                 <input type="hidden" id="userId5" name="userId">
                 <label for="modalidad">Modalidad:</label>
@@ -135,9 +137,9 @@
         <div class="form-section-bg" id="registerForm6" style="display: none;">
             <h2>Selección de Paquete</h2>
             <div id="packageOptions">
-                <div class="package-option" data-package="Paquete básico" onclick="selectPackage('Paquete básico')">Paquete básico</div>
-                <div class="package-option" data-package="Paquete completo" onclick="selectPackage('Paquete completo')">Paquete completo</div>
-                <div class="package-option" data-package="Paquete premium" onclick="selectPackage('Paquete premium')">Paquete premium</div>
+                <div class="package-option" data-package="Paquete básico" onclick="selectPackage('Paquete básico')">1 vez por semana</div>
+                <div class="package-option" data-package="Paquete completo" onclick="selectPackage('Paquete completo')">2 veces por semana</div>
+                <div class="package-option" data-package="Paquete premium" onclick="selectPackage('Paquete premium')">3 veces por semana</div>
             </div><br><br>
         
             <div id="packageDescription">
@@ -146,11 +148,17 @@
             </div><br><br>
         
             <div>
-                <p>Información de cuenta: Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                <p style="color: black;">Información de cuenta:
+                    N• 2204332302 ahorro<br>
+                    1757209158<br>
+                    Ariadna Labarca<br>
+                    Pichincha<br>
+                    ariadna2400@gmail.com<br>
+                </p>
                 <form id="registerForm6Form" enctype="multipart/form-data">
                     <input type="hidden" id="userId6" name="userId">
                     <input type="hidden" id="paquete" name="paquete">
-                    <label for="comprobante_pago">Comprobante de Pago:</label>
+                    <label for="comprobante_pago" style="color: black;">Compartenos una foto o screenshot de tu pago </label>
                     <input type="file" id="comprobante_pago" name="comprobante_pago" required><br><br>
                     <span id="comprobantePagoError" class="error"></span><br>
                     
@@ -194,6 +202,14 @@
 
 
     <script>
+
+function scrollToTop() {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+}
+
 function updateProgressBar(step) {
     const totalSteps = 8; // Actualiza este número si tienes más o menos pasos
     const percentage = (step / totalSteps) * 100;
@@ -273,6 +289,7 @@ function submitForm() {
 
             // Actualizar barra de progreso
             updateProgressBar(2); // Cambiar a 2 para el segundo paso
+            scrollToTop()
         }
     })
     .catch(error => {
@@ -351,6 +368,7 @@ function submitForm3() {
 
             // Actualizar barra de progreso
             updateProgressBar(4); // Cambiar a 4 para el cuarto paso
+            scrollToTop()
         }
     })
     .catch(error => {
@@ -388,6 +406,7 @@ function submitForm4() {
 
             // Actualizar barra de progreso
             updateProgressBar(5); // Cambiar a 5 para el quinto paso
+            scrollToTop()
         }
     })
     .catch(error => {
@@ -431,6 +450,7 @@ function submitForm5() {
 
             // Actualizar barra de progreso
             updateProgressBar(6); // Cambiar a 6 para el sexto paso
+            scrollToTop()
         }
     })
     .catch(error => {
@@ -450,13 +470,13 @@ function submitForm5() {
     const packageText = document.getElementById('packageText');
     switch(paquete) {
         case 'Paquete básico':
-            packageText.textContent = 'Descripción del Paquete básico: Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+            packageText.textContent = 'Es un paquete de 4 clases, tiene una duracion exacta de un mes. Ejemplo tu paque empieza el 5 de junio y se vence el 5 de julio ';
             break;
         case 'Paquete completo':
-            packageText.textContent = 'Descripción del Paquete completo: Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+            packageText.textContent = 'Es un paquete de 8 clases, tiene una duracion exacta de un mes. Ejemplo tu paque empieza el 5 de junio y se vence el 5 de julio ';
             break;
         case 'Paquete premium':
-            packageText.textContent = 'Descripción del Paquete premium: Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+            packageText.textContent = 'Es un paquete de 12 clases, tiene una duracion exacta de un mes. Ejemplo tu paque empieza el 5 de junio y se vence el 5 de julio ';
             break;
         default:
             packageText.textContent = 'Seleccione un paquete para ver la descripción.';
@@ -487,6 +507,7 @@ function submitForm6() {
 
             // Actualizar barra de progreso
             updateProgressBar(7); // Cambiar a 7 para el séptimo paso
+            scrollToTop()
         }
     })
     .catch(error => {
@@ -528,6 +549,7 @@ function submitBillingForm() {
 
             // Actualizar barra de progreso
             updateProgressBar(8); // Cambiar a 8 para el paso final
+            scrollToTop()
         }
     })
     .catch(error => {
