@@ -5,12 +5,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Usuarios</title>
     <link rel="stylesheet" href="style/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
     <link rel="stylesheet" href="./style/estilosformularios.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;700;800&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <style>
+            .info-box {
+        background-color: transparent;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .payment-icons i {
+        font-size: 24px;
+        color: white;
+        margin-right: 10px;
+    }
+
+
+     .password-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+        max-width: 70%;
+    margin-left: 20px;
+    }
+
+    .password-container input {
+        width: 100%;
+        padding-right: 30px; /* Espacio para el icono del ojo */
+    }
+
+    .password-container i {
+        position: absolute;
+        right: 10px;
+        cursor: pointer;
+        color: #B2987E; /* Marrón claro */
+        top: 11px;
+
+    }
     .option-container {
         display: flex;
         justify-content: center;
@@ -71,33 +108,44 @@
             
                 <input type="tel" id="telefono" name="telefono" placeholder=" Teléfono" required><br>
                 <span id="telefonoError" class="error"></span><br>
-            
-                <input type="password" id="password" name="password" placeholder=" Contraseña"  required><br>
+
+                <div class="password-container">
+                    <input type="password" id="password" name="password" placeholder=" Contraseña" required>
+                    <i class="fas fa-eye" id="togglePassword" onclick="togglePasswordVisibility('password', 'togglePassword')"></i>
+                </div>
                 <span id="passwordError" class="error"></span><br>
 
-                <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirmar Contraseña"  required><br>
-                    <span id="confirmPasswordError" class="error"></span><br>
-         
-                    
+                <div class="password-container">
+                    <input type="password" id="confirm_password" name="confirm_password" placeholder=" Confirmar Contraseña" required>
+                    <i class="fas fa-eye" id="toggleConfirmPassword" onclick="togglePasswordVisibility('confirm_password', 'toggleConfirmPassword')"></i>
+                </div>
+                <span id="confirmPasswordError" class="error"></span><br>
 
-                    <label for="fecha_nacimiento" style="color: white; max-width: 100%;">Fecha de Nacimiento:</label>
-                        <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required><br>
-                        <span id="fechaNacimientoError" class="error"></span><br>
+                <label for="fecha_nacimiento" style="color: white; max-width: 100%;">Fecha de Nacimiento:</label>
+                <input type="text" id="fecha_nacimiento" name="fecha_nacimiento" required><br>
+                <span id="fechaNacimientoError" class="error"></span><br>
 
-
-            
-                <select id="genero" name="genero" required>
-                    <option value=""> Genero</option>
-                    <option value="hombre"> Hombre</option>
-                    <option value="mujer">Mujer</option>
-                    <option value="otro">Prefiero no decir</option>
-                </select><br>
+                <div class="option-container">
+                    <div class="option" id="option-hombre" onclick="selectGender('hombre')">
+                        <i class="fas fa-male"></i>
+                        <p>Hombre</p>
+                    </div>
+                    <div class="option selected" id="option-mujer" onclick="selectGender('mujer')">
+                        <i class="fas fa-female"></i>
+                        <p>Mujer</p>
+                    </div>
+                    <div class="option" id="option-otro" onclick="selectGender('otro')">
+                        <i class="fas fa-genderless"></i>
+                        <p>Prefiero no decir</p>
+                    </div>
+                </div>
+                <input type="hidden" id="genero" name="genero" value="mujer">
                 <span id="generoError" class="error"></span><br>
-            
+
                 <button type="button" class="button" onclick="submitForm()">Completar</button>
             </form>
         </div>
-
+   
         <div class="form-section-bg" id="registerForm2" style="display: none;">
             <h2>Sube tu Foto de Perfil</h2>
             <form id="registerForm2Form" enctype="multipart/form-data">
@@ -179,78 +227,128 @@
                 <button type="button" class="button" onclick="submitForm5()">Continuar</button>
             </form>
         </div>
-        
-
         <div class="form-section-bg" id="registerForm6" style="display: none;">
             <h2>Selección de Paquete</h2>
-            <div id="packageOptions">
-                <div class="package-option" data-package="Paquete básico" onclick="selectPackage('Paquete básico')">1 vez por semana</div>
-                <div class="package-option" data-package="Paquete completo" onclick="selectPackage('Paquete completo')">2 veces por semana</div>
-                <div class="package-option" data-package="Paquete premium" onclick="selectPackage('Paquete premium')">3 veces por semana</div>
-            </div><br><br>
-        
-            <div id="packageDescription">
-                <h3>Descripción del Paquete</h3>
-                <p id="packageText">Seleccione un paquete para ver la descripción.</p>
-            </div><br><br>
-        
-            <div>
-                <p style="color: black;">Información de cuenta:
-                    N• 2204332302 ahorro<br>
-                    1757209158<br>
-                    Ariadna Labarca<br>
-                    Pichincha<br>
-                    ariadna2400@gmail.com<br>
-                </p>
-                <form id="registerForm6Form" enctype="multipart/form-data">
-                    <input type="hidden" id="userId6" name="userId">
-                    <input type="hidden" id="paquete" name="paquete">
-                    <label for="comprobante_pago" style="color: black;">Compartenos una foto o screenshot de tu pago </label>
-                    <input type="file" id="comprobante_pago" name="comprobante_pago" required><br><br>
-                    <span id="comprobantePagoError" class="error"></span><br>
-                    
-                    <input type="checkbox" id="showBilling" onclick="toggleBillingForm()"> Agregar datos de facturación<br><br>
-        
-                    <div id="billingForm" style="display: none;">
-                        <h2>Datos de Facturación</h2>
-                        <input type="hidden" id="usuario_id_billing" name="usuario_id">
-                        <label for="cedula_ruc">Cédula o RUC:</label>
-                        <input type="text" id="cedula_ruc" name="cedula_ruc" placeholder="Cedula o Ruc"><br><br>
-                        
-                        <label for="direccion1">Dirección 1:</label>
-                        <input type="text" id="direccion1" name="direccion1" placeholder="Direccion"><br><br>
-                        
-                        <label for="direccion2">Dirección 2:</label>
-                        <input type="text" id="direccion2" name="direccion2" placeholder="Direcion 2"><br><br>
-                        
-                        <label for="telefono_billing">Teléfono:</label>
-                        <input type="text" id="telefono_billing" name="telefono" placeholder="telefono"><br><br>
-                        
-                        <label for="nombre_completo">Nombre Completo:</label>
-                        <input type="text" id="nombre_completo" name="nombre_completo" placeholder="Nombre completo"><br><br>
-                        
-                        <label for="razon_social">Razón Social:</label>
-                        <input type="text" id="razon_social" name="razon_social" placeholder="Razon Social"><br><br>
-                        
-                        <label for="otro_dato">Otro Dato:</label>
-                        <input type="text" id="otro_dato" name="otro_dato" placeholder="extra"><br><br>
-                    </div>
-        
-                    <button type="button" class="button" onclick="submitForm6()">Verificar Pago</button>
-                </form>
+            <div class="option-container">
+                <div class="option" id="option-Paquete básico" onclick="selectPackage('Paquete básico')">
+                    <p>1 vez por semana</p>
+                </div>
+                <div class="option" id="option-Paquete completo" onclick="selectPackage('Paquete completo')">
+                    <p>2 veces por semana</p>
+                </div>
+                <div class="option" id="option-Paquete premium" onclick="selectPackage('Paquete premium')">
+                    <p>3 veces por semana</p>
+                </div>
             </div>
+            <input type="hidden" id="paquete" name="paquete" value="Paquete completo">
+            
+            
+            
+            <div id="packageDescription" class="info-box">
+                <h3>Descripción del Paquete</h3>
+                <ul id="packageDetails">
+                    <!-- Detalles del paquete se mostrarán aquí -->
+                </ul>
+                <p id="packageCost"></p>
+            </div>
+            
+            <div class="info-box">
+                <p style="color: black;">Información de cuenta:</p>
+                <ul>
+                    <li>N• 2204332302 ahorro</li>
+                    <li>1757209158</li>
+                    <li>Ariadna Labarca</li>
+                    <li>Pichincha</li>
+                    <li>ariadna2400@gmail.com</li>
+                </ul>
+                <div class="payment-icons">
+                    <i class="fas fa-credit-card"></i>
+                    <i class="fas fa-money-bill-wave"></i>
+                    <i class="fas fa-wallet"></i>
+                </div>
+                <p>Aceptamos todo tipo de pago.</p>
+            </div>
+        
+            <form id="registerForm6Form" enctype="multipart/form-data">
+                <input type="hidden" id="userId6" name="userId">
+                <label for="comprobante_pago" style="color: black;">Compártenos una foto o screenshot de tu pago</label>
+                <input type="file" id="comprobante_pago" name="comprobante_pago" required><br><br>
+                <span id="comprobantePagoError" class="error"></span><br>
+                
+                <input type="checkbox" id="showBilling" onclick="toggleBillingForm()"> Agregar datos de facturación<br><br>
+        
+                <div id="billingForm" style="display: none;">
+                    <h2>Datos de Facturación</h2>
+                    <input type="hidden" id="usuario_id_billing" name="usuario_id">
+                    <label for="cedula_ruc">Cédula o RUC:</label>
+                    <input type="text" id="cedula_ruc" name="cedula_ruc" placeholder="Cedula o Ruc"><br><br>
+                    
+                    <label for="direccion1">Dirección 1:</label>
+                    <input type="text" id="direccion1" name="direccion1" placeholder="Direccion"><br><br>
+                    
+                    <label for="direccion2">Dirección 2:</label>
+                    <input type="text" id="direccion2" name="direccion2" placeholder="Dirección 2"><br><br>
+                    
+                    <label for="telefono_billing">Teléfono:</label>
+                    <input type="text" id="telefono_billing" name="telefono" placeholder="Teléfono"><br><br>
+                    
+                    <label for="nombre_completo">Nombre Completo:</label>
+                    <input type="text" id="nombre_completo" name="nombre_completo" placeholder="Nombre completo"><br><br>
+                    
+                    <label for="razon_social">Razón Social:</label>
+                    <input type="text" id="razon_social" name="razon_social" placeholder="Razón Social"><br><br>
+                    
+                    <label for="otro_dato">Otro Dato:</label>
+                    <input type="text" id="otro_dato" name="otro_dato" placeholder="extra"><br><br>
+                </div>
+        
+                <button type="button" class="button" onclick="submitForm6()">Verificar Pago</button>
+            </form>
         </div>
+        
 
         <div id="successMessage" style="display: none; color: green;">
             <h2>Te has registrado con éxito</h2>
             <p>Serás redirigido al inicio de sesión en 5 segundos...</p>
         </div>
+
+    </div>
         
     <div id="footer"></div>
     <div id="sidebar-container"></div>
 
-
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
+
+function togglePasswordVisibility(inputId, toggleId) {
+        const passwordInput = document.getElementById(inputId);
+        const toggleIcon = document.getElementById(toggleId);
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            toggleIcon.classList.remove('fa-eye');
+            toggleIcon.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            toggleIcon.classList.remove('fa-eye-slash');
+            toggleIcon.classList.add('fa-eye');
+        }
+    }
+
+flatpickr("#fecha_nacimiento", {
+            dateFormat: "Y-m-d",
+            allowInput: false
+        });
+
+        function selectGender(genero) {
+            document.getElementById('genero').value = genero;
+
+            const options = document.querySelectorAll('.option');
+            options.forEach(option => option.classList.remove('selected'));
+
+            const selectedOption = document.getElementById(`option-${genero}`);
+            selectedOption.classList.add('selected');
+        }
+
 function toggleLesiones() {
         const pregunta2 = document.getElementById('pregunta2').value;
         const lesionesSection = document.getElementById('lesionesSection');
@@ -489,29 +587,10 @@ function submitForm3() {
         });
     }
 
-        function selectPackage(paquete) {
-    document.getElementById('paquete').value = paquete;
-    const packageOptions = document.querySelectorAll('.package-option');
-    packageOptions.forEach(option => option.classList.remove('selected'));
-    document.querySelector(`[data-package="${paquete}"]`).classList.add('selected');
+    
 
-    // Mostrar la descripción del paquete seleccionado
-    const packageText = document.getElementById('packageText');
-    switch(paquete) {
-        case 'Paquete básico':
-            packageText.textContent = 'Es un paquete de 4 clases, tiene una duracion exacta de un mes. Ejemplo tu paque empieza el 5 de junio y se vence el 5 de julio ';
-            break;
-        case 'Paquete completo':
-            packageText.textContent = 'Es un paquete de 8 clases, tiene una duracion exacta de un mes. Ejemplo tu paque empieza el 5 de junio y se vence el 5 de julio ';
-            break;
-        case 'Paquete premium':
-            packageText.textContent = 'Es un paquete de 12 clases, tiene una duracion exacta de un mes. Ejemplo tu paque empieza el 5 de junio y se vence el 5 de julio ';
-            break;
-        default:
-            packageText.textContent = 'Seleccione un paquete para ver la descripción.';
-    }
-}
-function toggleBillingForm() {
+
+    function toggleBillingForm() {
         const billingForm = document.getElementById('billingForm');
         if (document.getElementById('showBilling').checked) {
             billingForm.style.display = 'block';
@@ -520,56 +599,194 @@ function toggleBillingForm() {
         }
     }
 
-    function submitForm6() {
-        const form = document.getElementById('registerForm6Form');
-        const formData = new FormData(form);
-        const showBilling = document.getElementById('showBilling').checked;
+    // Inicializar con el paquete "completo" preseleccionado
+    document.addEventListener("DOMContentLoaded", function() {
+        selectPackage('completo');
+    });
 
-        if (showBilling) {
-            const cedula_ruc = document.getElementById('cedula_ruc').value;
-            const direccion1 = document.getElementById('direccion1').value;
-            const direccion2 = document.getElementById('direccion2').value;
-            const telefono = document.getElementById('telefono_billing').value;
-            const nombre_completo = document.getElementById('nombre_completo').value;
-            const razon_social = document.getElementById('razon_social').value;
-            const otro_dato = document.getElementById('otro_dato').value;
 
-            formData.append('cedula_ruc', cedula_ruc);
-            formData.append('direccion1', direccion1);
-            formData.append('direccion2', direccion2);
-            formData.append('telefono', telefono);
-            formData.append('nombre_completo', nombre_completo);
-            formData.append('razon_social', razon_social);
-            formData.append('otro_dato', otro_dato);
-        }
+    function selectPackage(paquete) {
+    const paqueteInput = document.getElementById('paquete');
+    const selectedOption = document.getElementById(`option-${paquete}`);
 
-        fetch('/register/step6', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(err => { throw new Error(err.message); });
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.message !== 'Verificación de pago exitosa') {
-                document.getElementById('comprobantePagoError').textContent = data.message;
-            } else {
-                document.getElementById('registerForm6').style.display = 'none';
-                document.getElementById('successMessage').style.display = 'block';
-
-                setTimeout(() => {
-                    window.location.href = '/login';
-                }, 5000);
-            }
-        })
-        .catch(error => {
-            console.error('Error durante la verificación del pago:', error);
-            document.getElementById('comprobantePagoError').textContent = 'Error durante la verificación del pago';
-        });
+    // Verificar si los elementos existen
+    if (!paqueteInput) {
+        console.error('No se encontró el input hidden para el paquete.');
+        return;
     }
+
+    if (!selectedOption) {
+        console.error(`No se encontró el elemento para el paquete: ${paquete}`);
+        return;
+    }
+
+    paqueteInput.value = paquete;
+
+    const options = document.querySelectorAll('.option');
+    options.forEach(option => option.classList.remove('selected'));
+
+    selectedOption.classList.add('selected');
+
+    const packageDetails = document.getElementById('packageDetails');
+    const packageCost = document.getElementById('packageCost');
+
+    switch(paquete) {
+        case 'Paquete básico':
+            packageDetails.innerHTML = `
+                <li>4 clases por mes</li>
+                <li>Duración de un mes</li>
+                <li>Acceso a contenido exclusivo online</li>
+            `;
+            packageCost.textContent = "Costo: $30";
+            break;
+        case 'Paquete completo':
+            packageDetails.innerHTML = `
+                <li>8 clases por mes</li>
+                <li>Duración de un mes</li>
+                <li>Acceso a contenido exclusivo online</li>
+                <li>Soporte personalizado</li>
+            `;
+            packageCost.textContent = "Costo: $50";
+            break;
+        case 'Paquete premium':
+            packageDetails.innerHTML = `
+                <li>12 clases por mes</li>
+                <li>Duración de un mes</li>
+                <li>Acceso a contenido exclusivo online</li>
+                <li>Soporte personalizado</li>
+                <li>Sesiones adicionales de coaching</li>
+            `;
+            packageCost.textContent = "Costo: $70";
+            break;
+        default:
+            packageDetails.innerHTML = '';
+            packageCost.textContent = '';
+    }
+}
+
+function submitForm6() {
+    const form = document.getElementById('registerForm6Form');
+    const formData = new FormData(form);
+    const showBilling = document.getElementById('showBilling').checked;
+
+    const paquete = document.getElementById('paquete').value;
+    formData.append('paquete', paquete);
+
+    if (showBilling) {
+        const cedula_ruc = document.getElementById('cedula_ruc').value;
+        const direccion1 = document.getElementById('direccion1').value;
+        const direccion2 = document.getElementById('direccion2').value;
+        const telefono = document.getElementById('telefono_billing').value;
+        const nombre_completo = document.getElementById('nombre_completo').value;
+        const razon_social = document.getElementById('razon_social').value;
+        const otro_dato = document.getElementById('otro_dato').value;
+
+        formData.append('cedula_ruc', cedula_ruc);
+        formData.append('direccion1', direccion1);
+        formData.append('direccion2', direccion2);
+        formData.append('telefono', telefono);
+        formData.append('nombre_completo', nombre_completo);
+        formData.append('razon_social', razon_social);
+        formData.append('otro_dato', otro_dato);
+    }
+
+    // Log the FormData content
+    formData.forEach((value, key) => {
+        console.log(key + ': ' + value);
+    });
+
+    fetch('/register/step6', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => { 
+                console.log('Error del servidor:', err);
+                throw new Error(err.message); 
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.message !== 'Verificación de pago exitosa') {
+            document.getElementById('comprobantePagoError').textContent = data.message;
+        } else {
+            document.getElementById('registerForm6').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'block';
+
+            setTimeout(() => {
+                window.location.href = '/login';
+            }, 5000);
+        }
+    })
+    .catch(error => {
+        console.error('Error durante la verificación del pago:', error);
+        document.getElementById('comprobantePagoError').textContent = 'Error durante la verificación del pago';
+    });
+}
+
+function submitForm6() {
+    const form = document.getElementById('registerForm6Form');
+    const formData = new FormData(form);
+    const showBilling = document.getElementById('showBilling').checked;
+
+    const paquete = document.getElementById('paquete').value;
+    formData.append('paquete', paquete);
+
+    if (showBilling) {
+        const cedula_ruc = document.getElementById('cedula_ruc').value;
+        const direccion1 = document.getElementById('direccion1').value;
+        const direccion2 = document.getElementById('direccion2').value;
+        const telefono = document.getElementById('telefono_billing').value;
+        const nombre_completo = document.getElementById('nombre_completo').value;
+        const razon_social = document.getElementById('razon_social').value;
+        const otro_dato = document.getElementById('otro_dato').value;
+
+        formData.append('cedula_ruc', cedula_ruc);
+        formData.append('direccion1', direccion1);
+        formData.append('direccion2', direccion2);
+        formData.append('telefono', telefono);
+        formData.append('nombre_completo', nombre_completo);
+        formData.append('razon_social', razon_social);
+        formData.append('otro_dato', otro_dato);
+    }
+
+    // Log the FormData content
+    formData.forEach((value, key) => {
+        console.log(key + ': ' + value);
+    });
+
+    fetch('/register/step6', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => { 
+                console.log('Error del servidor:', err);
+                throw new Error(err.message); 
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.message !== 'Verificación de pago exitosa') {
+            document.getElementById('comprobantePagoError').textContent = data.message;
+        } else {
+            document.getElementById('registerForm6').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'block';
+
+            setTimeout(() => {
+                window.location.href = '/login';
+            }, 5000);
+        }
+    })
+    .catch(error => {
+        console.error('Error durante la verificación del pago:', error);
+        document.getElementById('comprobantePagoError').textContent = 'Error durante la verificación del pago';
+    });
+}
 
         function loadComponent(id, url, callback) {
             fetch(url)

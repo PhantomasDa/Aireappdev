@@ -697,7 +697,7 @@ label {
 input, select, textarea {
     width: calc(100% - 40px);
     padding: 10px 20px;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     border: 1px solid #CCC;
     border-radius: 10px; /* Bordes redondeados */
     box-sizing: border-box;
