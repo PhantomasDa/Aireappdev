@@ -9,7 +9,110 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css' rel='stylesheet' />
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js'></script>
-    
+    <style>
+      /* Carousel styles */
+.carousel-container {
+    position: relative;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.carousel-images {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+    width: 500%; /* Asumiendo que hay 5 imágenes, ajusta según sea necesario */
+}
+
+.carousel-images img {
+    width: 20%; /* Cada imagen ocupa el 20% del ancho del contenedor de imágenes */
+    flex-shrink: 0;
+    height: auto;
+}
+
+.carousel-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.carousel-button.prev {
+    left: 10px;
+}
+
+.carousel-button.next {
+    right: 10px;
+}
+
+.carousel-dots {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.carousel-dots .dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin: 0 5px;
+    background-color: #bbb;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.carousel-dots .dot.active {
+    background-color: #717171;
+}
+
+/* Ajustes para escritorio */
+@media (min-width: 768px) {
+    .carousel-container {
+        max-width: 800px; /* Ancho máximo del carrusel en pantallas grandes */
+        margin: auto; /* Centrar el carrusel en pantallas grandes */
+    }
+
+    .carousel-images img {
+        height: 400px; /* Ajusta la altura de las imágenes para escritorio */
+    }
+}
+
+
+    /* Estilos para el slider y el efecto parallax */
+.slider {
+    position: relative;
+    height: 100vh; /* Ajusta la altura según sea necesario */
+    overflow: hidden;
+}
+
+.slider::before {
+    content: '';
+    background-image: url('content/slider.png');
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    z-index: -1; /* Para que el contenido del slider esté encima */
+}
+
+.slider-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    text-align: center;
+    z-index: 1;
+}
+    </style>
 </head>
 <body>
     <div id="sidebar-container"></div>
@@ -17,7 +120,6 @@
 
     <main>
         <div class="slider">
-            <img src="content/slider.png" alt="Pilates en Quito" class="slider-image">
             <div class="slider-text">
                 <h1>Aire Pilates Quito</h1>
                 <p>Fuerza y flexibilidad</p>
@@ -25,10 +127,10 @@
             </div>
         </div>
         
+        
         <section class="about">
             <h2>Nuestro Estudio</h2>
             <p>Bienvenido a Aire Pilates, tu estudio especializado en Springboard y Mat Pilates. Nuestras clases son personalizadas, con un máximo de 4 personas por sesión, lo que garantiza una supervisión detallada y un seguimiento efectivo de tus objetivos. En Aire Pilates, damos la bienvenida a todxs, desde los 13 años en adelante, incluyendo personas con lesiones. Estamos ubicados en la hermosa ciudad de Quito, en el sector de La Carolina. Además, ofrecemos clases online todos los martes y viernes. ¡Reserva tu clase <a href="#" style="color: black;">aquí</a> y comienza tu viaje hacia un cuerpo más fuerte y equilibrado!</p>
-
         </section>
         
         <section class="carousel">
@@ -36,10 +138,10 @@
                 <button class="carousel-button prev" id="prevBtn">&#10094;</button>
                 <div class="carousel-images">
                     <img src="content/carrusel1.png" alt="Image 1">
-                    <img src="content/carrusel1.png" alt="Image 2">
-                    <img src="content/carrusel1.png" alt="Image 3">
-                    <img src="content/carrusel1.png" alt="Image 4">
-                    <img src="content/carrusel1.png" alt="Image 5">
+                    <img src="content/carrusel2.png" alt="Image 2">
+                    <img src="content/carrusel3.png" alt="Image 3">
+                    <img src="content/carrusel4.png" alt="Image 4">
+                    <img src="content/carrusel5.png" alt="Image 5">
                 </div>
                 <button class="carousel-button next" id="nextBtn">&#10095;</button>
             </div>
@@ -52,23 +154,18 @@
             </div>
         </section>
 
-        
-
         <section class="about">
             <h2>Nuestras Clases</h2>
             <p>Nuestras clases en Aire Pilates tienen una duración de entre 50 y 55 minutos, durante los cuales trabajamos todo el cuerpo y realizamos estiramientos. Nos enfocamos en la respiración coordinada con los movimientos, buscando siempre conectar el cuerpo y la mente a lo largo de todo el ejercicio.
 
                 Para reservar una clase, simplemente regístrate en nuestra aplicación y agenda tus sesiones durante la semana en el horario que más te convenga.</p>
-                            <div id="calendar"></div>
             <a href="login.html" class="reserve-button">Reservar clases</a>
         </section>
-
 
         <section class="about">
             <h2>Nuestros Productos</h2>
             <p>En Aire Pilates, nos apasiona promover el ejercicio y el movimiento. Aquí encontrarás una lista de productos que creemos te ayudarán a mantener tu estilo de vida activo y saludable.</p>
         </section>
-
 
         <section class="products">
             <div class="product-carousel">
@@ -105,11 +202,11 @@
             <h2>Cortitos</h2>
             <p>Este es un espacio donde nos desahogamos, compartimos ideas, recetas, fotos, consejitos y mucha información valiosa para ustedes, mis pilaterxs.</p>
             <div class="blog-post">
-                <img src="content/blog1.png" alt="Blog 1">
+                <img src="content/blog2.webp" alt="Blog 1">
                 <p>5 consejos para empezar a hacer pialtes</p>
             </div>
             <div class="blog-post">
-                <img src="content/blog1.png" alt="Blog 2">
+                <img src="content/blog3.webp" alt="Blog 2">
                 <p>Cuales son los beneficios del metodo pilates</p>
             </div>
             <div class="blog-post">
@@ -118,8 +215,6 @@
             </div>
         </section>
         
-
-
         <section class="subscribe">
             <div class="subscribe-bar"></div>
             <h2>suscribete</h2>
@@ -129,17 +224,14 @@
                 <button type="submit">SIGN UP</button>
             </form>
         </section>
-        
-
-        
-        
     </main>
     
-        <div id="footer"></div>
-    </div>
-   
+    <div id="footer"></div>
+
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            console.log('DOM fully loaded and parsed');
+            
             function loadComponent(id, url, callback) {
                 fetch(url)
                     .then(response => response.text())
@@ -170,70 +262,102 @@
             loadComponent('footer', 'footer.html');
             loadComponent('sidebar-container', 'sidebar.html');
     
-            document.addEventListener("DOMContentLoaded", function() {
-                const toggleButton = document.getElementById('navbar-toggle');
-                const navbarLinks = document.getElementById('navbar-links');
+            const toggleButton = document.getElementById('navbar-toggle');
+            const navbarLinks = document.getElementById('navbar-links');
     
+            if (toggleButton && navbarLinks) {
                 toggleButton.addEventListener('click', () => {
                     for (let i = 0; i < navbarLinks.children.length; i++) {
                         navbarLinks.children[i].style.display = navbarLinks.children[i].style.display === 'block' ? 'none' : 'block';
                     }
                 });
-            });
+            } else {
+                console.error('Toggle button or navbar links not found');
+            }
     
-            document.addEventListener("DOMContentLoaded", function() {
-                let index = 0;
-                const images = document.querySelectorAll(".carousel-images img");
-                const dots = document.querySelectorAll(".carousel-dots .dot");
+            let index = 0;
+            const images = document.querySelectorAll(".carousel-images img");
+            const dots = document.querySelectorAll(".carousel-dots .dot");
+            const carouselImagesContainer = document.querySelector('.carousel-images');
     
-                function showImage(n) {
-                    if (n >= images.length) {
-                        index = 0;
-                    } else if (n < 0) {
-                        index = images.length - 1;
-                    } else {
-                        index = n;
-                    }
-    
-                    images.forEach((img, i) => {
-                        img.style.transform = `translateX(-${index * 100}%)`;
-                        dots[i].classList.remove("active");
-                    });
-                    dots[index].classList.add("active");
+            function showImage(n) {
+                if (n >= images.length) {
+                    index = 0;
+                } else if (n < 0) {
+                    index = images.length - 1;
+                } else {
+                    index = n;
                 }
     
-                document.getElementById("prevBtn").addEventListener("click", () => {
+                const offset = -index * 100 / images.length; // Ajusta el desplazamiento según la cantidad de imágenes
+                carouselImagesContainer.style.transform = `translateX(${offset}%)`;
+    
+                images.forEach((img, i) => {
+                    dots[i].classList.remove("active");
+                });
+                dots[index].classList.add("active");
+            }
+    
+            const prevBtn = document.getElementById("prevBtn");
+            const nextBtn = document.getElementById("nextBtn");
+    
+            if (prevBtn && nextBtn) {
+                prevBtn.addEventListener('click', () => {
+                    console.log('Prev button clicked');
                     showImage(index - 1);
                 });
     
-                document.getElementById("nextBtn").addEventListener("click", () => {
+                nextBtn.addEventListener('click', () => {
+                    console.log('Next button clicked');
                     showImage(index + 1);
                 });
+            } else {
+                console.error('Prev or Next button not found');
+            }
     
-                dots.forEach((dot, i) => {
-                    dot.addEventListener("click", () => {
-                        showImage(i);
-                    });
+            dots.forEach((dot, i) => {
+                dot.addEventListener('click', () => {
+                    console.log('Dot clicked', i);
+                    showImage(i);
+                });
+            });
+    
+            function autoSlide() {
+                showImage(index + 1);
+            }
+    
+            let autoSlideInterval = setInterval(autoSlide, 3000);
+    
+            // Pause auto-slide on hover
+            const carouselContainer = document.querySelector('.carousel-container');
+            if (carouselContainer) {
+                carouselContainer.addEventListener('mouseover', () => {
+                    clearInterval(autoSlideInterval);
                 });
     
-                showImage(index);
+                carouselContainer.addEventListener('mouseout', () => {
+                    autoSlideInterval = setInterval(autoSlide, 3000);
+                });
+            } else {
+                console.error('Carousel container not found');
+            }
     
-                // Inicializar FullCalendar
-                var calendarEl = document.getElementById('calendar');
-                var calendar = new FullCalendar.Calendar(calendarEl, {
+            showImage(index);
+    
+            // Inicializar FullCalendar
+            const calendarEl = document.getElementById('calendar');
+            if (calendarEl) {
+                const calendar = new FullCalendar.Calendar(calendarEl, {
                     initialView: 'dayGridMonth',
                     locale: 'es'
                 });
                 calendar.render();
-            });
+            } else {
+                console.error('Calendar element not found');
+            }
         });
-
-        
     </script>
-<script src="./js/sidebar.js"></script>
-
-
-
-
+    
+    <script src="./js/sidebar.js"></script>
 </body>
 </html>

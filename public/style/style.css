@@ -394,72 +394,6 @@ body {
 }
 
 
-
-/* Seccion 2 carrousel home  */
-
-.carousel {
-    position: relative;
-    width: 80%;
-    margin: 40px auto;
-    overflow: hidden;
-}
-
-.carousel-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.carousel-images {
-    display: flex;
-    transition: transform 0.5s ease-in-out;
-}
-
-.carousel-images img {
-    width: 100%;
-    border-radius: 10px;
-}
-
-.carousel-button {
-    background-color: rgba(0, 0, 0, 0.5);
-    border: none;
-    color: white;
-    font-size: 24px;
-    cursor: pointer;
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 2;
-}
-
-.prev {
-    left: 0;
-}
-
-.next {
-    right: 0;
-}
-
-.carousel-dots {
-    text-align: center;
-    padding: 10px 0;
-}
-
-.carousel-dots .dot {
-    display: inline-block;
-    width: 15px;
-    height: 15px;
-    margin: 0 5px;
-    background-color: #bbb;
-    border-radius: 50%;
-    cursor: pointer;
-}
-
-.carousel-dots .dot.active {
-    background-color: #717171;
-}
-
-
 .reserve-button {
     display: inline-block;
     padding: 10px 20px;
@@ -809,3 +743,5 @@ input[type="date"]::before {
 }
 
 }
+
+
