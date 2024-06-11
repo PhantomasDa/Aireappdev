@@ -170,13 +170,13 @@
         <section class="products">
             <div class="product-carousel">
                 <div class="product-card">
-                    <img src="content/producto.png" alt="Producto 1">
+                    <img src="content/producto3.webp" alt="Producto 1">
                     <h3>Producto 1</h3>
                     <p>$99.50 <span class="original-price">$1128.00</span></p>
                     <a href="#" class="add-to-cart-button">Agregar al carrito</a>
                 </div>
                 <div class="product-card">
-                    <img src="content/producto.png" alt="Producto 2">
+                    <img src="content/producto2.webp" alt="Producto 2">
                     <h3>Producto 2</h3>
                     <p>$99.50 <span class="original-price">$1128.00</span></p>
                     <a href="#" class="add-to-cart-button">Agregar al carrito</a>
@@ -219,16 +219,43 @@
             <div class="subscribe-bar"></div>
             <h2>suscribete</h2>
             <p>Si deseas recibir actualizaciones relevantes de vez en cuando, suscríbete a nuestro boletín privado. Tu correo electrónico nunca será compartido.</p>
-            <form class="subscribe-form">
-                <input type="email" placeholder="Enter your email..." required>
-                <button type="submit">SIGN UP</button>
+            <form class="subscribe-form" id="subscribeForm">
+                <input type="email" id="subscriberEmail" placeholder="Correo electrónico" required>
+                <button type="submit">Registrate</button>
             </form>
+            <p id="subscribeMessage"></p>
         </section>
     </main>
     
     <div id="footer"></div>
 
     <script>
+        document.getElementById('subscribeForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const email = document.getElementById('subscriberEmail').value;
+    const messageElement = document.getElementById('subscribeMessage');
+
+    fetch('/subscribe', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            messageElement.textContent = data.message;
+        } else if (data.errors) {
+            messageElement.textContent = data.errors.map(error => error.msg).join(', ');
+        }
+    })
+    .catch(error => {
+        console.error('Error al suscribir:', error);
+        messageElement.textContent = 'Error al suscribir';
+    });
+});
         document.addEventListener("DOMContentLoaded", function() {
             console.log('DOM fully loaded and parsed');
             

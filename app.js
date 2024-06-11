@@ -11,6 +11,8 @@ const cors = require('cors');
 const session = require('express-session');
 const flash = require('connect-flash');
 const app = express();
+const homeRoutes = require('./routes/home');
+
 
 // Configuración de session middleware
 app.use(session({
@@ -63,6 +65,9 @@ if (!fs.existsSync(uploadsDir)) {
 }
 
 app.use('/profile', profileRouter); // Montar las rutas de profile
+
+app.use('/', homeRoutes);
+
 
 // Rutas
 app.use('/perfil', profileRouter);

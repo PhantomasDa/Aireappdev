@@ -553,7 +553,7 @@ body {
     text-align: center;
     border: 1px solid #000; /* Borde negro */
     border-radius: 10px;
-    margin: 20px auto;
+    margin: 20px;
     max-width: 500px;
 }
 
@@ -579,12 +579,7 @@ body {
     margin-bottom: 20px;
 }
 
-.subscribe-form {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-}
+
 
 .subscribe-form input {
     padding: 10px;
