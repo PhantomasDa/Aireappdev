@@ -5,14 +5,14 @@ async function sendRegistrationEmail(to, subject, text) {
     let transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
-            user: 'tu-email@gmail.com',
-            pass: 'tu-contraseña'
+            user: 'Mockraw@gmail.com',
+            pass: 'iidr awan vpzn crhm'
         }
     });
 
     // Configuración del correo
     let mailOptions = {
-        from: 'tu-email@gmail.com',
+        from: 'Mockraw@gmail.com',
         to: to,
         subject: subject,
         text: text
