@@ -1,6 +1,6 @@
 .my-button-reservas-2{
     display: block;
-    width: 40%;
+    width: 70%;
     padding: 6px;
     margin-top: 20px;
     background-color: #7F5B41;
@@ -84,6 +84,7 @@
     border: none;
     font-size: 20px;
     cursor: pointer;
+    max-width: 120px;
 }
 
 .fecha-container {
@@ -261,7 +262,7 @@ cursor: pointer;
     max-height: 80vh;
 }
 
-#reservaPopup {
+/* #reservaPopup {
     display: none;
     position: fixed;
     bottom: 0;
@@ -275,7 +276,7 @@ cursor: pointer;
     width: 100%;
     max-width: 400px;
     top:45%;
-}
+} */
 
 #reservaPopup.active {
     display: block;
@@ -359,10 +360,10 @@ cursor: pointer;
 
 .container-data{
     display: flex;
-    flex-direction: column-reverse;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
+        flex-direction: row-reverse;
+        flex-wrap: nowrap;
+        align-items: center;
+        justify-content: flex-end;
 }
 
 .margin-ajuste{
@@ -455,3 +456,63 @@ cursor: pointer;
 
 
 
+#informacion_extra{
+    position: absolute;
+    top: 80px;
+}
+
+
+/* Estilos para las tarjetas de clases */
+.card {
+    background-color: #FBF7F2; /* Blanco de la marca */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin: 10px 0;
+    padding: 15px;
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.card:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.card-header {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #7F5B41; /* Color principal de la marca */
+}
+
+.card-body {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 15px;
+    color: #14110F; /* Negro de la marca */
+}
+
+.card-footer {
+    text-align: right;
+    margin-top: 10px;
+}
+
+.my-button-reservas-2 {
+    background-color: #7F5B41; /* Color principal de la marca */
+    color: #FBF7F2; /* Blanco de la marca */
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.my-button-reservas-2:hover {
+    background-color: #B2987E; /* Marrón de la marca */
+}
+
+.ajustes-slo{
+    max-width: 50% !important;
+}
+
+#calendario > div.fc-header-toolbar.fc-toolbar.fc-toolbar-ltr > div:nth-child(1) > div > button.fc-prev-button.fc-button.fc-button-primary{
+    background-color: #6C4A31 !important;
+}
+#calendario > div.fc-header-toolbar.fc-toolbar.fc-toolbar-ltr > div:nth-child(1) > div > button.fc-next-button.fc-button.fc-button-primary{background-color: #6C4A31;}

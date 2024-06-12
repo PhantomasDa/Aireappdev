@@ -27,7 +27,7 @@
     <div id="sidebar-container"></div>
     <div class="my-container-bg">
         <div class="container-data">
-            <h1 id="user_name">Bienvenid@, [Nombre del Usuario]</h1>
+            <h1 id="user_name">Holis, [Nombre del Usuario]</h1>
             <a id="logout" href="#" onclick="logout()">Logout</a>
             <div id="profile-picture-container">
                 <img id="profile_picture" src="ruta/a/la/foto/de/perfil.jpg" alt="Foto de perfil">
@@ -36,18 +36,16 @@
 
         <div id="horariosPopup" class="popup desktop-popup">
             <div class="popup-content">
-                <button onclick="cerrarHorariosPopup()" class="close-button">&times;</button>
+                <button onclick="cerrarHorariosPopup()" class="close-button ajustes">&times;</button>
                 <h2>Horarios Disponibles</h2>
                 <div id="horariosContenido"></div>
             </div>
         </div>
 
-
-        <h2 class="color-ajuste margin-ajuste">Tus Horarios Disponibles</h2>
-        <div id="informacion_extra" style="font-size: smaller; margin-top: 10px;"></div>
         <div id="clases_disponibles"></div>
-
-
+        <h2 class="color-ajuste margin-ajuste">Tus Horarios Disponibles</h2>
+        <div id="informacion_extra" style="font-size: 10px; margin-top: 10px;"></div>
+       
 
         <div id="calendario" class="calendar-container"></div>
         <div id="calendar-legend">
@@ -61,7 +59,7 @@
             </div>
         </div>
         
-        <h2 class="color-ajuste">Tus Próximas Clases</h2>
+        <h2 class="color-ajuste margin-ajuste">Tus Próximas Clases</h2>
         <h4 class="color-ajuste margin-ajuste">Puedes reagendar tus clases máximo 2 veces</h4>
         <div id="proximas_clases" class="toggle-content active"></div>
 
@@ -75,8 +73,9 @@
                     <input type="checkbox" id="aceptoTerminos" required>
                     <label for="aceptoTerminos">Acepto <a href="#" target="_blank">términos y condiciones</a></label>
                 </div>
-                <button class="my-button-reservas" onclick="cerrarPopup()">Cerrar</button>
                 <button id="confirmarReservaBtn" class="my-button-reservas" onclick="confirmarReserva()">Reservar Clase Ahora</button>
+                <button class="my-button-reservas" onclick="cerrarPopup()">Cancelar</button>
+
             </div>
         </div>
 
@@ -121,7 +120,14 @@
             </div>
         </div>
 
-
+<!-- profile.html -->
+<div id="errorModal" class="modal">
+    <div class="modal-content modal-content--oculto">
+        <h2>Lo sentimos!</h2>
+        <p id="errorText"></p>
+        <button onclick="cerrarErrorModal()">Volver</button>
+    </div>
+</div>
         
         
     </div>

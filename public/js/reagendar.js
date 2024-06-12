@@ -78,17 +78,19 @@ function confirmarReagendar(claseId, nuevaFecha) {
             console.error('Error al verificar las clases del mismo día:', error);
             alert('Error al verificar las clases del mismo día: ' + error.message);
         });
-}function confirmarReagendar(claseId, nuevaFecha) {
+}
+
+function confirmarReagendar(claseId, nuevaFecha) {
     fetchData(`/perfil/proximas-clases`)
         .then(clases => {
             const nuevaFechaObj = new Date(nuevaFecha);
             const mismoDia = clases.some(clase => {
                 const claseFechaObj = new Date(clase.fecha_hora);
-                return claseFechaObj.toDateString() === nuevaFechaObj.toDateString();
+                return claseFechaObj.toDateString() === nuevaFechaObj.toDateString() && clase.id !== claseId;
             });
 
             if (mismoDia) {
-                alert('No puedes reagendar para el mismo día en que ya tienes una clase.');
+                alert('No puedes reagendar para el mismo día en que ya tienes otra clase.');
                 return;
             }
 

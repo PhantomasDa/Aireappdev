@@ -51,21 +51,18 @@ router.get('/usuario', verifyToken, (req, res) => {
     });
 });
 
-// Reagendar clase
 router.post('/reagendar', verifyToken, async (req, res) => {
     const { claseId, nuevaFecha } = req.body;
     console.log('Datos recibidos en /reagendar:', { claseId, nuevaFecha });
 
-    // Verificar que la nueva fecha no sea anterior a hoy
-    const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0);
+    const ahora = new Date();
     const nuevaFechaDate = new Date(nuevaFecha);
-    console.log('Fecha actual:', hoy.toISOString());
-    console.log('Nueva fecha para reagendar:', nuevaFechaDate.toISOString());
 
-    if (nuevaFechaDate < hoy) {
-        console.log('Error: No se puede reagendar a una fecha anterior a hoy');
-        return res.status(400).send({ message: 'No se puede reagendar a una fecha anterior a hoy' });
+    // Verificar que la nueva fecha esté al menos 18 horas en el futuro
+    const diferenciaHoras = (nuevaFechaDate - ahora) / 36e5; // Conversión de milisegundos a horas
+    if (diferenciaHoras < 18) {
+        console.log('Error: No se puede reagendar con menos de 18 horas de anticipación');
+        return res.status(400).send({ message: 'Lo sentimos, pero solo puedes reservar clases con un mínimo de 18 horas de anticipación.' });
     }
 
     try {
@@ -75,28 +72,26 @@ router.post('/reagendar', verifyToken, async (req, res) => {
             return res.status(400).send({ message: 'Reserva no encontrada' });
         }
 
-        console.log('Reserva encontrada:', reserva);
-
         if (reserva[0].reagendamientos >= 2) {
             console.log('Error: Has superado el número de veces que puedes reagendar esta clase');
             return res.status(400).send({ message: 'Has superado el número de veces que puedes reagendar esta clase' });
         }
 
-        // Verificar si ya hay una clase agendada el mismo día en la tabla Reservas
+        // Verificar si ya hay una clase agendada el mismo día en la tabla Reservas (excepto la misma clase)
         const [existingClasses] = await db.execute(`
-            SELECT * FROM Reservas 
-            WHERE usuario_id = ? AND DATE(fecha_hora) = DATE(?)
-        `, [req.user.id, nuevaFecha]);
+            SELECT r.* 
+            FROM Reservas r
+            JOIN Clases c ON r.clase_id = c.id
+            WHERE r.usuario_id = ? AND DATE(c.fecha_hora) = DATE(?) AND r.clase_id != ?
+        `, [req.user.id, nuevaFecha, claseId]);
 
         if (existingClasses.length > 0) {
-            console.log('Error: Ya tienes una clase registrada en esta fecha');
-            return res.status(400).send({ message: 'No puedes reagendar para el mismo día en que ya tienes una clase.' });
+            console.log('Error: Ya tienes otra clase registrada en esta fecha');
+            return res.status(400).send({ message: 'No puedes reagendar para el mismo día en que ya tienes otra clase.' });
         }
 
         const nuevaFechaSimplificada = new Date(nuevaFecha);
         nuevaFechaSimplificada.setSeconds(0, 0);
-
-        console.log('Nueva fecha simplificada para consulta:', nuevaFechaSimplificada);
 
         const [nuevaClase] = await db.execute(`SELECT id, cupos_disponibles 
                                                FROM Clases 
@@ -106,8 +101,6 @@ router.post('/reagendar', verifyToken, async (req, res) => {
             console.log('Error: Fecha no válida para reagendar');
             return res.status(400).send({ message: 'Fecha no válida para reagendar' });
         }
-
-        console.log('Nueva clase encontrada:', nuevaClase);
 
         if (nuevaClase[0].cupos_disponibles <= 0) {
             console.log('Error: No hay cupos disponibles en la nueva clase');
@@ -119,13 +112,16 @@ router.post('/reagendar', verifyToken, async (req, res) => {
 
         try {
             console.log('Actualizando cupos de la nueva clase');
-            await db.execute('UPDATE Clases SET cupos_disponibles = cupos_disponibles - 1 WHERE id = ?', [nuevaClase[0].id]);
-            
+            const updateNuevaClase = await db.execute('UPDATE Clases SET cupos_disponibles = cupos_disponibles - 1 WHERE id = ?', [nuevaClase[0].id]);
+            console.log('Resultado de actualizar cupos de la nueva clase:', updateNuevaClase);
+
             console.log('Actualizando cupos de la clase actual');
-            await db.execute('UPDATE Clases SET cupos_disponibles = cupos_disponibles + 1 WHERE id = ?', [reserva[0].clase_id]);
-            
+            const updateClaseActual = await db.execute('UPDATE Clases SET cupos_disponibles = cupos_disponibles + 1 WHERE id = ?', [reserva[0].clase_id]);
+            console.log('Resultado de actualizar cupos de la clase actual:', updateClaseActual);
+
             console.log('Actualizando la reserva con la nueva clase');
-            await db.execute('UPDATE Reservas SET clase_id = ?, reagendamientos = reagendamientos + 1 WHERE usuario_id = ? AND clase_id = ?', [nuevaClase[0].id, req.user.id, claseId]);
+            const updateReserva = await db.execute('UPDATE Reservas SET clase_id = ?, reagendamientos = reagendamientos + 1 WHERE usuario_id = ? AND clase_id = ?', [nuevaClase[0].id, req.user.id, claseId]);
+            console.log('Resultado de actualizar la reserva:', updateReserva);
 
             // Confirmar transacción
             await db.query('COMMIT');
@@ -142,6 +138,7 @@ router.post('/reagendar', verifyToken, async (req, res) => {
         res.status(500).send({ message: 'Error en el servidor', error: error.message });
     }
 });
+
 
 
 
@@ -279,14 +276,5 @@ router.get('/disponibilidad-clases', verifyToken, async (req, res) => {
         res.status(500).json({ message: 'Error obteniendo disponibilidad de clases' });
     }
 });
-
-
-
-
-
-
-
-
-
 
 module.exports = router;

@@ -3,7 +3,7 @@
 function cargarNombreUsuario() {
     fetchData('/perfil/usuario')
         .then(usuario => {
-            document.getElementById('user_name').textContent = `Bienvenid@, ${usuario.nombre}`;
+            document.getElementById('user_name').textContent = `Holis, ${usuario.nombre}`;
             document.getElementById('profile_picture').src = usuario.foto_perfil;
         })
         .catch(error => console.error('Error al cargar el nombre del usuario:', error));
@@ -22,11 +22,21 @@ function cargarProximasClases() {
                     const fechaFormateada = fechaClase.toLocaleDateString('es-ES', opcionesFecha);
                     const horaFormateada = fechaClase.toLocaleTimeString('es-ES', opcionesHora);
                     const ordinal = index === 0 ? 'Primera' : index === 1 ? 'Segunda' : index === 2 ? 'Tercera' : `${index + 1}ª`;
-                    return `<div>${ordinal} clase: ${fechaFormateada} a las ${horaFormateada} <button class="my-button-reservas-2" onclick="reagendarClase(${clase.id})">Reagendar Clase</button></div>`;
+                    return `
+                        <div class="card">
+                            <div class="card-header">${ordinal} clase</div>
+                            <div class="card-body">
+                                ${fechaFormateada} a las ${horaFormateada}
+                            </div>
+                            <div class="card-footer">
+                                <button class="my-button-reservas-2" onclick="reagendarClase(${clase.id})">Reagendar Clase</button>
+                            </div>
+                        </div>`;
                 }).join('');
         })
         .catch(error => console.error('Error al cargar las próximas clases:', error));
 }
+
 function actualizarClasesDisponibles() {
     fetchData('/perfil/clases-disponibles')
         .then(data => {
