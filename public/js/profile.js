@@ -152,6 +152,37 @@ function actualizarFechaExpiracionPaquete() {
         });
 }
 
+function actualizarEstadoDelPaquete() {
+    fetchData('/perfil/estado-paquete')
+        .then(data => {
+            const estadoDelPaqueteElement = document.getElementById('estadodelpaquete');
+            
+            if (data.estado === 'Activo') {
+                estadoDelPaqueteElement.textContent = 'Activo';
+                estadoDelPaqueteElement.style.color = 'green';
+            } else if (data.estado === 'Inactivo') {
+                estadoDelPaqueteElement.textContent = 'Inactivo';
+                estadoDelPaqueteElement.style.color = 'red';
+            } else {
+                estadoDelPaqueteElement.textContent = 'Información no disponible';
+                estadoDelPaqueteElement.style.color = 'grey';
+            }
+        })
+        .catch(error => {
+            console.error('Error al cargar el estado del paquete:', error);
+            document.getElementById('estadodelpaquete').textContent = 'Error al cargar el estado del paquete';
+            document.getElementById('estadodelpaquete').style.color = 'grey';
+        });
+}
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM fully loaded and parsed');
+    actualizarEstadoDelPaquete();
+});
+
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM fully loaded and parsed');
     actualizarFechaExpiracionPaquete();

@@ -1,0 +1,223 @@
+/* styles.css */
+body {
+    font-family: 'Montserrat', sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+body.modal-open {
+    overflow: hidden; /* Prevent body scrolling when modal is open */
+}
+
+.blogs {
+    padding: 20px;
+}
+
+.blogs h2 {
+    font-size: 36px;
+    color: #7F5B41;
+}
+
+.blogs p {
+    font-size: 16px;
+    color: #14110F;
+}
+
+.blog-post {
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.blog-post img {
+    max-width: 100%;
+    border-radius: 5px;
+}
+
+.blog-post p {
+    margin-top: 10px;
+    font-size: 18px;
+    color: #14110F;
+}
+
+.read-more {
+    background-color: #7F5B41;
+    color: #FBF7F2;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.read-more:hover {
+    background-color: #B2987E;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: rgba(0,0,0,0.4);
+    opacity: 0;
+    transition: opacity 0.6s ease; /* Increased duration */
+}
+
+.modal.show {
+    display: block;
+    opacity: 1;
+}
+
+.modal-content3 {
+    background-color: #fefefe;
+    position: absolute;
+    bottom: -100%;
+    width: 100%;
+    height: 100%; /* Ensure it covers the full screen */
+    transform: translateY(100%);
+    transition: transform 0.6s ease, bottom 0.6s ease; /* Increased duration */
+    z-index: 99999;
+    scroll-behavior: auto;
+    overscroll-behavior-y: contain;
+    overflow-y: auto; /* Enable scrolling inside the modal */
+}
+
+.modal.show .modal-content3 {
+    bottom: 0;
+    transform: translateY(0);
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+
+
+
+
+ /* Carousel styles */
+  /* Carousel styles */
+   /* Carousel styles */
+    /* Carousel styles */
+
+
+.carousel-container {
+    position: relative;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.carousel-images {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+    width: 500%; /* Asumiendo que hay 5 imágenes, ajusta según sea necesario */
+}
+
+.carousel-images img {
+    width: 20%; /* Cada imagen ocupa el 20% del ancho del contenedor de imágenes */
+    flex-shrink: 0;
+    height: auto;
+}
+
+.carousel-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.carousel-button.prev {
+    left: 10px;
+}
+
+.carousel-button.next {
+    right: 10px;
+}
+
+.carousel-dots {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.carousel-dots .dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin: 0 5px;
+    background-color: #bbb;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.carousel-dots .dot.active {
+    background-color: #717171;
+}
+
+/* Ajustes para escritorio */
+@media (min-width: 768px) {
+    .carousel-container {
+        max-width: 800px; /* Ancho máximo del carrusel en pantallas grandes */
+        margin: auto; /* Centrar el carrusel en pantallas grandes */
+    }
+
+    .carousel-images img {
+        height: 400px; /* Ajusta la altura de las imágenes para escritorio */
+    }
+}
+
+
+    /* Estilos para el slider y el efecto parallax */
+.slider {
+    position: relative;
+    height: 100vh; /* Ajusta la altura según sea necesario */
+    overflow: hidden;
+}
+
+.slider::before {
+    content: '';
+    background-image: url('../content/slider.png');
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    z-index: -1; /* Para que el contenido del slider esté encima */
+}
+
+.slider-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    text-align: center;
+    z-index: 1;
+}

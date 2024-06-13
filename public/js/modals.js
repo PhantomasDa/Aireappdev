@@ -37,3 +37,14 @@ function cerrarReagendarPopup() {
     cerrarModal('reagendarPopup');
 }
 
+function togglePackageInfo() {
+    const packageInfo = document.getElementById('packageInfo');
+    const toggleHeader = document.querySelector('.toggle-header');
+    if (packageInfo.classList.contains('active')) {
+        packageInfo.classList.remove('active');
+        toggleHeader.textContent = 'Mostrar información de paquete';
+    } else {
+        packageInfo.classList.add('active');
+        toggleHeader.textContent = 'Ocultar información de paquete';
+    }
+}

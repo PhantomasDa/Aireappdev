@@ -8,6 +8,56 @@ function initPage() {
     cargarNombreUsuario();
     inicializarCalendario();
 }
+async function marcarDisponibilidad() {
+    const year = new Date().getFullYear();
+    try {
+        // Solicitud para obtener disponibilidad de clases
+        const responseDisponibilidad = await fetch(`/profile/disponibilidad-clases?year=${year}`, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+        });
+        if (!responseDisponibilidad.ok) {
+            throw new Error('Error en la solicitud al servidor para disponibilidad');
+        }
+        const disponibilidad = await responseDisponibilidad.json();
+
+        // Solicitud para obtener clases agendadas
+        const responseAgendadas = await fetch(`/profile/clases-agendadas?year=${year}`, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+        });
+        if (!responseAgendadas.ok) {
+            throw new Error('Error en la solicitud al servidor para clases agendadas');
+        }
+        const agendadas = await responseAgendadas.json();
+
+        const dias = document.querySelectorAll('.fc-daygrid-day');
+        dias.forEach(dia => {
+            const dateStr = dia.getAttribute('data-date');
+
+            // Marcar clases agendadas en azul claro
+            const claseAgendada = agendadas.find(d => moment(d.fecha).format('YYYY-MM-DD') === dateStr);
+            if (claseAgendada) {
+                dia.classList.add('clase-agendada');
+            } else {
+                const fecha = disponibilidad.find(d => moment(d.fecha).format('YYYY-MM-DD') === dateStr);
+                if (fecha) {
+                    if (parseInt(fecha.cupos_disponibles) > 0) {
+                        dia.classList.add('cupos-disponibles');
+                    } else {
+                        dia.classList.add('sin-actividades');
+                    }
+                } else {
+                    dia.classList.add('sin-actividades');
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Error obteniendo disponibilidad de clases:', error);
+    }
+}
 
 async function inicializarCalendario() {
     const calendarEl = document.getElementById('calendario');
@@ -31,50 +81,9 @@ async function inicializarCalendario() {
             document.querySelectorAll('.fc-daygrid-day.selected-date').forEach(date => date.classList.remove('selected-date'));
             info.dayEl.classList.add('selected-date');
         },
-        datesSet: async (info) => {
-            await marcarDisponibilidad(info.start, info.end);
+        datesSet: async () => {
+            await marcarDisponibilidad();
         }
     });
     calendar.render();
 }
-
-async function marcarDisponibilidad(start, end) {
-    const month = start.getMonth() + 1;
-    const year = start.getFullYear();
-    try {
-        const response = await fetch(`/profile/disponibilidad-clases?month=${month}&year=${year}`, {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
-        });
-        if (!response.ok) {
-            throw new Error('Error en la solicitud al servidor');
-        }
-        const disponibilidad = await response.json();
-        // console.log('Disponibilidad recibida:', disponibilidad); // Depurar respuesta
-
-        const dias = document.querySelectorAll('.fc-daygrid-day');
-        dias.forEach(dia => {
-            const dateStr = dia.getAttribute('data-date');
-            // console.log('Fecha del día en el calendario:', dateStr); // Depurar fechas de los días
-            
-            const fecha = disponibilidad.find(d => moment(d.fecha).format('YYYY-MM-DD') === dateStr);
-            if (fecha) {
-                // console.log(`Fecha: ${dateStr}, Cupos disponibles: ${fecha.cupos_disponibles}`); // Depurar datos de cupos
-                if (parseInt(fecha.cupos_disponibles) > 0) {
-                    dia.classList.add('cupos-disponibles');
-                    // console.log(`Fecha ${dateStr} con cupos disponibles`); // Depurar cupos disponibles
-                } else {
-                    dia.classList.add('sin-actividades');
-                    // console.log(`Fecha ${dateStr} sin cupos`); // Depurar sin cupos
-                }
-            } else {
-                dia.classList.add('sin-actividades');
-                // console.log(`Fecha ${dateStr} sin actividades`); // Depurar sin actividades
-            }
-        });
-    } catch (error) {
-        console.error('Error obteniendo disponibilidad de clases:', error);
-    }
-}
-

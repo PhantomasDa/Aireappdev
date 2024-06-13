@@ -264,16 +264,19 @@ router.get('/fechas-reagendar/:claseId', verifyToken, (req, res) => {
 router.get('/profile', isAuthenticated, (req, res) => {
     res.render('profile', { user: req.session.user });
 });
+
+
+
 router.get('/disponibilidad-clases', verifyToken, async (req, res) => {
-    const { month, year } = req.query;
+    const { year } = req.query;
 
     try {
         const [clases] = await db.execute(`
             SELECT DATE(fecha_hora) as fecha, SUM(cupos_disponibles) as cupos_disponibles
             FROM Clases
-            WHERE MONTH(fecha_hora) = ? AND YEAR(fecha_hora) = ?
+            WHERE YEAR(fecha_hora) = ?
             GROUP BY DATE(fecha_hora)
-        `, [month, year]);
+        `, [year]);
 
         console.log('Clases disponibles:', clases); // Depurar resultados de la consulta
         res.json(clases);
@@ -282,6 +285,7 @@ router.get('/disponibilidad-clases', verifyToken, async (req, res) => {
         res.status(500).json({ message: 'Error obteniendo disponibilidad de clases' });
     }
 });
+
 
 // Obtener fecha de expiración del paquete
 router.get('/fecha-expiracion-paquete', verifyToken, (req, res) => {
@@ -295,6 +299,48 @@ router.get('/fecha-expiracion-paquete', verifyToken, (req, res) => {
         }
     });
 });
+
+
+
+router.get('/estado-paquete', verifyToken, (req, res) => {
+    const query = 'SELECT fecha_activacion FROM paquetes WHERE usuario_id = ? ORDER BY fecha_activacion DESC LIMIT 1';
+    const params = [req.user.id];
+    executeQuery(query, params, res, (result) => {
+        if (result.length > 0) {
+            const fechaActivacion = new Date(result[0].fecha_activacion);
+            const fechaActual = new Date();
+            
+            if (fechaActual >= fechaActivacion) {
+                res.json({ estado: 'Activo' });
+            } else {
+                res.json({ estado: 'Inactivo' });
+            }
+        } else {
+            res.status(404).send({ message: 'No hay paquete disponible para este usuario' });
+        }
+    });
+});
+
+
+router.get('/clases-agendadas', verifyToken, async (req, res) => {
+    const { year } = req.query;
+
+    try {
+        const [clases] = await db.execute(`
+            SELECT DATE(c.fecha_hora) as fecha
+            FROM Clases c
+            JOIN Reservas r ON c.id = r.clase_id
+            WHERE r.usuario_id = ? AND YEAR(c.fecha_hora) = ?
+        `, [req.user.id, year]);
+
+        console.log('Clases agendadas:', clases); // Depurar resultados de la consulta
+        res.json(clases);
+    } catch (error) {
+        console.error('Error obteniendo clases agendadas:', error);
+        res.status(500).json({ message: 'Error obteniendo clases agendadas' });
+    }
+});
+
 
 
 

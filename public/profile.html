@@ -8,22 +8,6 @@
     <link rel="stylesheet" href="style/profile.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css' rel='stylesheet' />
-
-    <style>
-        .fc-daygrid-day.cupos-disponibles {
-            background-color: #d4edda; /* Verde claro */
-            color: #155724; /* Texto verde oscuro */
-        }
-
-        .fc-daygrid-day.sin-cupos {
-            background-color: #f8d7da; /* Rojo claro */
-            color: #721c24; /* Texto rojo oscuro */
-        }
-
-        #confirmacionReagendarPopup, #exitoReagendarPopup{
-            z-index: 999999;
-        }
-    </style>
 </head>
 <body>
     <!-- Contenido del cuerpo -->
@@ -31,6 +15,8 @@
     <div id="sidebar-container"></div>
     <div class="my-container-bg">
         <div class="container-data">
+            <div id="informacion_extra" style="font-size: 10px; margin-top: 10px;"></div>
+
             <h1 id="user_name">Holis, [Nombre del Usuario]</h1>
             <a id="logout" href="#" onclick="logout()">Logout</a>
             <div id="profile-picture-container">
@@ -46,27 +32,39 @@
             </div>
         </div>
 
-        <div id="clases_disponibles"></div>
+        <div class="toggle-header" onclick="togglePackageInfo()">Mostrar información de paquete</div>
+        <div id="packageInfo" class="toggle-content">
+            <div id="clases_disponibles"></div>
+            <p style="color: black;">tu paquete está: <span id="estadodelpaquete"></span></p>
+            <p style="color: black;">Paquete válido hasta: <span id="fechaExpiracionPaquete"></span></p>
+            <h4 class="color-ajuste margin-ajuste">Puedes reagendar tus clases máximo 2 veces <span id="reagedamientosporusar"></span></h4>
+        </div>
         <h2 class="color-ajuste margin-ajuste">Tus Horarios Disponibles</h2>
-        <div id="informacion_extra" style="font-size: 10px; margin-top: 10px;"></div>
-        <p style="color: black;">Paquete válido hasta: <span id="fechaExpiracionPaquete"></span></p>
+        <div id="calendar-legend">
+            <div class="legend-item">
+                <span class="legend-color cupos-disponibles"></span>
+                <span>Cupos Disponibles</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color sin-actividades"></span>
+                <span>No hay cupos</span>
+            </div>
+
+            <div class="legend-item">
+                <span class="legend-color clase-agendada"></span>
+                <span>Dia con clases</span>
+            </div>
+        </div>
+        
+
+
 
        
 
         <div id="calendario" class="calendar-container"></div>
-        <div id="calendar-legend">
-            <div class="legend-item">
-                <span class="legend-color cupos-disponibles"></span>
-                <span>Día con cupos disponibles</span>
-            </div>
-            <div class="legend-item">
-                <span class="legend-color sin-actividades"></span>
-                <span>No hay cupos disponibles</span>
-            </div>
-        </div>
+        
         
         <h2 class="color-ajuste margin-ajuste">Tus Próximas Clases</h2>
-        <h4 class="color-ajuste margin-ajuste">Puedes reagendar tus clases máximo 2 veces</h4>
         <div id="proximas_clases" class="toggle-content active"></div>
 
         <div id="reservaPopup" class="popup desktop-popup">
@@ -118,6 +116,14 @@
         </div>
 
 
+        <div id="errorFechaModal" class="modal">
+            <div class="modal-content">
+                <span class="close-button" onclick="cerrarErrorFechaModal()">&times;</span>
+                <p id="errorFechaText" style="color: black;"> Recuerda que tu paquete tiene una validez de un mes</p>
+                <button onclick="cerrarErrorFechaModal()">Cerrar</button>
+            </div>
+        </div>
+
 <!-- profile.html -->
 <div id="errorModal" class="modal">
     <div class="modal-content modal-content--oculto">
@@ -168,5 +174,6 @@
     <script src="js/utils.js"></script>
     <script src="js/init.js"></script>
     <script src="./js/sidebar.js"></script>
+   
 </body>
 </html>
