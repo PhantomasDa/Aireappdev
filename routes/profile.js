@@ -142,6 +142,8 @@ router.post('/reagendar', verifyToken, async (req, res) => {
 
 
 
+
+
 // Obtener horarios disponibles filtrados por fecha
 router.get('/horarios', verifyToken, (req, res) => {
     const { fecha } = req.query;
@@ -254,6 +256,10 @@ router.get('/fechas-reagendar/:claseId', verifyToken, (req, res) => {
     });
 });
 
+
+
+
+
 // Ruta protegida para el perfil
 router.get('/profile', isAuthenticated, (req, res) => {
     res.render('profile', { user: req.session.user });
@@ -276,5 +282,20 @@ router.get('/disponibilidad-clases', verifyToken, async (req, res) => {
         res.status(500).json({ message: 'Error obteniendo disponibilidad de clases' });
     }
 });
+
+// Obtener fecha de expiración del paquete
+router.get('/fecha-expiracion-paquete', verifyToken, (req, res) => {
+    const query = 'SELECT fecha_expiracion FROM paquetes WHERE usuario_id = ? ORDER BY fecha_activacion DESC LIMIT 1';
+    const params = [req.user.id];
+    executeQuery(query, params, res, (result) => {
+        if (result.length > 0) {
+            res.json({ fecha_expiracion: result[0].fecha_expiracion });
+        } else {
+            res.status(404).send({ message: 'No hay paquete activo para este usuario' });
+        }
+    });
+});
+
+
 
 module.exports = router;

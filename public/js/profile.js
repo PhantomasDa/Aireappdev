@@ -131,3 +131,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const proximasClasesContainer = document.getElementById('proximas_clases');
     proximasClasesContainer.parentNode.insertBefore(header, proximasClasesContainer);
 });
+
+function actualizarFechaExpiracionPaquete() {
+    fetchData('/perfil/fecha-expiracion-paquete')
+        .then(data => {
+            const fechaExpiracionPaqueteElement = document.getElementById('fechaExpiracionPaquete');
+
+            if (data.fecha_expiracion) {
+                const fechaExpiracion = new Date(data.fecha_expiracion);
+                const opciones = { year: 'numeric', month: 'long', day: 'numeric' };
+
+                fechaExpiracionPaqueteElement.textContent = fechaExpiracion.toLocaleDateString(undefined, opciones);
+            } else {
+                fechaExpiracionPaqueteElement.textContent = 'No hay paquete activo';
+            }
+        })
+        .catch(error => {
+            console.error('Error al cargar la fecha de expiración del paquete:', error);
+            document.getElementById('fechaExpiracionPaquete').textContent = 'Error al cargar la fecha de expiración del paquete';
+        });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM fully loaded and parsed');
+    actualizarFechaExpiracionPaquete();
+});

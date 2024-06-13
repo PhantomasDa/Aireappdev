@@ -128,7 +128,6 @@ router.post('/step5', [
         res.status(500).json({ message: 'Error al guardar modalidad' });
     }
 });
-
 router.post('/step6', upload.single('comprobante_pago'), [
     body('userId').isInt(),
     body('paquete').isIn(['Paquete básico', 'Paquete completo', 'Paquete premium']),
@@ -156,21 +155,30 @@ router.post('/step6', upload.single('comprobante_pago'), [
         return res.status(400).json({ message: 'Todos los campos son obligatorios' });
     }
 
-    let clasesDisponibles;
+    let clasesDisponibles, maxReagendamientos;
     switch (paquete) {
         case 'Paquete básico':
             clasesDisponibles = 4;
+            maxReagendamientos = 1; // Ajusta según tus necesidades
             break;
         case 'Paquete completo':
             clasesDisponibles = 8;
+            maxReagendamientos = 3;
             break;
         case 'Paquete premium':
             clasesDisponibles = 12;
+            maxReagendamientos = 4;
             break;
         default:
             console.error('Paquete inválido:', paquete);
             return res.status(400).json({ message: 'Paquete inválido' });
     }
+
+    const fechaCompra = new Date();
+    const fechaActivacion = new Date(fechaCompra);
+    fechaActivacion.setDate(fechaActivacion.getDate() + 1);
+    const fechaExpiracion = new Date(fechaActivacion);
+    fechaExpiracion.setMonth(fechaExpiracion.getMonth() + 1);
 
     try {
         console.log('Actualizando usuario:', { userId, paquete, comprobantePago, clasesDisponibles });
@@ -181,6 +189,10 @@ router.post('/step6', upload.single('comprobante_pago'), [
             await db.execute('INSERT INTO Datos_de_facturacion (usuario_id, cedula_ruc, direccion1, direccion2, telefono, nombre_completo, razon_social, otro_dato) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', 
                 [userId, cedula_ruc, direccion1, direccion2, telefono, nombre_completo, razon_social, otro_dato]);
         }
+
+        console.log('Insertando datos del paquete:', { userId, fechaCompra, fechaActivacion, fechaExpiracion, maxReagendamientos, paquete });
+        await db.execute('INSERT INTO paquetes (usuario_id, fecha_compra, fecha_activacion, fecha_expiracion, max_reagendamientos, informacion_paquete) VALUES (?, ?, ?, ?, ?, ?)', 
+            [userId, fechaCompra, fechaActivacion, fechaExpiracion, maxReagendamientos, paquete]);
 
         const [user] = await db.execute('SELECT email FROM Usuarios WHERE id = ?', [userId]);
         const userEmail = user[0].email;
@@ -193,6 +205,7 @@ router.post('/step6', upload.single('comprobante_pago'), [
         res.status(500).json({ message: 'Error al guardar paquete, comprobante de pago y datos de facturación' });
     }
 });
+
 
 module.exports = sendRegistrationEmail;
 module.exports = router;

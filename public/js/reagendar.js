@@ -1,5 +1,8 @@
 // reagendar.js
 
+let claseIdGlobal;
+let nuevaFechaGlobal;
+
 function reagendarClase(claseId) {
     fetchData(`/perfil/proximas-clases`)
         .then(clases => {
@@ -26,61 +29,49 @@ function reagendarClase(claseId) {
                     <div class="fecha-container">
                         <div>Fecha: <span class="fecha">${fechaFormateada}</span></div>
                         <div>Cupos disponibles: ${fecha.cupos_disponibles}</div>
-                        <button onclick="confirmarReagendar(${claseId}, '${fecha.fecha_hora}')">Reagendar</button>
+                        <button class="reservar-clase-button" onclick="mostrarConfirmacionReagendar(${claseId}, '${fecha.fecha_hora}')">Reagendar</button>
                     </div>
                 `;
             });
+
+            fetchData(`/perfil/clases-disponibles`)
+                .then(data => {
+                    const clasesDisponibles = data.clases_disponibles;
+                    document.getElementById('clasesDisponibles').innerHTML = `Reservas disponibles: ${clasesDisponibles}`;
+                })
+                .catch(error => console.error('Error al obtener las reservas disponibles:', error));
+
             document.getElementById('reagendarPopup').style.display = 'block';
         })
         .catch(error => console.error('Error al obtener fechas para reagendar:', error));
 }
 
-function confirmarReagendar(claseId, nuevaFecha) {
+function mostrarConfirmacionReagendar(claseId, nuevaFecha) {
+    claseIdGlobal = claseId;
+    nuevaFechaGlobal = nuevaFecha;
+
     fetchData(`/perfil/proximas-clases`)
         .then(clases => {
-            const nuevaFechaObj = new Date(nuevaFecha);
-            const mismoDia = clases.some(clase => {
-                const claseFechaObj = new Date(clase.fecha_hora);
-                return claseFechaObj.toDateString() === nuevaFechaObj.toDateString();
-            });
+            const claseActual = clases.find(clase => clase.id === claseId);
+            if (claseActual) {
+                const fechaActual = new Date(claseActual.fecha_hora);
+                const nuevaFechaObj = new Date(nuevaFecha);
+                const fechaActualFormateada = `${fechaActual.toLocaleDateString('es-ES')} ${fechaActual.toLocaleTimeString('es-ES')}`;
+                const nuevaFechaFormateada = `${nuevaFechaObj.toLocaleDateString('es-ES')} ${nuevaFechaObj.toLocaleTimeString('es-ES')}`;
 
-            if (mismoDia) {
-                alert('No puedes reagendar para el mismo día en que ya tienes una clase.');
-                return;
+                document.getElementById('confirmacionReagendarMensaje').innerHTML = `Tu clase actual es el <span class="fecha">${fechaActualFormateada}</span>. 
+                ¿Quieres cambiarla al <span class="fecha">${nuevaFechaFormateada}</span>?`;
+
+                document.getElementById('confirmacionReagendarPopup').style.display = 'block';
             }
-
-            // Procede con la solicitud de reagendar si no hay clases el mismo día
-            fetch('/perfil/reagendar', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + localStorage.getItem('token')
-                },
-                body: JSON.stringify({ claseId, nuevaFecha: nuevaFechaObj.toISOString() })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    return response.json().then(error => { throw new Error(error.message); });
-                }
-                return response.json();
-            })
-            .then(data => {
-                alert(data.message);
-                cerrarReagendarPopup();
-                cargarProximasClases(); // Asegúrate de que esta función esté disponible globalmente o impórtala si es necesario.
-            })
-            .catch(error => {
-                console.error('Error al reagendar la clase:', error);
-                alert('Error al reagendar la clase: ' + error.message);
-            });
         })
-        .catch(error => {
-            console.error('Error al verificar las clases del mismo día:', error);
-            alert('Error al verificar las clases del mismo día: ' + error.message);
-        });
+        .catch(error => console.error('Error al obtener la clase actual para confirmar:', error));
 }
 
-function confirmarReagendar(claseId, nuevaFecha) {
+function confirmarReagendarDefinitivo() {
+    const claseId = claseIdGlobal;
+    const nuevaFecha = nuevaFechaGlobal;
+
     fetchData(`/perfil/proximas-clases`)
         .then(clases => {
             const nuevaFechaObj = new Date(nuevaFecha);
@@ -110,9 +101,17 @@ function confirmarReagendar(claseId, nuevaFecha) {
                 return response.json();
             })
             .then(data => {
-                alert(data.message);
-                cerrarReagendarPopup();
+                cerrarConfirmacionReagendarPopup();
+                mostrarExitoReagendarPopup();
                 cargarProximasClases(); // Asegúrate de que esta función esté disponible globalmente o impórtala si es necesario.
+
+                // Actualiza el número de reservas disponibles
+                fetchData(`/perfil/clases-disponibles`)
+                    .then(data => {
+                        const clasesDisponibles = data.clases_disponibles;
+                        document.getElementById('clasesDisponibles').innerHTML = `Reservas disponibles: ${clasesDisponibles}`;
+                    })
+                    .catch(error => console.error('Error al obtener las reservas disponibles:', error));
             })
             .catch(error => {
                 console.error('Error al reagendar la clase:', error);
@@ -125,4 +124,19 @@ function confirmarReagendar(claseId, nuevaFecha) {
         });
 }
 
+function cerrarReagendarPopup() {
+    document.getElementById('reagendarPopup').style.display = 'none';
+}
 
+function cerrarConfirmacionReagendarPopup() {
+    document.getElementById('confirmacionReagendarPopup').style.display = 'none';
+}
+
+function mostrarExitoReagendarPopup() {
+    document.getElementById('exitoReagendarPopup').style.display = 'block';
+}
+
+function cerrarExitoReagendarPopup() {
+    document.getElementById('exitoReagendarPopup').style.display = 'none';
+    location.reload();
+}

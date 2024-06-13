@@ -663,7 +663,6 @@ function submitForm3() {
             packageCost.textContent = '';
     }
 }
-
 function submitForm6() {
     const form = document.getElementById('registerForm6Form');
     const formData = new FormData(form);
@@ -709,9 +708,6 @@ function submitForm6() {
         } else {
             document.getElementById('registerForm6').style.display = 'none';
             document.getElementById('successMessage').style.display = 'block';
-
-            // Desencadenar la función de enviar correo en segundo plano
-            sendConfirmationEmail(data.userId);
 
             setTimeout(() => {
                 window.location.href = '/login';

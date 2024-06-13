@@ -19,6 +19,10 @@
             background-color: #f8d7da; /* Rojo claro */
             color: #721c24; /* Texto rojo oscuro */
         }
+
+        #confirmacionReagendarPopup, #exitoReagendarPopup{
+            z-index: 999999;
+        }
     </style>
 </head>
 <body>
@@ -36,7 +40,7 @@
 
         <div id="horariosPopup" class="popup desktop-popup">
             <div class="popup-content">
-                <button onclick="cerrarHorariosPopup()" class="close-button ajustes">&times;</button>
+                <button onclick="cerrarHorariosPopup()" class="close-button ajustes-slo">&times;</button>
                 <h2>Horarios Disponibles</h2>
                 <div id="horariosContenido"></div>
             </div>
@@ -45,6 +49,8 @@
         <div id="clases_disponibles"></div>
         <h2 class="color-ajuste margin-ajuste">Tus Horarios Disponibles</h2>
         <div id="informacion_extra" style="font-size: 10px; margin-top: 10px;"></div>
+        <p style="color: black;">Paquete válido hasta: <span id="fechaExpiracionPaquete"></span></p>
+
        
 
         <div id="calendario" class="calendar-container"></div>
@@ -111,14 +117,6 @@
             </div>
         </div>
 
-        <div id="reagendarPopup" class="modal">
-            <div class="modal-content">
-                <button onclick="cerrarReagendarPopup()" class="close-button">&times;</button>
-                <h2>Reagendar Clase</h2>
-                <div id="claseActualMensaje" style="margin-bottom: 20px;"></div>
-                <div id="fechasReagendar"></div>
-            </div>
-        </div>
 
 <!-- profile.html -->
 <div id="errorModal" class="modal">
@@ -128,7 +126,34 @@
         <button onclick="cerrarErrorModal()">Volver</button>
     </div>
 </div>
-        
+<div id="reagendarPopup" class="modal">
+    <div class="modal-content">
+        <button onclick="cerrarReagendarPopup()" class="close-button">&times;</button>
+        <h2>Reagendar Clase</h2>
+        <div id="clasesDisponibles">Reservas disponibles: 2</div>
+        <div id="claseActualMensaje" style="margin-bottom: 20px;"></div>
+        <div id="fechasReagendar"></div>
+    </div>
+</div>
+
+<div id="confirmacionReagendarPopup" class="modal">
+    <div class="modal-content">
+        <button onclick="cerrarConfirmacionReagendarPopup()" class="close-button">&times;</button>
+        <h2>Confirmar Reagendamiento</h2>
+        <div id="confirmacionReagendarMensaje" style="margin-bottom: 20px;"></div>
+        <button onclick="confirmarReagendarDefinitivo()">Confirmar Reagendar</button>
+    </div>
+</div>
+
+<div id="exitoReagendarPopup" class="modal">
+    <div class="modal-content">
+        <button onclick="cerrarExitoReagendarPopup()" class="close-button">&times;</button>
+        <h2>¡Felicitaciones!</h2>
+        <p style="color: black;">Haz reagendado tu clase con éxito.</p>
+        <button onclick="cerrarExitoReagendarPopup()">Cerrar</button>
+    </div>
+</div>
+
         
     </div>
     <div id="footer"></div>

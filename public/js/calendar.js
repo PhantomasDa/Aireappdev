@@ -51,26 +51,26 @@ async function marcarDisponibilidad(start, end) {
             throw new Error('Error en la solicitud al servidor');
         }
         const disponibilidad = await response.json();
-        console.log('Disponibilidad recibida:', disponibilidad); // Depurar respuesta
+        // console.log('Disponibilidad recibida:', disponibilidad); // Depurar respuesta
 
         const dias = document.querySelectorAll('.fc-daygrid-day');
         dias.forEach(dia => {
             const dateStr = dia.getAttribute('data-date');
-            console.log('Fecha del día en el calendario:', dateStr); // Depurar fechas de los días
+            // console.log('Fecha del día en el calendario:', dateStr); // Depurar fechas de los días
             
             const fecha = disponibilidad.find(d => moment(d.fecha).format('YYYY-MM-DD') === dateStr);
             if (fecha) {
-                console.log(`Fecha: ${dateStr}, Cupos disponibles: ${fecha.cupos_disponibles}`); // Depurar datos de cupos
+                // console.log(`Fecha: ${dateStr}, Cupos disponibles: ${fecha.cupos_disponibles}`); // Depurar datos de cupos
                 if (parseInt(fecha.cupos_disponibles) > 0) {
                     dia.classList.add('cupos-disponibles');
-                    console.log(`Fecha ${dateStr} con cupos disponibles`); // Depurar cupos disponibles
+                    // console.log(`Fecha ${dateStr} con cupos disponibles`); // Depurar cupos disponibles
                 } else {
                     dia.classList.add('sin-actividades');
-                    console.log(`Fecha ${dateStr} sin cupos`); // Depurar sin cupos
+                    // console.log(`Fecha ${dateStr} sin cupos`); // Depurar sin cupos
                 }
             } else {
                 dia.classList.add('sin-actividades');
-                console.log(`Fecha ${dateStr} sin actividades`); // Depurar sin actividades
+                // console.log(`Fecha ${dateStr} sin actividades`); // Depurar sin actividades
             }
         });
     } catch (error) {
