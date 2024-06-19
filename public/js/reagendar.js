@@ -2,7 +2,6 @@
 
 let claseIdGlobal;
 let nuevaFechaGlobal;
-
 function reagendarClase(claseId) {
     fetchData(`/perfil/proximas-clases`)
         .then(clases => {
@@ -18,21 +17,37 @@ function reagendarClase(claseId) {
 
     fetchData(`/perfil/fechas-reagendar/${claseId}`)
         .then(fechas => {
+            console.log('Fechas obtenidas del servidor:', fechas);
+
             const fechasReagendarDiv = document.getElementById('fechasReagendar');
             fechasReagendarDiv.innerHTML = '';
 
-            fechas.forEach(fecha => {
-                const fechaObj = new Date(fecha.fecha_hora);
-                const diaSemana = fechaObj.toLocaleDateString('es-ES', { weekday: 'long' });
-                const fechaFormateada = `${diaSemana} ${fechaObj.toLocaleDateString('es-ES')} ${fechaObj.toLocaleTimeString('es-ES')}`;
-                fechasReagendarDiv.innerHTML += `
-                    <div class="fecha-container">
-                        <div>Fecha: <span class="fecha">${fechaFormateada}</span></div>
-                        <div>Cupos disponibles: ${fecha.cupos_disponibles}</div>
-                        <button class="reservar-clase-button" onclick="mostrarConfirmacionReagendar(${claseId}, '${fecha.fecha_hora}')">Reagendar</button>
-                    </div>
-                `;
+            // Filtrar las fechas para mostrar solo aquellas desde el día siguiente en adelante
+            const fechaActual = new Date();
+            fechaActual.setHours(0, 0, 0, 0); // Resetear las horas para comparar solo fechas
+
+            const fechasFuturas = fechas.filter(fecha => {
+                const fechaClase = new Date(fecha.fecha_hora);
+                return fechaClase > fechaActual; // Solo fechas futuras, excluyendo el día actual
             });
+            console.log('Fechas filtradas (futuras excluyendo el mismo día):', fechasFuturas);
+
+            if (fechasFuturas.length === 0) {
+                fechasReagendarDiv.innerHTML = '<p>No hay fechas disponibles para reagendar en este momento.</p>';
+            } else {
+                fechasFuturas.forEach(fecha => {
+                    const fechaObj = new Date(fecha.fecha_hora);
+                    const diaSemana = fechaObj.toLocaleDateString('es-ES', { weekday: 'long' });
+                    const fechaFormateada = `${diaSemana} ${fechaObj.toLocaleDateString('es-ES')} ${fechaObj.toLocaleTimeString('es-ES')}`;
+                    fechasReagendarDiv.innerHTML += `
+                        <div class="fecha-container">
+                            <div>Fecha: <span class="fecha">${fechaFormateada}</span></div>
+                            <div>Cupos disponibles: ${fecha.cupos_disponibles}</div>
+                            <button class="reservar-clase-button" onclick="mostrarConfirmacionReagendar(${claseId}, '${fecha.fecha_hora}')">Reagendar</button>
+                        </div>
+                    `;
+                });
+            }
 
             fetchData(`/perfil/clases-disponibles`)
                 .then(data => {
@@ -45,6 +60,7 @@ function reagendarClase(claseId) {
         })
         .catch(error => console.error('Error al obtener fechas para reagendar:', error));
 }
+
 
 function mostrarConfirmacionReagendar(claseId, nuevaFecha) {
     claseIdGlobal = claseId;

@@ -98,3 +98,81 @@ input::placeholder, select::placeholder {
     color: white;
     transition: width 0.4s;
 }
+
+
+.info-box {
+    background-color: transparent;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.payment-icons i {
+    font-size: 24px;
+    color: white;
+    margin-right: 10px;
+}
+
+
+ .password-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    max-width: 70%;
+margin-left: 20px;
+}
+
+.password-container input {
+    width: 100%;
+    padding-right: 30px; /* Espacio para el icono del ojo */
+}
+
+.password-container i {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+    color: #B2987E; /* Marrón claro */
+    top: 11px;
+
+}
+.option-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 150px;
+    height: 150px;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.option i {
+    font-size: 50px;
+    color: white;
+}
+
+.option p {
+    color: white;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.option:hover {
+    background-color: #f0f0f0;
+}
+
+.option.selected {
+    border-color: #7F5B41;
+    background-color: #B2987E;
+}

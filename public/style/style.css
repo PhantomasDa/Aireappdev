@@ -412,64 +412,89 @@ body {
     background-color: #8B4513; /* Color marrón oscuro al pasar el ratón */
 }
 
-
 .products {
     padding: 20px;
-    background-color: #FBF7F2; /* Fondo blanco */
-    color: #14110F; /* Texto negro */
+    background-color: #f9f9f9;
 }
 
 .product-carousel {
     display: flex;
+    gap: 20px;
     overflow-x: auto;
-    scroll-behavior: smooth;
+    padding: 20px 0;
 }
 
 .product-card {
-    flex: 0 0 auto;
-    width: 250px;
-    margin: 0 10px;
-    padding: 10px;
     background-color: #fff;
     border: 1px solid #ddd;
     border-radius: 10px;
+    padding: 20px;
     text-align: center;
+    flex: 0 0 auto;
+    width: 300px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
 .product-card img {
-    width: 100%;
+    max-width: 100%;
     border-radius: 10px;
+    margin-bottom: 10px;
 }
 
 .product-card h3 {
-    font-size: 18px;
-    font-weight: 700;
-    margin: 10px 0;
-}
-
-.product-card p {
-    font-size: 16px;
+    font-size: 24px;
     color: #14110F;
+    margin-bottom: 10px;
 }
 
-.product-card .original-price {
+.rating {
+    font-size: 20px;
+    color: #FFD700; /* Gold color for stars */
+    margin-bottom: 10px;
+}
+
+.price {
+    font-size: 18px;
+    color: #14110F;
+    margin-bottom: 10px;
+}
+
+.current-price {
+    color: #7F5B41;
+    font-weight: bold;
+}
+
+.original-price {
+    color: #aaa;
     text-decoration: line-through;
-    color: #888;
     margin-left: 10px;
 }
 
+.product-info {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 20px;
+}
+
 .add-to-cart-button {
-    display: inline-block;
+    background-color: #7F5B41;
+    color: #FBF7F2;
+    border: none;
     padding: 10px 20px;
-    background-color: #B2987E; /* Color marrón */
-    color: white;
-    text-decoration: none;
+    cursor: pointer;
     border-radius: 5px;
-    margin-top: 10px;
+    text-decoration: none;
+    font-weight: bold;
 }
 
 .add-to-cart-button:hover {
-    background-color: #8B4513; /* Color marrón oscuro al pasar el ratón */
+    background-color: #B2987E;
 }
 
 
