@@ -21,14 +21,16 @@ function verifyToken(req, res, next) {
     try {
         const decoded = jwt.verify(token, JWT_SECRET);
         console.log('Token verificado:', decoded);
-        req.user = decoded;  // Guardar usuario decodificado en la solicitud para su uso posterior
+        req.user = decoded; // Guardar usuario decodificado en la solicitud para su uso posterior
         next();
     } catch (error) {
         console.error('Error verificando token:', error);
+        if (error.name === 'TokenExpiredError') {
+            return res.redirect('/login'); // Redirige al login si el token ha expirado
+        }
         return res.redirect('/login');
     }
 }
-
 
 // Middleware para verificar si el usuario está autenticado mediante sesión
 const isAuthenticated = (req, res, next) => {
@@ -50,8 +52,7 @@ router.post('/login', (req, res) => {
         req.session.user = user; // Configura los datos de la sesión
         res.json({ token }); // Enviar el token al cliente
     } else {
-        req.flash('error', 'Credenciales incorrectas');
-        res.redirect('/login');
+        res.status(401).json({ error: 'Credenciales incorrectas' });
     }
 });
 

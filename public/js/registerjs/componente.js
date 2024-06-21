@@ -29,3 +29,18 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 });
+function selectGender(gender) {
+    // Obtener todas las opciones
+    const options = document.querySelectorAll('.option');
+
+    // Remover la clase 'selected' de todas las opciones
+    options.forEach(option => {
+        option.classList.remove('selected');
+    });
+
+    // Agregar la clase 'selected' a la opción seleccionada
+    document.getElementById(`option-${gender}`).classList.add('selected');
+
+    // Actualizar el valor del input hidden
+    document.getElementById('genero').value = gender;
+}

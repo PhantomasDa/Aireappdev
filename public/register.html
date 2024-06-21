@@ -5,63 +5,116 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Usuarios</title>
     <link rel="stylesheet" href="style/style.css">
+    <link rel="stylesheet" href="style/register.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-
     <link rel="stylesheet" href="./style/estilosformularios.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;700;800&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
+<style>
+    /* Asegura que los campos de entrada tengan un tamaño de fuente mínimo de 16px */
+    input, select, textarea, button {
+        font-size: 16px;
+    }
+    #loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.spinner {
+    border: 16px solid #f3f3f3;
+    border-top: 16px solid #3498db;
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.cajaparadatosdefacturacion {
+    display: flex;
+    align-items: center;
+    flex-direction: row-reverse;
+    justify-content: center;
+}
+
+.cajaparadatosdefacturacion input[type="checkbox"] {
+    margin-right: 20px;
+    max-width: 30px;
+}
+</style>
 <body>
     <div id="menu"></div>
     <div id="progress-container">
         <div id="progress-bar"></div>
     </div>
-  
+    <div id="loading" style="display:none;">
+        <div class="spinner"></div>
+    </div>
+    
     <div class="my-container-bg">
         <div class="form-section-bg" id="registerForm1">
-            <h2 style="margin: 50px 10px 30px 10px; color:white;">Registro de Usuario</h2>
+            <h2>Registro de Usuario</h2>
             <form id="registerForm1Form">
-                <input type="text" id="nombre" name="nombre" placeholder=" Nombre Completo"  required><br>
-                <span id="nombreError" class="error"></span><br>
+                <label for="nombre">Nombre Completo:</label>
+                <input type="text" id="nombre" name="nombre" placeholder="Nombre Completo" required>
+                <span id="nombreError" class="error"></span>
             
-                <input type="email" id="email" name="email" placeholder="Correo electrónico"  required><br>
-                <span id="emailError" class="error"></span><br>
+                <label for="email">Correo electrónico:</label>
+                <input type="email" id="email" name="email" placeholder="Correo electrónico" required>
+                <span id="emailError" class="error"></span>
             
-                <input type="tel" id="telefono" name="telefono" placeholder=" Teléfono" required><br>
-                <span id="telefonoError" class="error"></span><br>
+                <label for="telefono">Teléfono:</label>
+                <input type="tel" id="telefono" name="telefono" placeholder="Teléfono" required>
+                <span id="telefonoError" class="error"></span>
 
+                <label for="password">Contraseña:</label>
                 <div class="password-container">
-                    <input type="password" id="password" name="password" placeholder=" Contraseña" required>
+                    <input type="password" id="password" name="password" placeholder="Contraseña" required>
                     <i class="fas fa-eye" id="togglePassword" onclick="togglePasswordVisibility('password', 'togglePassword')"></i>
                 </div>
-                <span id="passwordError" class="error"></span><br>
+                <span id="passwordError" class="error"></span>
 
+                <label for="confirm_password">Confirmar Contraseña:</label>
                 <div class="password-container">
-                    <input type="password" id="confirm_password" name="confirm_password" placeholder=" Confirmar Contraseña" required>
+                    <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirmar Contraseña" required>
                     <i class="fas fa-eye" id="toggleConfirmPassword" onclick="togglePasswordVisibility('confirm_password', 'toggleConfirmPassword')"></i>
                 </div>
-                <span id="confirmPasswordError" class="error"></span><br>
+                <span id="confirmPasswordError" class="error"></span>
 
-                <label for="fecha_nacimiento" style="color: white; max-width: 100%;">Fecha de Nacimiento:</label>
-                <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required><br>
-                <span id="fechaNacimientoError" class="error"></span><br>
+                <label for="fecha_nacimiento">Fecha de Nacimiento:</label>
+                <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required>
+                <span id="fechaNacimientoError" class="error"></span>
 
+                <label>Género:</label>
                 <div class="option-container">
                     <div class="option" id="option-hombre" onclick="selectGender('hombre')">
-                        <i class="fas fa-male"></i>
+                        <i class="fas fa-male" aria-hidden="true"></i>
                         <p>Hombre</p>
                     </div>
                     <div class="option selected" id="option-mujer" onclick="selectGender('mujer')">
-                        <i class="fas fa-female"></i>
+                        <i class="fas fa-female" aria-hidden="true"></i>
                         <p>Mujer</p>
                     </div>
                     <div class="option" id="option-otro" onclick="selectGender('otro')">
-                        <i class="fas fa-genderless"></i>
+                        <i class="fas fa-genderless" aria-hidden="true"></i>
                         <p>Prefiero no decir</p>
                     </div>
                 </div>
                 <input type="hidden" id="genero" name="genero" value="mujer">
-                <span id="generoError" class="error"></span><br>
+                <span id="generoError" class="error"></span>
 
                 <button type="button" class="button" onclick="submitForm()">Completar</button>
             </form>
@@ -71,85 +124,87 @@
             <h2>Sube tu Foto de Perfil</h2>
             <form id="registerForm2Form" enctype="multipart/form-data">
                 <input type="hidden" id="userId2" name="userId">
-                <label for="foto_perfil">Comparte una foto desde tu carrete o tomate una foto para tu perfil pilßatero</label>
-                <input type="file" id="foto_perfil" name="foto_perfil" required><br><br>
-                <span id="fotoPerfilError" class="error"></span><br>
+                <label for="foto_perfil">Comparte una foto desde tu carrete o tómate una foto para tu perfil pilatero:</label>
+                <input type="file" id="foto_perfil" name="foto_perfil" required>
+                <span id="fotoPerfilError" class="error"></span>
                 
                 <button type="button" class="button" onclick="submitForm2()">Continuar</button>
             </form>
         </div>
+
         <div class="form-section-bg" id="registerForm3" style="display: none;">
             <h2>Cuestionario y Datos Relevantes</h2>
-            <label>Completa las siguientes preguntas que nos ayudaran con informacion necesaria para comenzar con nuestras clases de pilates</label><br>
-        
             <form id="registerForm3Form">
                 <input type="hidden" id="userId3" name="userId">
-                <label for="pregunta1">¿Has practicado Pilates antes?</label><br>
+
+                <label for="pregunta1">¿Has practicado Pilates antes?</label>
                 <select id="pregunta1" name="pregunta1" required>
                     <option value="">Seleccione</option>
                     <option value="si">Sí</option>
                     <option value="no">No</option>
-                </select><br><br>
-        
-                <label for="pregunta2">¿Tienes alguna lesión o condición médica que debamos conocer?</label><br>
+                </select>
+
+                <label for="pregunta2">¿Tienes alguna lesión o condición médica que debamos conocer?</label>
                 <select id="pregunta2" name="pregunta2" onchange="toggleLesiones()" required>
                     <option value="">Seleccione</option>
                     <option value="si">Sí</option>
                     <option value="no">No</option>
-                </select><br><br>
-        
+                </select>
+
                 <div id="lesionesSection" style="display:none;">
-                    <span>Si tienes alguna condición médica o algo que debamos saber, por favor escríbelo aquí.</span>
-                    <textarea id="lesiones" name="lesiones" rows="4" cols="50"></textarea><br><br>
+                    <label for="lesiones">Si tienes alguna condición médica o algo que debamos saber, por favor escríbelo aquí:</label>
+                    <textarea id="lesiones" name="lesiones" rows="4" cols="50"></textarea>
                 </div>
-        
-                <label for="pregunta3">¿Realizas ejercicio regularmente (al menos tres veces por semana)?</label><br>
+
+                <label for="pregunta3">¿Realizas ejercicio regularmente (al menos tres veces por semana)?</label>
                 <select id="pregunta3" name="pregunta3" required>
                     <option value="">Seleccione</option>
                     <option value="si">Sí</option>
                     <option value="no">No</option>
-                </select><br><br>
-        
-                <label for="pregunta4">¿Sigues algun plan de alimentación que debamos tener en cuenta para tu entrenamiento?</label><br>
+                </select>
+
+                <label for="pregunta4">¿Sigues algún plan de alimentación que debamos tener en cuenta para tu entrenamiento?</label>
                 <select id="pregunta4" name="pregunta4" required>
                     <option value="">Seleccione</option>
                     <option value="si">Sí</option>
                     <option value="no">No</option>
-                </select><br><br>
-        
-                <span>Cuéntanos un poco más sobre ti y por qué quieres practicar Pilates.</span>
-                <textarea id="motivacion" name="motivacion" rows="4" cols="50"></textarea><br><br>
+                </select>
+
+                <label for="motivacion">Cuéntanos un poco más sobre ti y por qué quieres practicar Pilates:</label>
+                <textarea id="motivacion" name="motivacion" rows="4" cols="50"></textarea>
                 
-                <span id="cuestionarioError" class="error"></span><br>
+                <span id="cuestionarioError" class="error"></span>
                         
                 <button type="button" class="button" onclick="submitForm3()">Continuar</button>
             </form>
         </div>
         
-
         <div class="form-section-bg" id="registerForm5" style="display: none;">
-            <h2>Como quieres Pilatear</h2>
+            <h2>Cómo quieres Pilatear</h2>
             <form id="registerForm5Form">
                 <input type="hidden" id="userId5" name="userId">
                 <input type="hidden" id="modalidad" name="modalidad" value="presencial">
                 
+                <label for="modalidad">Modalidad:</label>
                 <div class="option-container">
                     <div class="option" id="option-online" onclick="selectOption('online')">
-                        <i class="fas fa-laptop"></i>
+                        <i class="fas fa-laptop" aria-hidden="true"></i>
                         <p>ONLINE</p>
                     </div>
                     <div class="option selected" id="option-presencial" onclick="selectOption('presencial')">
-                        <i class="fas fa-home"></i>
+                        <i class="fas fa-home" aria-hidden="true"></i>
                         <p>PRESENCIAL</p>
                     </div>
                 </div>
                 
-                <span id="modalidadError" class="error"></span><br>
+                <span id="modalidadError" class="error"></span>
                 <button type="button" class="button" onclick="submitForm5()">Continuar</button>
             </form>
         </div>
+
         <div class="form-section-bg" id="registerForm6" style="display: none;">
             <h2>Selección de Paquete</h2>
+            <label for="paquete">Paquete:</label>
             <div class="option-container">
                 <div class="option" id="option-Paquete básico" onclick="selectPackage('Paquete básico')">
                     <p>1 vez por semana</p>
@@ -162,8 +217,6 @@
                 </div>
             </div>
             <input type="hidden" id="paquete" name="paquete" value="Paquete completo">
-            
-            
             
             <div id="packageDescription" class="info-box">
                 <h3>Descripción del Paquete</h3>
@@ -183,68 +236,114 @@
                     <li>ariadna2400@gmail.com</li>
                 </ul>
                 <div class="payment-icons">
-                    <i class="fas fa-credit-card"></i>
-                    <i class="fas fa-money-bill-wave"></i>
-                    <i class="fas fa-wallet"></i>
+                    <i class="fas fa-credit-card" aria-hidden="true"></i>
+                    <i class="fas fa-money-bill-wave" aria-hidden="true"></i>
+                    <i class="fas fa-wallet" aria-hidden="true"></i>
                 </div>
                 <p>Aceptamos todo tipo de pago.</p>
             </div>
         
             <form id="registerForm6Form" enctype="multipart/form-data">
                 <input type="hidden" id="userId6" name="userId">
-                <label for="comprobante_pago" style="color: black;">Compártenos una foto o screenshot de tu pago</label>
-                <input type="file" id="comprobante_pago" name="comprobante_pago" required><br><br>
-                <span id="comprobantePagoError" class="error"></span><br>
-                
-                <input type="checkbox" id="showBilling" onclick="toggleBillingForm()"> Agregar datos de facturación<br><br>
-        
+                <label for="comprobante_pago">Compártenos una foto o screenshot de tu pago:</label>
+                <input type="file" id="comprobante_pago" name="comprobante_pago" required>
+                <span id="comprobantePagoError" class="error"></span>
+                <div class="cajaparadatosdefacturacion">
+                 <label for=""> Agregar datos de facturacion</label>
+                 <input type="checkbox" id="showBilling" onclick="toggleBillingForm()"> 
+                 </div>
                 <div id="billingForm" style="display: none;">
                     <h2>Datos de Facturación</h2>
                     <input type="hidden" id="usuario_id_billing" name="usuario_id">
                     <label for="cedula_ruc">Cédula o RUC:</label>
-                    <input type="text" id="cedula_ruc" name="cedula_ruc" placeholder="Cedula o Ruc"><br><br>
+                    <input type="text" id="cedula_ruc" name="cedula_ruc" placeholder="Cedula o Ruc">
                     
                     <label for="direccion1">Dirección 1:</label>
-                    <input type="text" id="direccion1" name="direccion1" placeholder="Direccion"><br><br>
+                    <input type="text" id="direccion1" name="direccion1" placeholder="Dirección">
                     
                     <label for="direccion2">Dirección 2:</label>
-                    <input type="text" id="direccion2" name="direccion2" placeholder="Dirección 2"><br><br>
+                    <input type="text" id="direccion2" name="direccion2" placeholder="Dirección 2">
                     
                     <label for="telefono_billing">Teléfono:</label>
-                    <input type="text" id="telefono_billing" name="telefono" placeholder="Teléfono"><br><br>
+                    <input type="text" id="telefono_billing" name="telefono" placeholder="Teléfono">
                     
                     <label for="nombre_completo">Nombre Completo:</label>
-                    <input type="text" id="nombre_completo" name="nombre_completo" placeholder="Nombre completo"><br><br>
+                    <input type="text" id="nombre_completo" name="nombre_completo" placeholder="Nombre completo">
                     
                     <label for="razon_social">Razón Social:</label>
-                    <input type="text" id="razon_social" name="razon_social" placeholder="Razón Social"><br><br>
+                    <input type="text" id="razon_social" name="razon_social" placeholder="Razón Social">
                     
                     <label for="otro_dato">Otro Dato:</label>
-                    <input type="text" id="otro_dato" name="otro_dato" placeholder="extra"><br><br>
+                    <input type="text" id="otro_dato" name="otro_dato" placeholder="Extra">
                 </div>
         
                 <button type="button" class="button" onclick="submitForm6()">Verificar Pago</button>
             </form>
         </div>
-        
 
         <div id="successMessage" style="display: none; color: green;">
             <h2>Te has registrado con éxito</h2>
             <p>Serás redirigido al inicio de sesión en 5 segundos...</p>
         </div>
-
     </div>
         
     <div id="footer"></div>
     <div id="sidebar-container"></div>
-<script src="./js/registerjs/sendform1.js"></script>
-<script src="./js/registerjs/sendform2.js"></script>
-<script src="./js/registerjs/sendform3.js"></script>
-<script src="./js/registerjs/sendform4.js"></script>
-<script src="./js/registerjs/sendform5.js"></script>
-<script src="./js/registerjs/sendform6.js"></script>
-<script src="./js/registerjs/componente.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="./js/sidebar.js"></script>
+<script>
+   function togglePasswordVisibility(inputId, toggleId) {
+    const passwordInput = document.getElementById(inputId);
+    const toggleIcon = document.getElementById(toggleId);
+
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.classList.remove('fa-eye');
+        toggleIcon.classList.add('fa-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        toggleIcon.classList.remove('fa-eye-slash');
+        toggleIcon.classList.add('fa-eye');
+    }
+}
+function updateProgressBar(step) {
+    const progressBar = document.getElementById('progress-bar');
+    const steps = 6; // Número total de pasos en el formulario
+    const percentage = (step / steps) * 100;
+    progressBar.style.width = `${percentage}%`;
+}
+function scrollToTop() {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+}
+function toggleLesiones() {
+    const pregunta2 = document.getElementById('pregunta2').value;
+    const lesionesSection = document.getElementById('lesionesSection');
+
+    if (pregunta2 === 'si') {
+        lesionesSection.style.display = 'block';
+    } else {
+        lesionesSection.style.display = 'none';
+        document.getElementById('lesiones').value = ''; // Limpiar el campo de lesiones si está oculto
+    }
+}
+function toggleBillingForm() {
+    const billingForm = document.getElementById('billingForm');
+    if (document.getElementById('showBilling').checked) {
+        billingForm.style.display = 'block';
+    } else {
+        billingForm.style.display = 'none';
+    }
+}
+</script>
+    <script src="./js/registerjs/sendform1.js" defer></script>
+    <script src="./js/registerjs/sendform2.js" defer></script>
+    <script src="./js/registerjs/sendform3.js" defer></script>
+    <script src="./js/registerjs/sendform4.js" defer></script>
+    <script src="./js/registerjs/sendform5.js" defer></script>
+    <script src="./js/registerjs/sendform6.js" defer></script>
+    <script src="./js/registerjs/componente.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
+    <script src="./js/sidebar.js" defer></script>
 </body>
 </html>

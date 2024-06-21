@@ -1,64 +1,70 @@
- // Inicializar con el paquete "completo" preseleccionado
- document.addEventListener("DOMContentLoaded", function() {
-    selectPackage('completo');
-});
+function submitForm5() {
+    const modalidad = document.getElementById('modalidad').value;
+    const userId = document.getElementById('userId5').value;
 
+    if (!modalidad) {
+        document.getElementById('modalidadError').textContent = 'Por favor, seleccione una modalidad.';
+        return;
+    }
 
-function selectPackage(paquete) {
-const paqueteInput = document.getElementById('paquete');
-const selectedOption = document.getElementById(`option-${paquete}`);
+    console.log({ userId, modalidad });
 
-// Verificar si los elementos existen
-if (!paqueteInput) {
-    console.error('No se encontró el input hidden para el paquete.');
-    return;
+    // Mostrar animación de carga y bloquear formulario
+    document.getElementById('loading').style.display = 'flex';
+    document.getElementById('registerForm5Form').style.pointerEvents = 'none';
+
+    const startTime = Date.now();
+
+    fetch('/register/step5', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId, modalidad })
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => { throw new Error(err.message); });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.message !== 'Modalidad guardada exitosamente') {
+            document.getElementById('modalidadError').textContent = data.message;
+        } else {
+            document.getElementById('registerForm5').style.display = 'none';
+            document.getElementById('registerForm6').style.display = 'block';
+            document.getElementById('userId6').value = document.getElementById('userId5').value;
+
+            // Actualizar barra de progreso
+            updateProgressBar(6); // Cambiar a 6 para el sexto paso
+            scrollToTop();
+        }
+    })
+    .catch(error => {
+        console.error('Error durante la selección de modalidad:', error);
+        document.getElementById('modalidadError').textContent = 'Error durante la selección de modalidad';
+    })
+    .finally(() => {
+        const elapsedTime = Date.now() - startTime;
+        const remainingTime = 2000 - elapsedTime;
+
+        setTimeout(() => {
+            // Ocultar animación de carga y desbloquear formulario
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('registerForm5Form').style.pointerEvents = 'auto';
+        }, remainingTime > 0 ? remainingTime : 0);
+    });
 }
 
-if (!selectedOption) {
-    console.error(`No se encontró el elemento para el paquete: ${paquete}`);
-    return;
-}
 
-paqueteInput.value = paquete;
 
-const options = document.querySelectorAll('.option');
-options.forEach(option => option.classList.remove('selected'));
+function selectOption(modalidad) {
+    document.getElementById('modalidad').value = modalidad;
 
-selectedOption.classList.add('selected');
+    const options = document.querySelectorAll('.option');
+    options.forEach(option => option.classList.remove('selected'));
 
-const packageDetails = document.getElementById('packageDetails');
-const packageCost = document.getElementById('packageCost');
-
-switch(paquete) {
-    case 'Paquete básico':
-        packageDetails.innerHTML = `
-            <li>4 clases por mes</li>
-            <li>Duración de un mes</li>
-            <li>Acceso a contenido exclusivo online</li>
-        `;
-        packageCost.textContent = "Costo: $30";
-        break;
-    case 'Paquete completo':
-        packageDetails.innerHTML = `
-            <li>8 clases por mes</li>
-            <li>Duración de un mes</li>
-            <li>Acceso a contenido exclusivo online</li>
-            <li>Soporte personalizado</li>
-        `;
-        packageCost.textContent = "Costo: $50";
-        break;
-    case 'Paquete premium':
-        packageDetails.innerHTML = `
-            <li>12 clases por mes</li>
-            <li>Duración de un mes</li>
-            <li>Acceso a contenido exclusivo online</li>
-            <li>Soporte personalizado</li>
-            <li>Sesiones adicionales de coaching</li>
-        `;
-        packageCost.textContent = "Costo: $70";
-        break;
-    default:
-        packageDetails.innerHTML = '';
-        packageCost.textContent = '';
-}
+    const selectedOption = document.getElementById(`option-${modalidad}`);
+    selectedOption.classList.add('selected');
 }

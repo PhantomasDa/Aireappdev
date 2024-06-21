@@ -8,19 +8,21 @@ const { isAuthenticated } = require('../middleware/auth');
 function verifyToken(req, res, next) {
     const token = req.headers.authorization?.split(' ')[1];
     if (!token) {
-        return res.status(401).send('No autorizado');
+        return res.redirect('/login');
     }
     try {
-        const decoded = jwt.verify(token, 'your_jwt_secret');
-        req.user = decoded;  // Guardar usuario decodificado en la solicitud para su uso posterior
+        const decoded = jwt.verify(token, JWT_SECRET);
         console.log('Token verificado:', decoded);
+        req.user = decoded; // Guardar usuario decodificado en la solicitud para su uso posterior
         next();
     } catch (error) {
         console.error('Error verificando token:', error);
-        res.status(401).send({ message: 'Token inválido', error: error.message });
+        if (error.name === 'TokenExpiredError') {
+            return res.redirect('/login'); // Redirige al login si el token ha expirado
+        }
+        return res.redirect('/login');
     }
 }
-
 
 // Utilidad para ejecutar consultas de base de datos y manejar errores
 async function executeQuery(query, params, res, successCallback) {

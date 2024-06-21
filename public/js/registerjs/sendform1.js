@@ -1,4 +1,3 @@
-
 function submitForm() {
     const nombre = document.getElementById('nombre').value;
     const email = document.getElementById('email').value;
@@ -44,6 +43,12 @@ function submitForm() {
         return;
     }
 
+    // Mostrar animación de carga y bloquear formulario
+    document.getElementById('loading').style.display = 'flex';
+    document.getElementById('registerForm1Form').style.pointerEvents = 'none';
+
+    const startTime = Date.now();
+
     fetch('/register/step1', {
         method: 'POST',
         headers: {
@@ -66,13 +71,24 @@ function submitForm() {
             document.getElementById('registerForm2').style.display = 'block';
             document.getElementById('userId2').value = data.userId; // Asignar el userId al segundo formulario
 
+            
             // Actualizar barra de progreso
             updateProgressBar(2); // Cambiar a 2 para el segundo paso
-            scrollToTop()
+            scrollToTop();
         }
     })
     .catch(error => {
         console.error('Error durante el registro:', error);
         document.getElementById('nombreError').textContent = 'Error durante el registro';
+    })
+    .finally(() => {
+        const elapsedTime = Date.now() - startTime;
+        const remainingTime = 2000 - elapsedTime;
+
+        setTimeout(() => {
+            // Ocultar animación de carga y desbloquear formulario
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('registerForm1Form').style.pointerEvents = 'auto';
+        }, remainingTime > 0 ? remainingTime : 0);
     });
 }
