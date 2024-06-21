@@ -12,6 +12,7 @@ const session = require('express-session');
 const flash = require('connect-flash');
 const app = express();
 const homeRoutes = require('./routes/home');
+require('dotenv').config();
 
 
 // Configuración de session middleware

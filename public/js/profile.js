@@ -1,5 +1,7 @@
 // profile.js
 
+
+
 function cargarNombreUsuario() {
     fetchData('/perfil/usuario')
         .then(usuario => {

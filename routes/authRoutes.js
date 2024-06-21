@@ -1,7 +1,7 @@
 const express = require('express');
 const db = require('../database');
 const bcrypt = require('bcryptjs');
-const { generateToken, verifyToken } = require('../middleware/auth'); // Asegúrate de que la ruta a auth.js sea correcta
+const { generateToken, verifyToken } = require('../auth'); // Asegúrate de que la ruta a auth.js sea correcta
 const router = express.Router();
 
 router.post('/login', async (req, res) => {
