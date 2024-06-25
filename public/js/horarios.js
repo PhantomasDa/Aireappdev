@@ -52,6 +52,31 @@ function cerrarHorariosPopup() {
     document.getElementById('horariosPopup').classList.remove('active');
 }
 
+function convertirFechaEspañol(fechaStr) {
+    const meses = {
+        'enero': '01',
+        'febrero': '02',
+        'marzo': '03',
+        'abril': '04',
+        'mayo': '05',
+        'junio': '06',
+        'julio': '07',
+        'agosto': '08',
+        'septiembre': '09',
+        'octubre': '10',
+        'noviembre': '11',
+        'diciembre': '12'
+    };
+
+    const partes = fechaStr.toLowerCase().split(' de ');
+    if (partes.length === 3) {
+        const dia = partes[0];
+        const mes = meses[partes[1]];
+        const anio = partes[2];
+        return new Date(`${anio}-${mes}-${dia}`);
+    }
+    return null;
+}
 
 function mostrarErrorFechaModal(mensaje) {
     const modal = document.getElementById('errorFechaModal');
