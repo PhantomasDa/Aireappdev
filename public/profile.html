@@ -32,12 +32,77 @@
             </div>
         </div>
 
-        <div class="toggle-header" onclick="togglePackageInfo()">Mostrar información de paquete</div>
+        <div class="toggle-header" onclick="togglePackageInfo()">Mostrar  paquete</div>
         <div id="packageInfo" class="toggle-content">
             <div id="clases_disponibles"></div>
-            <p style="color: black;">tu paquete está: <span id="estadodelpaquete"></span></p>
-            <p style="color: black;">Paquete válido hasta: <span id="fechaExpiracionPaquete"></span></p>
-            <h4 class="color-ajuste margin-ajuste">Puedes reagendar tus clases máximo 2 veces <span id="reagedamientosporusar"></span></h4>
+            <p style="color: black;">Estado: <span id="estadodelpaquete"></span></p>
+            <p style="color: black;">Expiración: <span id="fechaExpiracionPaquete"></span></p>
+            <h4 class="color-ajuste margin-ajuste">Reagendamientos disponibles <span id="reagedamientosporusar"></span></h4>
+
+                <button id="reservaPaqueteBtn" onclick="abrirReservaPaquetePopup()">Te quedan X clases. Reserva tu siguiente paquete aquí.</button>
+            
+            <!-- Popup de Reserva de Paquete -->
+<div id="reservaPaquetePopup" class="popup">
+    <div class="popup-content">
+        <button onclick="cerrarReservaPaquetePopup()" class="close-button">&times;</button>
+        <div id="registerForm6">
+            <h2>Selección de Paquete</h2>
+            <label for="paquete">Paquete:</label>
+            <div class="option-container">
+                <div class="option" id="option-Paquete básico" onclick="selectPackage('Paquete básico')">
+                    <p style="color: black;">1 vez por semana</p>
+                </div>
+                <div class="option" id="option-Paquete completo" onclick="selectPackage('Paquete completo')">
+                    <p style="color: black;">2 veces por semana</p>
+                </div>
+                <div class="option" id="option-Paquete premium" onclick="selectPackage('Paquete premium')">
+                    <p style="color: black;"> 3 veces por semana</p>
+                </div>
+            </div>
+            <input type="hidden" id="paquete" name="paquete" value="Paquete completo">
+            <input type="hidden" id="userId" name="userId" value="">
+            
+            <div id="packageDescription" class="info-box">
+                <h3>Descripción del Paquete</h3>
+                <ul id="packageDetails">
+                    <!-- Detalles del paquete se mostrarán aquí -->
+                </ul>
+                <p id="packageCost"></p>
+            </div>
+            
+            <div class="info-box">
+                <p style="color: black;">Información de cuenta:</p>
+                <ul>
+                    <li>N• 2204332302 ahorro</li>
+                    <li>1757209158</li>
+                    <li>Ariadna Labarca</li>
+                    <li>Pichincha</li>
+                    <li>ariadna2400@gmail.com</li>
+                </ul>
+                <div class="payment-icons">
+                    <i class="fas fa-credit-card" aria-hidden="true"></i>
+                    <i class="fas fa-money-bill-wave" aria-hidden="true"></i>
+                    <i class="fas fa-wallet" aria-hidden="true"></i>
+                </div>
+                <p>Aceptamos todo tipo de pago.</p>
+            </div>
+        
+            <form id="registerForm6Form" enctype="multipart/form-data">
+                <label for="comprobante_pago">Compártenos una foto o screenshot de tu pago:</label>
+                <input type="file" id="comprobante_pago" name="comprobante_pago" required>
+                <span id="comprobantePagoError" class="error"></span>
+            
+        
+                <button type="button" class="button" onclick="submitRenovacionPaquete()">Verificar Pago</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
+
         </div>
         <h2 class="color-ajuste margin-ajuste">Tus Horarios Disponibles</h2>
         <div id="calendar-legend">
@@ -55,14 +120,8 @@
                 <span>Dia con clases</span>
             </div>
         </div>
-        
-
-
-
-       
 
         <div id="calendario" class="calendar-container"></div>
-        
         
         <h2 class="color-ajuste margin-ajuste">Tus Próximas Clases</h2>
         <div id="proximas_clases" class="toggle-content active"></div>
@@ -171,9 +230,13 @@
     <script src="js/profile.js"></script>
     <script src="js/horarios.js"></script>
     <script src="js/reagendar.js"></script>
+    <script src="js/renovar.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/init.js"></script>
-    <script src="./js/sidebar.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/renovacionpaquete.js"></script>
+
+
    
 </body>
 </html>

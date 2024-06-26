@@ -3,7 +3,23 @@ const jwt = require('jsonwebtoken');
 const db = require('../database'); // Asegúrate de que la ruta al archivo de base de datos sea correcta
 const router = express.Router();
 const { isAuthenticated } = require('../middleware/auth');
+const multer = require('multer'); // Añadir esta línea para importar multer
+const path = require('path'); // Añadir esta línea para importar path
+const { body, validationResult } = require('express-validator'); // Importar body y validationResult desde express-validator
 
+
+
+
+// Configurar multer para almacenar archivos
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/');
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + path.extname(file.originalname));
+    }
+});
+const upload = multer({ storage: storage });
 // Middleware para verificar el token
 function verifyToken(req, res, next) {
     const token = req.headers.authorization?.split(' ')[1];
@@ -342,6 +358,81 @@ router.get('/clases-agendadas', verifyToken, async (req, res) => {
 });
 
 
+
+
+// Obtener el ID del usuario
+router.get('/user-id', verifyToken, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        console.log('ID del usuario:', userId);
+        res.json({ userId });
+    } catch (error) {
+        console.error('Error obteniendo el ID del usuario:', error);
+        res.status(500).json({ message: 'Error obteniendo el ID del usuario' });
+    }
+});// Ruta para la renovación del paquete
+router.post('/renovacion-paquete', upload.single('comprobante_pago'), [
+    body('userId').isInt().notEmpty().withMessage('Invalid userId'),
+    body('paquete').isIn(['Paquete básico', 'Paquete completo', 'Paquete premium']).withMessage('Invalid paquete')
+], async (req, res) => {
+    console.log('Campos recibidos:', req.body, req.file);
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        console.log('Errores de validación:', errors.array());
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { userId, paquete } = req.body;
+    const comprobantePago = req.file ? req.file.filename : null;
+
+    if (!comprobantePago) {
+        console.error('No se recibió el comprobante de pago.');
+        return res.status(400).json({ message: 'Todos los campos son obligatorios' });
+    }
+
+    console.log('Datos después de la validación:', {
+        userId,
+        paquete,
+        comprobantePago
+    });
+
+    let clasesDisponibles, maxReagendamientos;
+    switch (paquete) {
+        case 'Paquete básico':
+            clasesDisponibles = 4;
+            maxReagendamientos = 2;
+            break;
+        case 'Paquete completo':
+            clasesDisponibles = 8;
+            maxReagendamientos = 3;
+            break;
+        case 'Paquete premium':
+            clasesDisponibles = 12;
+            maxReagendamientos = 4;
+            break;
+        default:
+            console.error('Paquete inválido:', paquete);
+            return res.status(400).json({ message: 'Paquete inválido' });
+    }
+
+    const fechaCompra = new Date();
+    const fechaActivacion = new Date(fechaCompra);
+    fechaActivacion.setDate(fechaActivacion.getDate() + 1);
+    const fechaExpiracion = new Date(fechaActivacion);
+    fechaExpiracion.setMonth(fechaExpiracion.getMonth() + 1);
+
+    try {
+        console.log('Preparando para insertar datos de la renovación:', { userId, fechaCompra, fechaActivacion, fechaExpiracion, maxReagendamientos, paquete, comprobantePago });
+        await db.execute('INSERT INTO renovaciones (usuario_id, paquete, comprobante_pago, fecha_compra, fecha_activacion, fecha_expiracion, max_reagendamientos) VALUES (?, ?, ?, ?, ?, ?, ?)', 
+            [userId, paquete, comprobantePago, fechaCompra, fechaActivacion, fechaExpiracion, maxReagendamientos]);
+
+        res.status(200).json({ message: 'Renovación de paquete registrada exitosamente' });
+    } catch (error) {
+        console.error('Error al registrar la renovación del paquete:', error);
+        res.status(500).json({ message: 'Error al registrar la renovación del paquete', error: error.message });
+    }
+});
 
 
 module.exports = router;

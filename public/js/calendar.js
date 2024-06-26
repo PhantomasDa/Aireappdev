@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initPage() {
-    console.log("Página inicializada");
     actualizarClasesDisponibles();
     cargarProximasClases();
     cargarNombreUsuario();
@@ -13,7 +12,6 @@ function initPage() {
 async function marcarDisponibilidad() {
     const year = new Date().getFullYear();
     try {
-        console.log("Obteniendo disponibilidad de clases...");
         // Solicitud para obtener disponibilidad de clases
         const responseDisponibilidad = await fetch(`/profile/disponibilidad-clases?year=${year}`, {
             headers: {
@@ -24,10 +22,10 @@ async function marcarDisponibilidad() {
             throw new Error('Error en la solicitud al servidor para disponibilidad');
         }
         const disponibilidad = await responseDisponibilidad.json();
-        console.log("Disponibilidad obtenida:", disponibilidad);
+        // console.log("Disponibilidad obtenida:", disponibilidad);
 
         // Solicitud para obtener clases agendadas
-        console.log("Obteniendo clases agendadas...");
+        // console.log("Obteniendo clases agendadas...");
         const responseAgendadas = await fetch(`/profile/clases-agendadas?year=${year}`, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -37,36 +35,36 @@ async function marcarDisponibilidad() {
             throw new Error('Error en la solicitud al servidor para clases agendadas');
         }
         const agendadas = await responseAgendadas.json();
-        console.log("Clases agendadas obtenidas:", agendadas);
+        // console.log("Clases agendadas obtenidas:", agendadas);
 
         const dias = document.querySelectorAll('.fc-daygrid-day');
         dias.forEach(dia => {
             const dateStr = dia.getAttribute('data-date');
-            console.log("Procesando día:", dateStr);
+            // console.log("Procesando día:", dateStr);
 
             // Marcar clases agendadas en azul claro
             const claseAgendada = agendadas.find(d => moment(d.fecha).format('YYYY-MM-DD') === dateStr);
             if (claseAgendada) {
                 dia.classList.add('clase-agendada');
-                console.log(`Clase agendada encontrada para ${dateStr}`);
+                // console.log(`Clase agendada encontrada para ${dateStr}`);
             } else {
                 const fecha = disponibilidad.find(d => moment(d.fecha).format('YYYY-MM-DD') === dateStr);
                 if (fecha) {
                     if (parseInt(fecha.cupos_disponibles) > 0) {
                         dia.classList.add('cupos-disponibles');
-                        console.log(`Cupos disponibles para ${dateStr}`);
+                        // console.log(`Cupos disponibles para ${dateStr}`);
                     } else {
                         dia.classList.add('sin-actividades');
-                        console.log(`Sin cupos disponibles para ${dateStr}`);
+                        // console.log(`Sin cupos disponibles para ${dateStr}`);
                     }
                 } else {
                     dia.classList.add('sin-actividades');
-                    console.log(`Sin actividades para ${dateStr}`);
+                    // console.log(`Sin actividades para ${dateStr}`);
                 }
             }
         });
     } catch (error) {
-        console.error('Error obteniendo disponibilidad de clases:', error);
+         console.error('Error obteniendo disponibilidad de clases:', error);
     }
 }
 
@@ -99,5 +97,5 @@ async function inicializarCalendario() {
         }
     });
     calendar.render();
-    console.log("Calendario inicializado");
+    // console.log("Calendario inicializado");
 }
