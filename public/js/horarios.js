@@ -32,7 +32,7 @@ function cargarHorarios(fecha) {
         .then(clases => {
             const horariosContenido = document.getElementById('horariosContenido');
             horariosContenido.innerHTML = clases.map(clase => {
-                const fechaClase = new Date(clase.fecha_hora + 'Z'); // Aseguramos que la fecha se interprete como UTC
+                const fechaClase = new Date(clase.fecha_hora);
                 const diaSemana = fechaClase.toLocaleDateString('es-ES', { weekday: 'long' });
                 const fechaFormateada = `${diaSemana} ${fechaClase.toLocaleDateString('es-ES')} ${fechaClase.toLocaleTimeString('es-ES')}`;
                 return `
