@@ -1,5 +1,20 @@
 // horarios.js
 
+// Convertir fecha en formato español (dd/mm/yyyy) a objeto Date
+function convertirFechaEspañol(fechaStr) {
+    const partes = fechaStr.split('/');
+    return new Date(partes[2], partes[1] - 1, partes[0]);
+}
+
+// Mostrar modal de error con un mensaje específico
+function mostrarErrorFechaModal(mensaje) {
+    const errorFechaModal = document.getElementById('errorFechaModal');
+    const errorFechaText = document.getElementById('errorFechaText');
+    errorFechaText.textContent = mensaje;
+    errorFechaModal.style.display = 'block';
+}
+
+// Cargar horarios disponibles para una fecha específica
 function cargarHorarios(fecha) {
     const estadoPaqueteElement = document.getElementById('estadodelpaquete');
     if (!estadoPaqueteElement) {
@@ -16,6 +31,18 @@ function cargarHorarios(fecha) {
     const fechaExpiracionPaqueteElement = document.getElementById('fechaExpiracionPaquete');
     if (!fechaExpiracionPaqueteElement) {
         mostrarErrorFechaModal('No se pudo encontrar la fecha de expiración del paquete.');
+        return;
+    }
+
+    const clasesDisponiblesElement = document.getElementById('clases_disponibles');
+    if (!clasesDisponiblesElement) {
+        mostrarErrorFechaModal('No se pudo encontrar el número de clases disponibles.');
+        return;
+    }
+
+    const clasesDisponibles = parseInt(clasesDisponiblesElement.textContent.trim(), 10);
+    if (clasesDisponibles === 0) {
+        mostrarErrorFechaModal('Lo sentimos, no tienes clases disponibles. Te recomendamos comprar otro paquete.');
         return;
     }
 
@@ -47,6 +74,7 @@ function cargarHorarios(fecha) {
         })
         .catch(error => console.error('Error al cargar los horarios:', error));
 }
+
 
 function cerrarHorariosPopup() {
     document.getElementById('horariosPopup').classList.remove('active');

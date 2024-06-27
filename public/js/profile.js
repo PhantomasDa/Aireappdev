@@ -43,7 +43,7 @@ function actualizarClasesDisponibles() {
     fetchData('/perfil/clases-disponibles')
         .then(data => {
             const clasesDisponibles = data.clases_disponibles;
-            document.getElementById('clases_disponibles').textContent = `Número de clases disponibles: ${clasesDisponibles}`;
+            document.getElementById('clases_disponibles').textContent = `${clasesDisponibles}`;
 
             const ahora = new Date();
             const opcionesFecha = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
