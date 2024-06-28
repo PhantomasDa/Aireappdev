@@ -2,9 +2,13 @@
 
 let claseIdGlobal;
 let nuevaFechaGlobal;
+
 function reagendarClase(claseId) {
+    console.log(`Reagendando clase con ID: ${claseId}`);
+    
     fetchData(`/perfil/proximas-clases`)
         .then(clases => {
+            console.log('Clases próximas obtenidas:', clases);
             const claseActual = clases.find(clase => clase.id === claseId);
             if (claseActual) {
                 const fechaObj = new Date(claseActual.fecha_hora);
@@ -51,6 +55,7 @@ function reagendarClase(claseId) {
 
             fetchData(`/perfil/clases-disponibles`)
                 .then(data => {
+                    console.log('Reservas disponibles obtenidas:', data);
                     const clasesDisponibles = data.clases_disponibles;
                     document.getElementById('clasesDisponibles').innerHTML = `Reservas disponibles: ${clasesDisponibles}`;
                 })
@@ -61,13 +66,14 @@ function reagendarClase(claseId) {
         .catch(error => console.error('Error al obtener fechas para reagendar:', error));
 }
 
-
 function mostrarConfirmacionReagendar(claseId, nuevaFecha) {
+    console.log(`Mostrando confirmación para reagendar la clase con ID: ${claseId} a la nueva fecha: ${nuevaFecha}`);
     claseIdGlobal = claseId;
     nuevaFechaGlobal = nuevaFecha;
 
     fetchData(`/perfil/proximas-clases`)
         .then(clases => {
+            console.log('Clases próximas obtenidas para confirmación:', clases);
             const claseActual = clases.find(clase => clase.id === claseId);
             if (claseActual) {
                 const fechaActual = new Date(claseActual.fecha_hora);
@@ -88,8 +94,11 @@ function confirmarReagendarDefinitivo() {
     const claseId = claseIdGlobal;
     const nuevaFecha = nuevaFechaGlobal;
 
+    console.log(`Confirmando reagendamiento definitivo para la clase con ID: ${claseId} a la nueva fecha: ${nuevaFecha}`);
+
     fetchData(`/perfil/proximas-clases`)
         .then(clases => {
+            console.log('Verificando clases para el mismo día:', clases);
             const nuevaFechaObj = new Date(nuevaFecha);
             const mismoDia = clases.some(clase => {
                 const claseFechaObj = new Date(clase.fecha_hora);
@@ -117,6 +126,7 @@ function confirmarReagendarDefinitivo() {
                 return response.json();
             })
             .then(data => {
+                console.log('Clase reagendada con éxito:', data);
                 cerrarConfirmacionReagendarPopup();
                 mostrarExitoReagendarPopup();
                 cargarProximasClases(); // Asegúrate de que esta función esté disponible globalmente o impórtala si es necesario.
@@ -124,6 +134,7 @@ function confirmarReagendarDefinitivo() {
                 // Actualiza el número de reservas disponibles
                 fetchData(`/perfil/clases-disponibles`)
                     .then(data => {
+                        console.log('Actualizando reservas disponibles:', data);
                         const clasesDisponibles = data.clases_disponibles;
                         document.getElementById('clasesDisponibles').innerHTML = `Reservas disponibles: ${clasesDisponibles}`;
                     })

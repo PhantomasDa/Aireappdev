@@ -65,6 +65,8 @@
     </div>
     
     <div class="my-container-bg">
+        <button class="button" type="button" onclick="prevStep()">Anterior</button>
+        <button class="button" type="button" onclick="nextStep()">Siguiente</button>
         <div class="form-section-bg" id="registerForm1">
             <h2>Registro de Usuario</h2>
             <form id="registerForm1Form">
@@ -335,7 +337,201 @@ function toggleBillingForm() {
         billingForm.style.display = 'none';
     }
 }
+
+
 </script>
+
+
+
+
+<script>
+    let currentStep = 1;
+    
+    function showStep(step) {
+        // Oculta todas las secciones
+        const sections = document.querySelectorAll('.form-section-bg');
+        sections.forEach(section => section.style.display = 'none');
+    
+        // Verifica y salta el paso 4 al mostrar
+        if (step === 4) {
+            step++;
+        }
+    
+        // Verifica y ajusta el paso final si es necesario
+        if (step > sections.length) {
+            step = sections.length;
+        }
+    
+        // Muestra la sección actual
+        document.getElementById(`registerForm${step}`).style.display = 'block';
+    
+        // Actualiza la barra de progreso
+        updateProgressBar(step);
+    
+        // Deshabilitar el botón "Anterior" si está en el paso 1
+        document.getElementById('prevButton').disabled = (step === 1);
+    
+        // Actualizar currentStep
+        currentStep = step;
+    
+        // Cargar datos del paso actual
+        loadFormData();
+    }
+    
+    function nextStep() {
+        // Guardar datos en Local Storage
+        saveFormData();
+    
+        // Incrementa el paso y muestra el siguiente paso
+        currentStep++;
+        showStep(currentStep);
+    }
+    
+    function prevStep() {
+        if (currentStep > 1) {
+            // Guardar datos en Local Storage
+            saveFormData();
+    
+            // Decrementa el paso y muestra el paso anterior
+            currentStep--;
+            // Verifica y salta el paso 4 al retroceder
+            if (currentStep === 4) {
+                currentStep--;
+            }
+            showStep(currentStep);
+        }
+    }
+    
+    function saveFormData() {
+        const form = document.getElementById(`registerForm${currentStep}Form`);
+        
+        if (!form) {
+            console.error(`Formulario no encontrado para el paso ${currentStep}`);
+            return;
+        }
+    
+        const formData = new FormData(form);
+    
+        const data = {};
+        for (const [key, value] of formData.entries()) {
+            data[key] = value;
+        }
+    
+        const expirationTime = Date.now() + (5 * 60 * 1000); // 5 minutos
+        const dataWithExpiration = {
+            data: data,
+            expiration: expirationTime
+        };
+    
+        localStorage.setItem(`formStep${currentStep}`, JSON.stringify(dataWithExpiration));
+    }
+    
+    function loadFormData() {
+        const form = document.getElementById(`registerForm${currentStep}Form`);
+        
+        if (!form) {
+            console.error(`Formulario no encontrado para el paso ${currentStep}`);
+            return;
+        }
+    
+        const savedData = localStorage.getItem(`formStep${currentStep}`);
+    
+        if (savedData) {
+            const dataWithExpiration = JSON.parse(savedData);
+    
+            if (Date.now() > dataWithExpiration.expiration) {
+                // Si los datos han expirado, los eliminamos
+                localStorage.removeItem(`formStep${currentStep}`);
+            } else {
+                // Si los datos no han expirado, los cargamos en el formulario
+                const data = dataWithExpiration.data;
+    
+                for (const [key, value] of Object.entries(data)) {
+                    if (form.elements[key]) {
+                        form.elements[key].value = value;
+                    }
+                }
+            }
+        }
+    }
+    
+    // Cargar datos al iniciar
+    document.addEventListener('DOMContentLoaded', () => {
+        showStep(currentStep);
+        loadFormData();
+    });
+    
+    function togglePasswordVisibility(inputId, toggleId) {
+        const passwordInput = document.getElementById(inputId);
+        const toggleIcon = document.getElementById(toggleId);
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            toggleIcon.classList.remove('fa-eye');
+            toggleIcon.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            toggleIcon.classList.remove('fa-eye-slash');
+            toggleIcon.classList.add('fa-eye');
+        }
+    }
+    
+    function selectGender(gender) {
+        // Obtener todas las opciones
+        const options = document.querySelectorAll('.option');
+    
+        // Remover la clase 'selected' de todas las opciones
+        options.forEach(option => {
+            option.classList.remove('selected');
+        });
+    
+        // Agregar la clase 'selected' a la opción seleccionada
+        document.getElementById(`option-${gender}`).classList.add('selected');
+    
+        // Actualizar el valor del input hidden
+        document.getElementById('genero').value = gender;
+    }
+    
+    function toggleLesiones() {
+        const pregunta2 = document.getElementById('pregunta2').value;
+        const lesionesSection = document.getElementById('lesionesSection');
+    
+        if (pregunta2 === 'si') {
+            lesionesSection.style.display = 'block';
+        } else {
+            lesionesSection.style.display = 'none';
+            document.getElementById('lesiones').value = ''; // Limpiar el campo de lesiones si está oculto
+        }
+    }
+    
+    function toggleBillingForm() {
+        const billingForm = document.getElementById('billingForm');
+        if (document.getElementById('showBilling').checked) {
+            billingForm.style.display = 'block';
+        } else {
+            billingForm.style.display = 'none';
+        }
+    }
+    
+    function scrollToTop() {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    }
+    
+    function updateProgressBar(step) {
+        const totalSteps = 6; // Actualiza este número si tienes más o menos pasos
+        const percentage = (step / totalSteps) * 100;
+        const progressBar = document.getElementById('progress-bar');
+        progressBar.style.width = percentage + '%';
+        progressBar.textContent = Math.round(percentage) + '%';
+    }
+    </script>
+
+    
+    
+    
+    
     <script src="./js/registerjs/sendform1.js" defer></script>
     <script src="./js/registerjs/sendform2.js" defer></script>
     <script src="./js/registerjs/sendform3.js" defer></script>

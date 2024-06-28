@@ -10,7 +10,6 @@ function cargarNombreUsuario() {
         })
         .catch(error => console.error('Error al cargar el nombre del usuario:', error));
 }
-
 function cargarProximasClases() {
     fetchData('/perfil/proximas-clases')
         .then(clases => {
@@ -24,6 +23,17 @@ function cargarProximasClases() {
                     const fechaFormateada = fechaClase.toLocaleDateString('es-ES', opcionesFecha);
                     const horaFormateada = fechaClase.toLocaleTimeString('es-ES', opcionesHora);
                     const ordinal = index === 0 ? 'Primera' : index === 1 ? 'Segunda' : index === 2 ? 'Tercera' : `${index + 1}ª`;
+
+                    // Obtener la fecha actual sin horas, minutos y segundos
+                    const fechaActual = new Date();
+                    fechaActual.setHours(0, 0, 0, 0);
+                    fechaClase.setHours(0, 0, 0, 0); // Resetear las horas para comparar solo fechas
+                    
+                    // Validar si la fecha de la clase coincide con la fecha actual
+                    const botonReagendar = fechaClase.getTime() === fechaActual.getTime()
+                        ? '<p style="color:red">Lo sentimos, no puedes reagendar esta clase, ya que es hoy.</p>'
+                        : `<button class="my-button-reservas-2" onclick="reagendarClase(${clase.id})">Reagendar Clase</button>`;
+
                     return `
                         <div class="card">
                             <div class="card-header">${ordinal} clase</div>
@@ -31,13 +41,14 @@ function cargarProximasClases() {
                                 ${fechaFormateada} a las ${horaFormateada}
                             </div>
                             <div class="card-footer">
-                                <button class="my-button-reservas-2" onclick="reagendarClase(${clase.id})">Reagendar Clase</button>
+                                ${botonReagendar}
                             </div>
                         </div>`;
                 }).join('');
         })
         .catch(error => console.error('Error al cargar las próximas clases:', error));
 }
+
 
 function actualizarClasesDisponibles() {
     fetchData('/perfil/clases-disponibles')

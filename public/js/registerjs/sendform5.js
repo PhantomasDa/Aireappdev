@@ -37,7 +37,7 @@ switch(paquete) {
             <li>Duración de un mes</li>
             <li>Acceso a contenido exclusivo online</li>
         `;
-        packageCost.textContent = "Valor: $30";
+        packageCost.textContent = "Valor: $50";
         break;
     case 'Paquete completo':
         packageDetails.innerHTML = `
@@ -46,7 +46,7 @@ switch(paquete) {
             <li>Acceso a contenido exclusivo online</li>
             <li>Soporte personalizado</li>
         `;
-        packageCost.textContent = "Valor: $50";
+        packageCost.textContent = "Valor: $75";
         break;
     case 'Paquete premium':
         packageDetails.innerHTML = `
@@ -56,7 +56,7 @@ switch(paquete) {
             <li>Soporte personalizado</li>
             <li>Sesiones adicionales de coaching</li>
         `;
-        packageCost.textContent = "Valor: $70";
+        packageCost.textContent = "Valor: $100";
         break;
     default:
         packageDetails.innerHTML = '';
