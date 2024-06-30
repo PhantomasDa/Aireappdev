@@ -26,7 +26,7 @@ router.post('/forgot-password', async (req, res) => {
         const timeDifference = currentTime - lastRequestTime;
         console.log('Diferencia de tiempo:', timeDifference);
 
-        if (timeDifference > 300000 ) { // 300000 ms = 5 minutos
+        if (timeDifference < 0 ) { // 300000 ms = 5 minutos
             return res.status(429).json({ message: 'Por favor, espera 5 minutos antes de solicitar otro enlace.' });
         }
 
