@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const db = require('./database');
 const loginRouter = require('./routes/login');
+const resetPasswordRoutes = require('./routes/resetPassword'); // Requiere las rutas de resetPassword
 const registerRouter = require('./routes/register');
 const profileRouter = require('./routes/profile');
 const adminRoutes = require('./routes/admin'); 
@@ -12,6 +13,7 @@ const session = require('express-session');
 const flash = require('connect-flash');
 const app = express();
 const homeRoutes = require('./routes/home');
+
 require('dotenv').config();
 
 
@@ -127,6 +129,11 @@ app.post('/perfil/reservar', (req, res) => {
 
 // Incorporar el router de login
 app.use('/login', loginRouter);
+
+app.use('/reset', resetPasswordRoutes); // Usar las rutas de resetPassword
+
+
+
 
 // Configurar el puerto y arrancar el servidor
 const PORT = process.env.PORT || 3000;

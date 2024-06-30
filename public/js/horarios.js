@@ -12,9 +12,7 @@ function mostrarErrorFechaModal(mensaje) {
     const errorFechaText = document.getElementById('errorFechaText');
     errorFechaText.textContent = mensaje;
     errorFechaModal.style.display = 'block';
-}
-
-// Cargar horarios disponibles para una fecha específica
+}// Cargar horarios disponibles para una fecha específica
 function cargarHorarios(fecha) {
     const estadoPaqueteElement = document.getElementById('estadodelpaquete');
     if (!estadoPaqueteElement) {
@@ -49,6 +47,15 @@ function cargarHorarios(fecha) {
     const fechaExpiracionPaqueteStr = fechaExpiracionPaqueteElement.textContent.trim();
     const fechaExpiracionPaquete = convertirFechaEspañol(fechaExpiracionPaqueteStr);
     const fechaSolicitada = new Date(fecha);
+
+    // Depuración
+    console.log('Fecha Expiración Paquete:', fechaExpiracionPaquete);
+    console.log('Fecha Solicitada:', fechaSolicitada);
+
+    if (isNaN(fechaExpiracionPaquete) || isNaN(fechaSolicitada)) {
+        mostrarErrorFechaModal('Hubo un error con el formato de las fechas.');
+        return;
+    }
 
     if (fechaSolicitada > fechaExpiracionPaquete) {
         mostrarErrorFechaModal(`No puedes reservar una clase después de la fecha de expiración de tu paquete (${fechaExpiracionPaquete.toLocaleDateString('es-ES')}).`);
