@@ -14,7 +14,7 @@ router.post('/forgot-password', async (req, res) => {
     }
 
     try {
-        const [users] = await db.query('SELECT * FROM usuarios WHERE email = ?', [email]);
+        const [users] = await db.query('SELECT * FROM Usuarios WHERE email = ?', [email]);
         if (users.length === 0) {
             return res.status(404).json({ message: 'No se encontró un usuario con ese correo electrónico.' });
         }
@@ -35,7 +35,7 @@ router.post('/forgot-password', async (req, res) => {
         console.log('Token generado:', token);
         console.log('Fecha de expiración:', expiration);
 
-        await db.query('UPDATE usuarios SET resetPasswordToken = ?, resetPasswordExpires = ? WHERE email = ?', [token, expiration, email]);
+        await db.query('UPDATE Usuarios SET resetPasswordToken = ?, resetPasswordExpires = ? WHERE email = ?', [token, expiration, email]);
 
         const transporter = nodemailer.createTransport({
             service: 'Gmail',
@@ -75,7 +75,7 @@ router.post('/forgot-password', async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
         const currentTime = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
-        const [users] = await db.query('SELECT * FROM usuarios WHERE resetPasswordToken = ? AND resetPasswordExpires > ?', [token, currentTime]);
+        const [users] = await db.query('SELECT * FROM Usuarios WHERE resetPasswordToken = ? AND resetPasswordExpires > ?', [token, currentTime]);
         if (users.length === 0) {
             console.error('El token es inválido o ha expirado');
             return res.status(400).json({ message: 'El token es inválido o ha expirado', success: false });
@@ -84,7 +84,7 @@ router.post('/forgot-password', async (req, res) => {
         const user = users[0];
         console.log('Usuario encontrado:', user);
 
-        await db.query('UPDATE usuarios SET password = ?, resetPasswordToken = NULL, resetPasswordExpires = NULL WHERE id = ?', [hashedPassword, user.id]);
+        await db.query('UPDATE Usuarios SET password = ?, resetPasswordToken = NULL, resetPasswordExpires = NULL WHERE id = ?', [hashedPassword, user.id]);
 
         console.log('Contraseña actualizada correctamente');
         res.status(200).json({ message: 'Contraseña restablecida correctamente', success: true, redirect: true });
