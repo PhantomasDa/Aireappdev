@@ -1,5 +1,3 @@
-
-
 function sendConfirmationEmail(userId) {
     fetch('/send-confirmation-email', {
         method: 'POST',
@@ -24,61 +22,120 @@ function sendConfirmationEmail(userId) {
         console.error('Error al enviar el correo de confirmación:', error);
     });
 }
-   
 
-function submitForm6() {
-    const form = document.getElementById('registerForm6Form');
-    const formData = new FormData(form);
-    const showBilling = document.getElementById('showBilling').checked;
+function submitForm() {
+    const nombre = document.getElementById('nombre').value;
+    const email = document.getElementById('email').value;
+    const telefono = document.getElementById('telefono').value;
+    const password = document.getElementById('password').value;
+    const confirm_password = document.getElementById('confirm_password').value;
+    const fecha_nacimiento = document.getElementById('fecha_nacimiento').value;
+    const genero = document.getElementById('genero').value;
+    const terms = document.getElementById('terms').checked;
 
-    const paquete = document.getElementById('paquete').value;
-    formData.append('paquete', paquete);
-
-    if (showBilling) {
-        const cedula_ruc = document.getElementById('cedula_ruc').value;
-        const direccion1 = document.getElementById('direccion1').value;
-        const direccion2 = document.getElementById('direccion2').value;
-        const telefono = document.getElementById('telefono_billing').value;
-        const nombre_completo = document.getElementById('nombre_completo').value;
-        const razon_social = document.getElementById('razon_social').value;
-        const otro_dato = document.getElementById('otro_dato').value;
-
-        formData.append('cedula_ruc', cedula_ruc);
-        formData.append('direccion1', direccion1);
-        formData.append('direccion2', direccion2);
-        formData.append('telefono', telefono);
-        formData.append('nombre_completo', nombre_completo);
-        formData.append('razon_social', razon_social);
-        formData.append('otro_dato', otro_dato);
+    if (!terms) {
+        document.getElementById('termsError').textContent = 'Debe aceptar los términos y condiciones y políticas de datos.';
+        return;
+    } else {
+        document.getElementById('termsError').textContent = '';
     }
 
-    fetch('/register/step6', {
+    if (nombre.length < 3) {
+        document.getElementById('nombreError').textContent = 'El nombre debe tener al menos 3 caracteres.';
+        return;
+    }
+
+    const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    if (!emailPattern.test(email)) {
+        document.getElementById('emailError').textContent = 'Por favor, ingrese un email válido.';
+        return;
+    }
+
+    if (telefono.length < 8) {
+        document.getElementById('telefonoError').textContent = 'Por favor, ingrese un teléfono válido.';
+        return;
+    }
+
+    if (password.length < 6) {
+        document.getElementById('passwordError').textContent = 'La contraseña debe tener al menos 6 caracteres.';
+        return;
+    }
+
+    if (password !== confirm_password) {
+        document.getElementById('confirmPasswordError').textContent = 'Las contraseñas no coinciden.';
+        return;
+    }
+
+    if (!fecha_nacimiento) {
+        document.getElementById('fechaNacimientoError').textContent = 'Por favor, ingrese una fecha de nacimiento.';
+        return;
+    }
+
+    const fechaPattern = /^\d{2}\/\d{2}\/\d{4}$/;
+    if (!fechaPattern.test(fecha_nacimiento)) {
+        document.getElementById('fechaNacimientoError').textContent = 'Por favor, ingrese una fecha de nacimiento válida (dd/mm/yyyy).';
+        return;
+    }
+
+    const [dia, mes, anio] = fecha_nacimiento.split('/');
+    const fechaISO = `${anio}-${mes}-${dia}`;
+
+    if (!genero) {
+        document.getElementById('generoError').textContent = 'Por favor, seleccione un género.';
+        return;
+    }
+
+    // Mostrar animación de carga y bloquear formulario
+    document.getElementById('loading').style.display = 'flex';
+    document.getElementById('registerForm1Form').style.pointerEvents = 'none';
+
+    const startTime = Date.now();
+
+    fetch('/register/step1', {
         method: 'POST',
-        body: formData
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ nombre, email, telefono, password, fecha_nacimiento: fechaISO, genero })
     })
     .then(response => {
         if (!response.ok) {
-            return response.json().then(err => { 
+            return response.json().then(err => {
                 console.log('Error del servidor:', err);
-                throw new Error(err.message); 
+                throw new Error(err.message);
             });
         }
         return response.json();
     })
     .then(data => {
-        if (data.message !== 'Verificación de pago exitosa') {
-            document.getElementById('comprobantePagoError').textContent = data.message;
+        console.log('Respuesta del servidor:', data);
+        if (data.message !== 'Datos principales guardados exitosamente') {
+            document.getElementById('nombreError').textContent = data.message;
         } else {
-            document.getElementById('registerForm6').style.display = 'none';
-            document.getElementById('successMessage').style.display = 'block';
-
-            setTimeout(() => {
-                window.location.href = '/login';
-            }, 5000);
+            // Avanzar al siguiente paso
+            document.getElementById('registerForm1').style.display = 'none';
+            document.getElementById('registerForm2').style.display = 'block';
+            document.getElementById('userId2').value = data.userId; // Asignar el userId al segundo formulario
+            
+            // Actualizar barra de progreso
+            updateProgressBar(2); // Cambiar a 2 para el segundo paso
+            scrollToTop();
         }
     })
     .catch(error => {
-        console.error('Error durante la verificación del pago:', error);
-        document.getElementById('comprobantePagoError').textContent = 'Error durante la verificación del pago';
+        console.error('Error durante el registro:', error);
+        document.getElementById('nombreError').textContent = `Error durante el registro: ${error.message}`;
+    })
+    .finally(() => {
+        const elapsedTime = Date.now() - startTime;
+        const remainingTime = 2000 - elapsedTime;
+
+        setTimeout(() => {
+            // Ocultar animación de carga y desbloquear formulario
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('registerForm1Form').style.pointerEvents = 'auto';
+        }, remainingTime > 0 ? remainingTime : 0);
     });
 }
+
+

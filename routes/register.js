@@ -128,16 +128,16 @@ router.post('/step5', [
         res.status(500).json({ message: 'Error al guardar modalidad' });
     }
 });
+
 router.post('/step6', upload.single('comprobante_pago'), [
     body('userId').isInt(),
     body('paquete').isIn(['Paquete básico', 'Paquete completo', 'Paquete premium']),
-    body('cedula_ruc').optional().trim().escape(),
+    body('cedula_ruc').optional().trim().escape().isLength({ max: 20 }),
     body('direccion1').optional().trim().escape(),
     body('direccion2').optional().trim().escape(),
-    body('telefono').optional().trim().escape(),
+    body('telefono').optional().trim().escape().isLength({ max: 20 }),
     body('nombre_completo').optional().trim().escape(),
-    body('razon_social').optional().trim().escape(),
-    body('otro_dato').optional().trim().escape()
+    body('razon_social').optional().trim().escape()
 ], async (req, res) => {
     console.log('Campos recibidos:', req.body, req.file);
 
@@ -147,7 +147,7 @@ router.post('/step6', upload.single('comprobante_pago'), [
         return res.status(400).json({ errors: errors.array() });
     }
 
-    const { userId, paquete, cedula_ruc, direccion1, direccion2, telefono, nombre_completo, razon_social, otro_dato } = req.body;
+    const { userId, paquete, cedula_ruc, direccion1, direccion2, telefono, nombre_completo, razon_social } = req.body;
     const comprobantePago = req.file ? req.file.filename : null;
 
     if (!comprobantePago) {
@@ -159,7 +159,7 @@ router.post('/step6', upload.single('comprobante_pago'), [
     switch (paquete) {
         case 'Paquete básico':
             clasesDisponibles = 4;
-            maxReagendamientos = 1; // Ajusta según tus necesidades
+            maxReagendamientos = 1;
             break;
         case 'Paquete completo':
             clasesDisponibles = 8;
@@ -184,10 +184,10 @@ router.post('/step6', upload.single('comprobante_pago'), [
         console.log('Actualizando usuario:', { userId, paquete, comprobantePago, clasesDisponibles });
         await db.execute('UPDATE Usuarios SET paquete = ?, comprobante_pago = ?, clases_disponibles = ? WHERE id = ?', [paquete, comprobantePago, clasesDisponibles, userId]);
 
-        if (cedula_ruc && direccion1 && telefono && nombre_completo) {
-            console.log('Insertando datos de facturación:', { userId, cedula_ruc, direccion1, direccion2, telefono, nombre_completo, razon_social, otro_dato });
-            await db.execute('INSERT INTO Datos_de_facturacion (usuario_id, cedula_ruc, direccion1, direccion2, telefono, nombre_completo, razon_social, otro_dato) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', 
-                [userId, cedula_ruc, direccion1, direccion2, telefono, nombre_completo, razon_social, otro_dato]);
+        if (cedula_ruc || direccion1 || telefono || nombre_completo) {
+            console.log('Insertando datos de facturación:', { userId, cedula_ruc, direccion1, direccion2, telefono, nombre_completo, razon_social });
+            await db.execute('INSERT INTO Datos_de_facturacion (usuario_id, cedula_ruc, direccion1, direccion2, telefono, nombre_completo, razon_social) VALUES (?, ?, ?, ?, ?, ?, ?)', 
+                [userId, cedula_ruc || null, direccion1 || null, direccion2 || null, telefono || null, nombre_completo || null, razon_social || null]);
         }
 
         console.log('Insertando datos del paquete:', { userId, fechaCompra, fechaActivacion, fechaExpiracion, maxReagendamientos, paquete });
@@ -202,7 +202,7 @@ router.post('/step6', upload.single('comprobante_pago'), [
         res.status(200).json({ message: 'Verificación de pago exitosa' });
     } catch (error) {
         console.error('Error al guardar paquete, comprobante de pago y datos de facturación:', error);
-        res.status(500).json({ message: 'Error al guardar paquete, comprobante de pago y datos de facturación' });
+        res.status(500).json({ message: `Error al guardar paquete, comprobante de pago y datos de facturación: ${error.message}` });
     }
 });
 

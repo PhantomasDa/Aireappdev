@@ -38,6 +38,15 @@ function submitForm() {
         return;
     }
 
+    const fechaPattern = /^\d{2}\/\d{2}\/\d{4}$/;
+    if (!fechaPattern.test(fecha_nacimiento)) {
+        document.getElementById('fechaNacimientoError').textContent = 'Por favor, ingrese una fecha de nacimiento válida (dd/mm/yyyy).';
+        return;
+    }
+
+    const [dia, mes, anio] = fecha_nacimiento.split('/');
+    const fechaISO = `${anio}-${mes}-${dia}`;
+
     if (!genero) {
         document.getElementById('generoError').textContent = 'Por favor, seleccione un género.';
         return;
@@ -54,15 +63,19 @@ function submitForm() {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ nombre, email, telefono, password, fecha_nacimiento, genero })
+        body: JSON.stringify({ nombre, email, telefono, password, fecha_nacimiento: fechaISO, genero })
     })
     .then(response => {
         if (!response.ok) {
-            return response.json().then(err => { throw new Error(err.message); });
+            return response.json().then(err => {
+                console.log('Error del servidor:', err);
+                throw new Error(err.message);
+            });
         }
         return response.json();
     })
     .then(data => {
+        console.log('Respuesta del servidor:', data);
         if (data.message !== 'Datos principales guardados exitosamente') {
             document.getElementById('nombreError').textContent = data.message;
         } else {
@@ -70,7 +83,6 @@ function submitForm() {
             document.getElementById('registerForm1').style.display = 'none';
             document.getElementById('registerForm2').style.display = 'block';
             document.getElementById('userId2').value = data.userId; // Asignar el userId al segundo formulario
-
             
             // Actualizar barra de progreso
             updateProgressBar(2); // Cambiar a 2 para el segundo paso
@@ -79,7 +91,7 @@ function submitForm() {
     })
     .catch(error => {
         console.error('Error durante el registro:', error);
-        document.getElementById('nombreError').textContent = 'Error durante el registro';
+        document.getElementById('nombreError').textContent = `Error durante el registro: ${error.message}`;
     })
     .finally(() => {
         const elapsedTime = Date.now() - startTime;
