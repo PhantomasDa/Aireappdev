@@ -52,10 +52,7 @@ function cargarHorarios(fecha) {
     console.log('Fecha Expiración Paquete:', fechaExpiracionPaquete);
     console.log('Fecha Solicitada:', fechaSolicitada);
 
-    if (isNaN(fechaExpiracionPaquete) || isNaN(fechaSolicitada)) {
-        mostrarErrorFechaModal('Hubo un error con el formato de las fechas.');
-        return;
-    }
+   
 
     if (fechaSolicitada > fechaExpiracionPaquete) {
         mostrarErrorFechaModal(`No puedes reservar una clase después de la fecha de expiración de tu paquete (${fechaExpiracionPaquete.toLocaleDateString('es-ES')}).`);

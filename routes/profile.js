@@ -370,7 +370,9 @@ router.get('/user-id', verifyToken, async (req, res) => {
         console.error('Error obteniendo el ID del usuario:', error);
         res.status(500).json({ message: 'Error obteniendo el ID del usuario' });
     }
-});// Ruta para la renovación del paquete
+});
+
+
 router.post('/renovacion-paquete', upload.single('comprobante_pago'), [
     body('userId').isInt().notEmpty().withMessage('Invalid userId'),
     body('paquete').isIn(['Paquete básico', 'Paquete completo', 'Paquete premium']).withMessage('Invalid paquete')
@@ -383,7 +385,7 @@ router.post('/renovacion-paquete', upload.single('comprobante_pago'), [
         return res.status(400).json({ errors: errors.array() });
     }
 
-    const { userId, paquete } = req.body;
+    const { userId, paquete, fechaActivacion, fechaExpiracion } = req.body;
     const comprobantePago = req.file ? req.file.filename : null;
 
     if (!comprobantePago) {
@@ -394,7 +396,9 @@ router.post('/renovacion-paquete', upload.single('comprobante_pago'), [
     console.log('Datos después de la validación:', {
         userId,
         paquete,
-        comprobantePago
+        comprobantePago,
+        fechaActivacion,
+        fechaExpiracion
     });
 
     let clasesDisponibles, maxReagendamientos;
@@ -417,15 +421,11 @@ router.post('/renovacion-paquete', upload.single('comprobante_pago'), [
     }
 
     const fechaCompra = new Date();
-    const fechaActivacion = new Date(fechaCompra);
-    fechaActivacion.setDate(fechaActivacion.getDate() + 1);
-    const fechaExpiracion = new Date(fechaActivacion);
-    fechaExpiracion.setMonth(fechaExpiracion.getMonth() + 1);
 
     try {
-        console.log('Preparando para insertar datos de la renovación:', { userId, fechaCompra, fechaActivacion, fechaExpiracion, maxReagendamientos, paquete, comprobantePago });
-        await db.execute('INSERT INTO renovaciones (usuario_id, paquete, comprobante_pago, fecha_compra, fecha_activacion, fecha_expiracion, max_reagendamientos) VALUES (?, ?, ?, ?, ?, ?, ?)', 
-            [userId, paquete, comprobantePago, fechaCompra, fechaActivacion, fechaExpiracion, maxReagendamientos]);
+        console.log('Preparando para insertar datos de la renovación:', { userId, fechaCompra, fechaActivacion, fechaExpiracion, maxReagendamientos, clasesDisponibles, paquete, comprobantePago });
+        await db.execute('INSERT INTO renovaciones (usuario_id, paquete, comprobante_pago, fecha_compra, fecha_activacion, fecha_expiracion, max_reagendamientos, num_clases, activado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', 
+            [userId, paquete, comprobantePago, fechaCompra, fechaActivacion, fechaExpiracion, maxReagendamientos, clasesDisponibles, 0]);
 
         res.status(200).json({ message: 'Renovación de paquete registrada exitosamente' });
     } catch (error) {

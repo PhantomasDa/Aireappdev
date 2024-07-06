@@ -11,6 +11,20 @@ function cerrarReservaPaquetePopup() {
     document.getElementById('reservaPaquetePopup').style.display = 'none';
 }
 
+function abrirPopup(message) {
+    const popup = document.getElementById('popup');
+    document.getElementById('popupMessage').innerText = message;
+    popup.style.display = 'block';
+    popup.style.left = '50%';
+    popup.style.top = '50%';
+    popup.style.transform = 'translate(-50%, -50%)';
+}
+
+function cerrarPopup() {
+    document.getElementById('popup').style.display = 'none';
+    window.location.reload(); // Recargar la página
+}
+
 function obtenerUserId() {
     fetch('/profile/user-id', {
         method: 'GET',
@@ -23,6 +37,11 @@ function obtenerUserId() {
         if (data.userId) {
             document.getElementById('userId').value = data.userId;
             console.log('ID del usuario:', data.userId);
+
+            // Ocultar el botón de renovación si hay una renovación activa
+            if (data.renovacionActiva) {
+                document.getElementById('renovarPaqueteBtn').style.display = 'none';
+            }
         } else {
             console.error('No se pudo obtener el ID del usuario');
         }
@@ -32,6 +51,17 @@ function obtenerUserId() {
     });
 }
 
+function formatDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+
+
 function submitRenovacionPaquete() {
     const form = document.getElementById('registerForm6Form');
     const formData = new FormData(form);
@@ -39,16 +69,19 @@ function submitRenovacionPaquete() {
     const paquete = document.getElementById('paquete').value;
     const userId = document.getElementById('userId').value;
 
-    // Log de valores para depuración
-    console.log('Valores del formulario:', { paquete, userId });
+    const fechaCompra = new Date();
+    const fechaActivacion = new Date(fechaCompra);
+    fechaActivacion.setDate(fechaActivacion.getDate() + 1);
+    const fechaExpiracion = new Date(fechaActivacion);
+    fechaExpiracion.setMonth(fechaExpiracion.getMonth() + 1);
 
     formData.append('paquete', paquete);
     formData.append('userId', userId);
+    formData.append('fechaActivacion', formatDate(fechaActivacion));
+    formData.append('fechaExpiracion', formatDate(fechaExpiracion));
 
-    // Verificar el contenido de formData
-    for (let pair of formData.entries()) {
-        console.log(`${pair[0]}: ${pair[1]}`);
-    }
+    // Log de valores para depuración
+    console.log('Valores del formulario:', { paquete, userId, fechaActivacion: formatDate(fechaActivacion), fechaExpiracion: formatDate(fechaExpiracion) });
 
     fetch('/profile/renovacion-paquete', {
         method: 'POST',
@@ -66,15 +99,23 @@ function submitRenovacionPaquete() {
     })
     .then(data => {
         console.log('Respuesta del servidor:', data);
-        if (data.message !== 'Renovación de paquete exitosa') {
+        if (data.message !== 'Renovación de paquete registrada exitosamente') {
             document.getElementById('comprobantePagoError').textContent = data.message;
         } else {
             document.getElementById('registerForm6').style.display = 'none';
-            document.getElementById('successMessage').style.display = 'block';
 
+            const message = `Felicidades, has solicitado tu paquete desde ${formatDate(fechaActivacion)} hasta ${formatDate(fechaExpiracion)}`;
+            abrirPopup(message);
+
+            // Guardar el indicador de paquete renovado en localStorage
+            localStorage.setItem('lastPurchaseTime', new Date().getTime());
+
+            // Deshabilitar el botón de renovación
+            const botonRenovar = document.getElementById('reservaPaqueteBtn');
+            botonRenovar.disabled = true;
             setTimeout(() => {
-                window.location.href = '/profile';
-            }, 3000);
+                botonRenovar.disabled = false;
+            }, 5 * 60 * 1000);
         }
     })
     .catch(error => {
@@ -142,5 +183,3 @@ function selectPackage(paquete) {
             packageCost.textContent = '';
     }
 }
-
-

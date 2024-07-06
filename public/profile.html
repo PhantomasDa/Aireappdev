@@ -5,15 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Perfil de Usuario</title>
     <link rel="stylesheet" href="style/style.css">
+    <link rel="stylesheet" href="./style/estilosformularios.css">
+
     <link rel="stylesheet" href="style/profile.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css' rel='stylesheet' />
 </head>
 <body>
     <!-- Contenido del cuerpo -->
+
+
+     <!-- Popup de confirmación -->
+     <div id="popup" style="z-index: 999999;" class="popup">
+        <h2 style="color: black;">Felicidades</h2>
+        <p style="color: black;" id="popupMessage">Acaba de reservar un nuevo paquete recuerda que tus clases se liberaran en maximo 24horas</p>
+        <button onclick="cerrarPopup()">Aceptar</button>
+    </div>
 <div id="menu"></div>
     <div id="sidebar-container"></div>
-    <div class="my-container-bg">
+    <div class="my-container-bg-2">
         <div class="container-data">
             <div id="informacion_extra" style="font-size: 10px; margin-top: 10px;"></div>
 
@@ -34,16 +44,18 @@
 
         <div class="toggle-header" onclick="togglePackageInfo()">Mostrar  paquete</div>
         <div id="packageInfo" class="toggle-content">
-            <div>
+            
+            <div>            <p style="color: black;">Estado: <span id="estadodelpaquete"></span></p>
+
                 <span>clases disponibles</span>            <span id="clases_disponibles"></span>
 
             </div>
-            <p style="color: black;">Estado: <span id="estadodelpaquete"></span></p>
             <p style="color: black;">Expiración: <span id="fechaExpiracionPaquete"></span></p>
-            <h4 class="color-ajuste margin-ajuste">Reagendamientos disponibles <span id="reagedamientosporusar"></span></h4>
+            <!-- <h4 class="color-ajuste margin-ajuste">Reagendamientos disponibles <span id="reagedamientosporusar"></span></h4> -->
 
-                <button id="reservaPaqueteBtn" onclick="abrirReservaPaquetePopup()">Te quedan X clases. Reserva tu siguiente paquete aquí.</button>
+                <button class="toggle-header" id="reservaPaqueteBtn" onclick="abrirReservaPaquetePopup()">Renovar Paquete</button>
             
+        </div>
             <!-- Popup de Reserva de Paquete -->
 <div id="reservaPaquetePopup" class="popup">
     <div class="popup-content">

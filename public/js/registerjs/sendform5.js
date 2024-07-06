@@ -66,28 +66,11 @@ switch(paquete) {
 function submitForm6() {
     const form = document.getElementById('registerForm6Form');
     const formData = new FormData(form);
-    const showBilling = document.getElementById('showBilling').checked;
+    // const showBilling = document.getElementById('showBilling').checked;
 
     const paquete = document.getElementById('paquete').value;
     formData.append('paquete', paquete);
 
-    if (showBilling) {
-        const cedula_ruc = document.getElementById('cedula_ruc').value;
-        const direccion1 = document.getElementById('direccion1').value;
-        const direccion2 = document.getElementById('direccion2').value;
-        const telefono = document.getElementById('telefono_billing').value;
-        const nombre_completo = document.getElementById('nombre_completo').value;
-        const razon_social = document.getElementById('razon_social').value;
-        const otro_dato = document.getElementById('otro_dato').value;
-
-        formData.append('cedula_ruc', cedula_ruc);
-        formData.append('direccion1', direccion1);
-        formData.append('direccion2', direccion2);
-        formData.append('telefono', telefono);
-        formData.append('nombre_completo', nombre_completo);
-        formData.append('razon_social', razon_social);
-        formData.append('otro_dato', otro_dato);
-    }
 
     // Mostrar animación de carga y bloquear formulario
     document.getElementById('loading').style.display = 'flex';

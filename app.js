@@ -16,6 +16,7 @@ const homeRoutes = require('./routes/home');
 
 require('dotenv').config();
 
+require('./cronJobs'); // Ajusta el path si es necesario
 
 // Configuración de session middleware
 app.use(session({
