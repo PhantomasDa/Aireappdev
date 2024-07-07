@@ -53,21 +53,7 @@ router.get('/usuarios', /*verifyToken,*/ async (req, res) => {
     }
 });
 
-// Nueva ruta para actualizar los usuarios
-router.post('/actualizar-usuarios', /*verifyToken,*/ async (req, res) => {
-    const { cambios } = req.body;
 
-    const updateQueries = cambios.map(cambio => {
-        return db.execute(`UPDATE Usuarios SET ${cambio.field} = ? WHERE id = ?`, [cambio.value, cambio.id]);
-    });
 
-    try {
-        await Promise.all(updateQueries);
-        res.status(200).send({ message: 'Usuarios actualizados correctamente' });
-    } catch (error) {
-        console.error('Error al actualizar usuarios:', error);
-        res.status(500).json({ message: 'Error en el servidor', error: error.message });
-    }
-});
 
 module.exports = router;

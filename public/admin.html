@@ -24,6 +24,8 @@
         .container-bg{
             margin: 40px;
         }
+
+        
     </style>
     <link rel="stylesheet" href="style/style.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;700;800&display=swap">
@@ -41,17 +43,17 @@
         <div id="filtros">
             <h3>Selecciona los campos a mostrar:</h3>
             <div style="display: block;">
-                <input type="checkbox" value="nombre" checked> <span>Nombre</span>
-                <input type="checkbox" value="email" checked> Email
-                <input type="checkbox" value="fecha_registro"> Fecha Registro
-                <input type="checkbox" value="paquete"> Paquete
-                <input type="checkbox" value="clases_disponibles"> Clases Disponibles
-                <input type="checkbox" value="telefono"> Teléfono
-                <input type="checkbox" value="motivacion"> Motivación
-                <input type="checkbox" value="fecha_nacimiento"> Fecha Nacimiento
-                <input type="checkbox" value="genero"> Género
-                <input type="checkbox" value="comprobante_pago"> Comprobante Pago
-                <input type="checkbox" value="rol"> Rol
+                <input style="width: 30px;" type="checkbox" value="nombre" checked> <span>Nombre</span>
+                <input style="width: 30px;" type="checkbox" value="email" checked> Email
+                <input style="width: 30px;" type="checkbox" value="fecha_registro"> Fecha Registro
+                <input style="width: 30px;" type="checkbox" value="paquete"> Paquete
+                <input style="width: 30px;" type="checkbox" value="clases_disponibles"> Clases Disponibles
+                <input style="width: 30px;" type="checkbox" value="telefono"> Teléfono
+                <input style="width: 30px;" type="checkbox" value="motivacion"> Motivación
+                <input style="width: 30px;" type="checkbox" value="fecha_nacimiento"> Fecha Nacimiento
+                <input style="width: 30px;" type="checkbox" value="genero"> Género
+                <input style="width: 30px;" type="checkbox" value="comprobante_pago"> Comprobante Pago
+                <input style="width: 30px;" type="checkbox" value="rol"> Rol
             </div>
         </div>
         <button onclick="cargarUsuarios()">Cargar Usuarios</button>
@@ -76,28 +78,29 @@
 
     <script>
         function fetchData(url, options = {}) {
-            const token = localStorage.getItem('token');
-            console.log('Token:', token);  // Verificar si el token está presente
-            options.headers = {
-                ...options.headers,
-                'Authorization': 'Bearer ' + token
-            };
-            return fetch(url, options)
-                .then(response => {
-                    if (!response.ok) {
-                        if (response.status === 401) {
-                            // Token inválido, redirigir a la página de inicio de sesión
-                            alert('Sesión expirada o no autorizada. Por favor, inicia sesión nuevamente.');
-                            localStorage.removeItem('token');
-                            window.location.href = '/login';
-                        }
-                        return response.json().then(error => {
-                            throw new Error(error.message || 'Error desconocido');
-                        });
-                    }
-                    return response.json();
+    const token = localStorage.getItem('token');
+    console.log('Token:', token);  // Verificar si el token está presente
+    options.headers = {
+        ...options.headers,
+        'Authorization': 'Bearer ' + token
+    };
+    return fetch(url, options)
+        .then(response => {
+            if (!response.ok) {
+                if (response.status === 401) {
+                    // Token inválido, redirigir a la página de inicio de sesión
+                    alert('Sesión expirada o no autorizada. Por favor, inicia sesión nuevamente.');
+                    localStorage.removeItem('token');
+                    window.location.href = '/login';
+                }
+                return response.json().then(error => {
+                    throw new Error(error.message || 'Error desconocido');
                 });
-        }
+            }
+            return response.json();
+        });
+}
+
 
         function cargarClasesUsuarios() {
     const fecha = document.getElementById('fecha_clases').value;
@@ -194,30 +197,42 @@
                     alert('Error al enviar asistencia');
                 });
         }
-
         function guardarCambiosUsuarios() {
-            const inputs = document.querySelectorAll('#tabla_usuarios input[data-field]');
-            const cambios = Array.from(inputs).map(input => ({
-                id: input.getAttribute('data-id'),
-                field: input.getAttribute('data-field'),
-                value: input.value
-            }));
+    const inputs = document.querySelectorAll('#tabla_usuarios input[data-field]');
+    const cambios = Array.from(inputs).map(input => ({
+        id: input.getAttribute('data-id'),
+        field: input.getAttribute('data-field'),
+        value: input.value
+    }));
 
-            fetchData('/admin/actualizar-usuarios', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ cambios })
-            })
-                .then(response => {
-                    alert('Cambios guardados correctamente');
-                })
-                .catch(error => {
-                    console.error('Error al guardar cambios:', error);
-                    alert('Error al guardar cambios');
-                });
+    console.log('Cambios a enviar:', cambios);  // Agregar mensaje de depuración
+
+    fetchData('/admin/actualizar-usuarios', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ cambios })
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.json();
+        } else {
+            return response.json().then(error => {
+                throw new Error(error.message || 'Error desconocido');
+            });
         }
+    })
+    .then(data => {
+        console.log('Respuesta del servidor:', data); // Agregar mensaje de depuración
+        alert('Cambios guardados correctamente');
+    })
+    .catch(error => {
+        console.error('Error al guardar cambios:', error);
+        alert('Error al guardar cambios');
+    });
+}
+
 
         function loadComponent(id, url, callback) {
             fetch(url)

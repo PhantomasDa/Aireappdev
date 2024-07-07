@@ -435,4 +435,30 @@ router.post('/renovacion-paquete', upload.single('comprobante_pago'), [
 });
 
 
+
+router.post('/validar-fecha', verifyToken, (req, res) => {
+    const { fechaSeleccionada } = req.body;
+    const userId = req.user.id;
+    
+    const query = 'SELECT fecha_expiracion FROM paquetes WHERE usuario_id = ? ORDER BY fecha_activacion DESC LIMIT 1';
+    db.execute(query, [userId], (err, results) => {
+        if (err) {
+            return res.status(500).json({ message: 'Error en el servidor' });
+        }
+        if (results.length === 0) {
+            return res.status(404).json({ message: 'Paquete no encontrado' });
+        }
+
+        const fechaExpiracionPaquete = new Date(results[0].fecha_expiracion);
+        const fechaSeleccionadaDate = new Date(fechaSeleccionada);
+
+        if (fechaSeleccionadaDate > fechaExpiracionPaquete) {
+            return res.status(400).json({ message: `No puedes reservar una clase después de la fecha de expiración de tu paquete (${fechaExpiracionPaquete.toLocaleDateString('es-ES')}).` });
+        }
+
+        res.json({ message: 'Fecha válida' });
+    });
+});
+
+
 module.exports = router;

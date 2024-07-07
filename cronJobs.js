@@ -64,7 +64,7 @@ async function activatePackages() {
 }
 
 // // Cron job para activar paquetes cada 30 segundos
-cron.schedule('*/30 * * * * *', activatePackages);
+cron.schedule('*/100 * * * * *', activatePackages);
 
 // Exportar la función de prueba para poder ejecutarla manualmente
 module.exports = { activatePackages };

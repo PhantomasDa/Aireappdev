@@ -1,8 +1,11 @@
 document.getElementById('loginForm').addEventListener('submit', function(event) {
     event.preventDefault();
 
-    const email = document.getElementById('email').value;
+    let email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
+
+    // Normalizar email: eliminar puntos de la parte local
+    email = email.replace(/\.(?=.*@)/g, '');
 
     fetch('/login', {
         method: 'POST',

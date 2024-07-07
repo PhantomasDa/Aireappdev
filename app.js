@@ -131,6 +131,7 @@ app.post('/perfil/reservar', (req, res) => {
 // Incorporar el router de login
 app.use('/login', loginRouter);
 
+
 app.use('/reset', resetPasswordRoutes); // Usar las rutas de resetPassword
 
 

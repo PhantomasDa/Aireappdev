@@ -49,23 +49,43 @@ function cargarProximasClases() {
         .catch(error => console.error('Error al cargar las próximas clases:', error));
 }
 
-
 function actualizarClasesDisponibles() {
+    console.log('Función actualizarClasesDisponibles iniciada.');
+
     fetchData('/perfil/clases-disponibles')
         .then(data => {
+            console.log('Datos recibidos:', data);
+
+            const clasesDisponiblesElement = document.getElementById('clases_disponibles');
+            if (!clasesDisponiblesElement) {
+                console.error('Elemento con ID "clases_disponibles" no encontrado.');
+                return;
+            }
+
             const clasesDisponibles = data.clases_disponibles;
-            document.getElementById('clases_disponibles').textContent = `${clasesDisponibles}`;
+            clasesDisponiblesElement.textContent = `${clasesDisponibles}`;
+            console.log('Clases disponibles actualizadas:', clasesDisponibles);
+
+            const informacionExtraElement = document.getElementById('informacion_extra');
+            if (!informacionExtraElement) {
+                console.error('Elemento con ID "informacion_extra" no encontrado.');
+                return;
+            }
 
             const ahora = new Date();
             const opcionesFecha = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             const opcionesHora = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
             const fechaFormateada = ahora.toLocaleDateString('es-ES', opcionesFecha);
             const horaFormateada = ahora.toLocaleTimeString('es-ES', opcionesHora);
-            document.getElementById('informacion_extra').textContent = `Hoy ${fechaFormateada}, ${horaFormateada} :)` ;
+            informacionExtraElement.textContent = `Hoy ${fechaFormateada}, ${horaFormateada} :)`;
+            console.log('Información extra actualizada:', informacionExtraElement.textContent);
         })
         .catch(error => {
             console.error('Error al cargar las clases disponibles:', error);
-            document.getElementById('clases_disponibles').textContent = 'Error al cargar las clases disponibles';
+            const clasesDisponiblesElement = document.getElementById('clases_disponibles');
+            if (clasesDisponiblesElement) {
+                clasesDisponiblesElement.textContent = 'Error al cargar las clases disponibles';
+            }
         });
 }
 

@@ -1,8 +1,9 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     // console.log('DOM fully loaded and parsed');
     initPage();
     setupMenuToggle();
     checkAuthAndLoadProfile();
+    await inicializarCalendario();
 });
 
 function initPage() {
@@ -10,8 +11,17 @@ function initPage() {
     actualizarClasesDisponibles();
     cargarProximasClases();
     cargarNombreUsuario();
-    inicializarCalendario();
+    
+    
 }
+
+
+function initPage() {
+    actualizarClasesDisponibles();
+    cargarProximasClases();
+    cargarNombreUsuario();
+}
+
 
 function setupMenuToggle() {
     // console.log('Setting up menu toggle...');
