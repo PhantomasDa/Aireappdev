@@ -42,11 +42,11 @@ async function activatePackages() {
             console.log(`Clases disponibles actualizadas para el usuario ID ${usuario_id}:`, updatedClasesDisponibles);
 
             // Actualizar la fecha de expiración en la tabla Paquetes
-            const [updatePaqueteResult] = await db.execute('UPDATE Paquetes SET fecha_expiracion = ? WHERE usuario_id = ?', [fecha_expiracion, usuario_id]);
+            const [updatePaqueteResult] = await db.execute('UPDATE paquetes SET fecha_expiracion = ? WHERE usuario_id = ?', [fecha_expiracion, usuario_id]);
             console.log(`Actualización de fecha de expiración en la tabla Paquetes para el usuario ID ${usuario_id} resultó en:`, updatePaqueteResult);
 
             // Verificar la actualización en la tabla Paquetes
-            const [updatedPaqueteRows] = await db.execute('SELECT fecha_expiracion FROM Paquetes WHERE usuario_id = ?', [usuario_id]);
+            const [updatedPaqueteRows] = await db.execute('SELECT fecha_expiracion FROM paquetes WHERE usuario_id = ?', [usuario_id]);
             const updatedFechaExpiracion = updatedPaqueteRows.length > 0 ? updatedPaqueteRows[0].fecha_expiracion : null;
             console.log(`Fecha de expiración del paquete actualizada para el usuario ID ${usuario_id}:`, updatedFechaExpiracion);
 
