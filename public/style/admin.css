@@ -1,0 +1,98 @@
+ /* Estilos generales */
+ body {
+    font-family: Montserrat, Arial, sans-serif;
+    background-color: var(--blanco);
+    color: var(--negro);
+    margin: 0;
+    padding: 0;
+}
+
+.container-bg {
+    margin: 40px;
+}
+
+h1, h2, h3 {
+    margin: 20px 0;
+}
+
+/* Estilos para tablas */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #7F5B41;
+    color: white;
+    font-weight: bold;
+}
+
+td img.comprobante {
+    max-width: 100px;
+    max-height: 100px;
+}
+
+/* Estilos para botones */
+button {
+    background-color: #7F5B41;
+    color: #FBF7F2;
+    border: none;
+    border-radius: 5px;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 10px 0;
+}
+
+button:hover {
+    background-color: #6c4d38;
+}
+
+
+ /* Estilos para tarjetas */
+ .card {
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 16px 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.card input {
+    width: 100%;
+    padding: 8px;
+    margin: 4px 0;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.card button {
+    background-color: #7F5B41;
+    color: #FBF7F2;
+    border: none;
+    border-radius: 5px;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 10px 0;
+}
+
+.card button:hover {
+    background-color: #6c4d38;
+}
+
+/* Ajustes para dispositivos móviles */
+@media (max-width: 600px) {
+    .container-bg {
+        margin: 20px;
+    }
+}
