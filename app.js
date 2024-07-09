@@ -41,6 +41,7 @@ app.get('/admin', (req, res) => {
 });
 
 
+
 // Middleware para servir archivos estáticos
 app.use(express.static(path.join(__dirname, 'public')));
 

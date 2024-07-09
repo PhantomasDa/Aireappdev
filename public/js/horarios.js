@@ -7,8 +7,10 @@ function mostrarErrorFechaModal(mensaje) {
     errorFechaText.textContent = mensaje;
     errorFechaModal.style.display = 'block';
 }
+
 function cargarHorarios(fecha) {
     if (!validarFechaSeleccionada(fecha)) {
+        console.log('Fecha seleccionada no válida.');
         return;
     }
 
@@ -39,6 +41,11 @@ function cargarHorarios(fecha) {
     fetchData(`/perfil/horarios?fecha=${fecha}`)
         .then(clases => {
             const horariosContenido = document.getElementById('horariosContenido');
+            if (!horariosContenido) {
+                console.error('No se pudo encontrar el contenedor de horarios.');
+                return;
+            }
+
             horariosContenido.innerHTML = clases.map(clase => {
                 const fechaClase = new Date(clase.fecha_hora);
                 const diaSemana = fechaClase.toLocaleDateString('es-ES', { weekday: 'long' });
@@ -59,6 +66,7 @@ function cargarHorarios(fecha) {
 function cerrarHorariosPopup() {
     document.getElementById('horariosPopup').classList.remove('active');
 }
+
 function convertirFechaTextoEspañol(fechaStr) {
     const meses = {
         'enero': 0,
@@ -80,14 +88,10 @@ function convertirFechaTextoEspañol(fechaStr) {
     return new Date(parseInt(anio, 10), mes, parseInt(dia, 10));
 }
 
-
-
 function cerrarErrorFechaModal() {
     const modal = document.getElementById('errorFechaModal');
     modal.style.display = 'none';
 }
-
-
 
 function convertirFechaEspañol(fechaStr) {
     const [dia, mes, anio] = fechaStr.split('/').map(part => parseInt(part, 10));
@@ -100,6 +104,7 @@ function formatearFecha(fecha) {
     const anio = fecha.getFullYear();
     return `${dia}/${mes}/${anio}`;
 }
+
 function validarFechaSeleccionada(fechaSeleccionadaStr) {
     const fechaExpiracionPaqueteStr = document.getElementById('fechaExpiracionPaquete').textContent.trim();
 
@@ -119,13 +124,7 @@ function validarFechaSeleccionada(fechaSeleccionadaStr) {
 
     return true;
 }
-function mostrarErrorFechaModal(mensaje) {
-    const errorFechaModal = document.getElementById('errorFechaModal');
-    const errorFechaText = document.getElementById('errorFechaText');
-    errorFechaText.textContent = mensaje;
-    errorFechaModal.style.display = 'block';
-}
-// Ejemplo de llamada a la función para depurar
+
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('botonValidarFecha').addEventListener('click', () => {
         const fechaSeleccionadaStr = document.getElementById('fechaSeleccionada').value;
@@ -133,7 +132,3 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log(`¿Fecha válida?: ${esValida}`);
     });
 });
-
-
-
-
