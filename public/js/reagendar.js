@@ -90,6 +90,7 @@ function mostrarConfirmacionReagendar(claseId, nuevaFecha) {
         .catch(error => console.error('Error al obtener la clase actual para confirmar:', error));
 }
 
+
 function confirmarReagendarDefinitivo() {
     const claseId = claseIdGlobal;
     const nuevaFecha = nuevaFechaGlobal;
@@ -150,6 +151,7 @@ function confirmarReagendarDefinitivo() {
             alert('Error al verificar las clases del mismo día: ' + error.message);
         });
 }
+
 
 function cerrarReagendarPopup() {
     document.getElementById('reagendarPopup').style.display = 'none';

@@ -66,95 +66,64 @@ router.get('/usuario', verifyToken, (req, res) => {
         }
     });
 });
-
-router.post('/reagendar', verifyToken, async (req, res) => {
+// Reagendar clase
+router.post('/perfil/reagendar', verifyToken, async (req, res) => {
     const { claseId, nuevaFecha } = req.body;
-    console.log('Datos recibidos en /reagendar:', { claseId, nuevaFecha });
+    console.log('Datos recibidos para reagendar:', { claseId, nuevaFecha });
 
+    if (!claseId || !nuevaFecha) {
+        console.log('Datos incompletos');
+        return res.status(400).send({ message: 'Datos incompletos' });
+    }
+
+    const nuevaFechaObj = new Date(nuevaFecha);
     const ahora = new Date();
-    const nuevaFechaDate = new Date(nuevaFecha);
+    const diferenciaHoras = (nuevaFechaObj - ahora) / (1000 * 60 * 60);
 
-    // Verificar que la nueva fecha esté al menos 18 horas en el futuro
-    const diferenciaHoras = (nuevaFechaDate - ahora) / 36e5; // Conversión de milisegundos a horas
     if (diferenciaHoras < 18) {
-        console.log('Error: No se puede reagendar con menos de 18 horas de anticipación');
+        console.log('Intento de reagendamiento con menos de 18 horas de anticipación');
         return res.status(400).send({ message: 'Lo sentimos, pero solo puedes reservar clases con un mínimo de 18 horas de anticipación.' });
     }
 
     try {
-        const [reserva] = await db.execute('SELECT reagendamientos, clase_id FROM Reservas WHERE usuario_id = ? AND clase_id = ?', [req.user.id, claseId]);
-        if (reserva.length === 0) {
-            console.log('Error: Reserva no encontrada');
-            return res.status(400).send({ message: 'Reserva no encontrada' });
+        const [claseData] = await db.execute('SELECT fecha_hora FROM Clases WHERE id = ?', [claseId]);
+        if (claseData.length === 0) {
+            console.log('Clase no encontrada');
+            return res.status(400).send({ message: 'Clase no encontrada' });
         }
 
-        if (reserva[0].reagendamientos >= 2) {
-            console.log('Error: Has superado el número de veces que puedes reagendar esta clase');
-            return res.status(400).send({ message: 'Has superado el número de veces que puedes reagendar esta clase' });
+        const [checkSameDay] = await db.execute(
+            'SELECT COUNT(*) as count FROM Reservas r JOIN Clases c ON r.clase_id = c.id WHERE r.usuario_id = ? AND DATE(c.fecha_hora) = DATE(?)',
+            [req.user.id, nuevaFechaObj]
+        );
+
+        if (checkSameDay[0].count > 0) {
+            console.log('Ya tienes una clase registrada en esta fecha');
+            return res.status(400).send({ message: 'Ya tienes una clase registrada en esta fecha' });
         }
 
-        // Verificar si ya hay una clase agendada el mismo día en la tabla Reservas (excepto la misma clase)
-        const [existingClasses] = await db.execute(`
-            SELECT r.* 
-            FROM Reservas r
-            JOIN Clases c ON r.clase_id = c.id
-            WHERE r.usuario_id = ? AND DATE(c.fecha_hora) = DATE(?) AND r.clase_id != ?
-        `, [req.user.id, nuevaFecha, claseId]);
+        const [result] = await db.execute(
+            'UPDATE Clases SET cupos_disponibles = cupos_disponibles - 1 WHERE id = ? AND cupos_disponibles > 0',
+            [claseId]
+        );
 
-        if (existingClasses.length > 0) {
-            console.log('Error: Ya tienes otra clase registrada en esta fecha');
-            return res.status(400).send({ message: 'No puedes reagendar para el mismo día en que ya tienes otra clase.' });
-        }
+        if (result.affectedRows > 0) {
+            await db.execute(
+                'UPDATE Reservas SET clase_id = ?, fecha_reserva = NOW() WHERE usuario_id = ? AND clase_id = ?',
+                [claseId, req.user.id, claseId]
+            );
 
-        const nuevaFechaSimplificada = new Date(nuevaFecha);
-        nuevaFechaSimplificada.setSeconds(0, 0);
-
-        const [nuevaClase] = await db.execute(`SELECT id, cupos_disponibles 
-                                               FROM Clases 
-                                               WHERE fecha_hora_simplificada = ? 
-                                               LIMIT 1`, [nuevaFechaSimplificada]);
-        if (nuevaClase.length === 0) {
-            console.log('Error: Fecha no válida para reagendar');
-            return res.status(400).send({ message: 'Fecha no válida para reagendar' });
-        }
-
-        if (nuevaClase[0].cupos_disponibles <= 0) {
-            console.log('Error: No hay cupos disponibles en la nueva clase');
-            return res.status(400).send({ message: 'No hay cupos disponibles en la nueva clase' });
-        }
-
-        // Iniciar transacción
-        await db.query('START TRANSACTION');
-
-        try {
-            console.log('Actualizando cupos de la nueva clase');
-            const updateNuevaClase = await db.execute('UPDATE Clases SET cupos_disponibles = cupos_disponibles - 1 WHERE id = ?', [nuevaClase[0].id]);
-            console.log('Resultado de actualizar cupos de la nueva clase:', updateNuevaClase);
-
-            console.log('Actualizando cupos de la clase actual');
-            const updateClaseActual = await db.execute('UPDATE Clases SET cupos_disponibles = cupos_disponibles + 1 WHERE id = ?', [reserva[0].clase_id]);
-            console.log('Resultado de actualizar cupos de la clase actual:', updateClaseActual);
-
-            console.log('Actualizando la reserva con la nueva clase');
-            const updateReserva = await db.execute('UPDATE Reservas SET clase_id = ?, reagendamientos = reagendamientos + 1 WHERE usuario_id = ? AND clase_id = ?', [nuevaClase[0].id, req.user.id, claseId]);
-            console.log('Resultado de actualizar la reserva:', updateReserva);
-
-            // Confirmar transacción
-            await db.query('COMMIT');
             console.log('Clase reagendada exitosamente');
-            res.json({ message: 'Clase reagendada exitosamente' });
-        } catch (error) {
-            console.error('Error durante el reagendamiento:', error);
-            // Revertir transacción en caso de error
-            await db.query('ROLLBACK');
-            res.status(500).send({ message: 'Error en el servidor', error: error.message });
+            res.json({ message: 'Clase reagendada exitosamente', fecha: claseData[0].fecha_hora });
+        } else {
+            console.log('No hay cupos disponibles');
+            res.status(400).send({ message: 'No hay cupos disponibles' });
         }
     } catch (error) {
-        console.error('Error durante la consulta:', error);
+        console.error('Error durante el reagendamiento:', error);
         res.status(500).send({ message: 'Error en el servidor', error: error.message });
     }
 });
-
 
 
 
