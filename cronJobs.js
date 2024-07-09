@@ -28,16 +28,16 @@ async function activatePackages() {
             }
 
             // Obtener las clases disponibles actuales del usuario
-            const [userRows] = await db.execute('SELECT clases_disponibles FROM usuarios WHERE id = ?', [usuario_id]);
+            const [userRows] = await db.execute('SELECT clases_disponibles FROM Usuarios WHERE id = ?', [usuario_id]);
             const currentClasesDisponibles = userRows.length > 0 ? userRows[0].clases_disponibles : null;
             console.log(`Clases disponibles actuales para el usuario ID ${usuario_id}:`, currentClasesDisponibles);
 
             // Actualizar las clases disponibles del usuario
-            const [updateResult] = await db.execute('UPDATE usuarios SET clases_disponibles = IFNULL(clases_disponibles, 0) + ? WHERE id = ?', [num_clases, usuario_id]);
+            const [updateResult] = await db.execute('UPDATE Usuarios SET clases_disponibles = IFNULL(clases_disponibles, 0) + ? WHERE id = ?', [num_clases, usuario_id]);
             console.log(`Actualización de clases para el usuario ID ${usuario_id} resultó en:`, updateResult);
 
             // Verificar la actualización en la tabla usuarios
-            const [updatedUserRows] = await db.execute('SELECT clases_disponibles FROM usuarios WHERE id = ?', [usuario_id]);
+            const [updatedUserRows] = await db.execute('SELECT clases_disponibles FROM Usuarios WHERE id = ?', [usuario_id]);
             const updatedClasesDisponibles = updatedUserRows.length > 0 ? updatedUserRows[0].clases_disponibles : null;
             console.log(`Clases disponibles actualizadas para el usuario ID ${usuario_id}:`, updatedClasesDisponibles);
 
