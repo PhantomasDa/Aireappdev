@@ -7,7 +7,6 @@ function mostrarErrorFechaModal(mensaje) {
     errorFechaText.textContent = mensaje;
     errorFechaModal.style.display = 'block';
 }
-
 function cargarHorarios(fecha) {
     if (!validarFechaSeleccionada(fecha)) {
         console.log('Fecha seleccionada no válida.');
@@ -33,7 +32,7 @@ function cargarHorarios(fecha) {
     }
 
     const clasesDisponibles = parseInt(clasesDisponiblesElement.textContent.trim(), 10);
-    if (clasesDisponibles === 0) {
+    if (isNaN(clasesDisponibles) || clasesDisponibles === 0) {
         mostrarErrorFechaModal('Lo sentimos, no tienes clases disponibles. Te recomendamos comprar otro paquete.');
         return;
     }
@@ -62,6 +61,7 @@ function cargarHorarios(fecha) {
         })
         .catch(error => console.error('Error al cargar los horarios:', error));
 }
+
 
 function cerrarHorariosPopup() {
     document.getElementById('horariosPopup').classList.remove('active');

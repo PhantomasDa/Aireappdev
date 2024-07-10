@@ -261,6 +261,14 @@
     <script src="js/init.js"></script>
     <script src="js/sidebar.js"></script>
     <script src="js/renovacionpaquete.js"></script>
+    <script>
+             document.addEventListener('DOMContentLoaded', function() {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/login';
+        }
+    });
+    </script>
 
 
    

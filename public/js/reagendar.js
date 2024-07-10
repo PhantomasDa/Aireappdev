@@ -110,49 +110,67 @@ function confirmarReagendarDefinitivo() {
                 return;
             }
 
-            // Procede con la solicitud de reagendar si no hay clases el mismo día
-            fetch('/perfil/reagendar', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + localStorage.getItem('token')
-                },
-                body: JSON.stringify({ claseId, nuevaFecha: nuevaFechaObj.toISOString() })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    if (response.status === 404) {
-                        throw new Error('La ruta de reagendamiento no se encontró (404)');
-                    }
-                    return response.json().then(error => { throw new Error(error.message); });
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Clase reagendada con éxito:', data);
-                cerrarConfirmacionReagendarPopup();
-                mostrarExitoReagendarPopup();
-                cargarProximasClases(); // Asegúrate de que esta función esté disponible globalmente o impórtala si es necesario.
+            // Obtener la fecha de expiración del paquete
+            fetchData(`/perfil/fecha-expiracion-paquete`)
+                .then(data => {
+                    const fechaExpiracionPaquete = new Date(data.fecha_expiracion);
+                    console.log(`Fecha de expiración del paquete: ${fechaExpiracionPaquete}`);
 
-                // Actualiza el número de reservas disponibles
-                fetchData(`/perfil/clases-disponibles`)
-                    .then(data => {
-                        console.log('Actualizando reservas disponibles:', data);
-                        const clasesDisponibles = data.clases_disponibles;
-                        document.getElementById('clasesDisponibles').innerHTML = `Reservas disponibles: ${clasesDisponibles}`;
+                    // Verificar si la nueva fecha de reagendamiento es mayor que la fecha de expiración del paquete
+                    if (nuevaFechaObj > fechaExpiracionPaquete) {
+                        alert('No puedes reagendar para una fecha posterior a la fecha de expiración de tu paquete.');
+                        return;
+                    }
+
+                    // Procede con la solicitud de reagendar si no hay clases el mismo día y la fecha es válida
+                    fetch('/perfil/reagendar', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + localStorage.getItem('token')
+                        },
+                        body: JSON.stringify({ claseId, nuevaFecha: nuevaFechaObj.toISOString() })
                     })
-                    .catch(error => console.error('Error al obtener las reservas disponibles:', error));
-            })
-            .catch(error => {
-                console.error('Error al reagendar la clase:', error);
-                alert('Error al reagendar la clase: ' + error.message);
-            });
+                    .then(response => {
+                        if (!response.ok) {
+                            if (response.status === 404) {
+                                throw new Error('La ruta de reagendamiento no se encontró (404)');
+                            }
+                            return response.json().then(error => { throw new Error(error.message); });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Clase reagendada con éxito:', data);
+                        cerrarConfirmacionReagendarPopup();
+                        mostrarExitoReagendarPopup();
+                        cargarProximasClases(); // Asegúrate de que esta función esté disponible globalmente o impórtala si es necesario.
+
+                        // Actualiza el número de reservas disponibles
+                        fetchData(`/perfil/clases-disponibles`)
+                            .then(data => {
+                                console.log('Actualizando reservas disponibles:', data);
+                                const clasesDisponibles = data.clases_disponibles;
+                                document.getElementById('clasesDisponibles').innerHTML = `Reservas disponibles: ${clasesDisponibles}`;
+                            })
+                            .catch(error => console.error('Error al obtener las reservas disponibles:', error));
+                    })
+                    .catch(error => {
+                        console.error('Error al reagendar la clase:', error);
+                        alert('Error al reagendar la clase: ' + error.message);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error al obtener la fecha de expiración del paquete:', error);
+                    alert('Error al obtener la fecha de expiración del paquete: ' + error.message);
+                });
         })
         .catch(error => {
             console.error('Error al verificar las clases del mismo día:', error);
             alert('Error al verificar las clases del mismo día: ' + error.message);
         });
 }
+
 
 
 function cerrarReagendarPopup() {
