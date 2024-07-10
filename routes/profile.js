@@ -66,8 +66,11 @@ router.get('/usuario', verifyToken, (req, res) => {
         }
     });
 });
+
+
+
 // Reagendar clase
-router.post('/perfil/reagendar', verifyToken, async (req, res) => {
+router.post('/reagendar', verifyToken, async (req, res) => {
     const { claseId, nuevaFecha } = req.body;
     console.log('Datos recibidos para reagendar:', { claseId, nuevaFecha });
 
@@ -124,9 +127,6 @@ router.post('/perfil/reagendar', verifyToken, async (req, res) => {
         res.status(500).send({ message: 'Error en el servidor', error: error.message });
     }
 });
-
-
-
 
 
 // Obtener horarios disponibles filtrados por fecha

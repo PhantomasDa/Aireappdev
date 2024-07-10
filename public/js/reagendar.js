@@ -90,7 +90,6 @@ function mostrarConfirmacionReagendar(claseId, nuevaFecha) {
         .catch(error => console.error('Error al obtener la clase actual para confirmar:', error));
 }
 
-
 function confirmarReagendarDefinitivo() {
     const claseId = claseIdGlobal;
     const nuevaFecha = nuevaFechaGlobal;
@@ -122,6 +121,9 @@ function confirmarReagendarDefinitivo() {
             })
             .then(response => {
                 if (!response.ok) {
+                    if (response.status === 404) {
+                        throw new Error('La ruta de reagendamiento no se encontró (404)');
+                    }
                     return response.json().then(error => { throw new Error(error.message); });
                 }
                 return response.json();
