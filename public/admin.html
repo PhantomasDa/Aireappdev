@@ -17,7 +17,8 @@
         <input type="date" id="fecha_clases" />
         <button onclick="cargarClasesUsuarios()">Cargar Clases</button>
         <div id="clases_usuarios"></div>
-    
+        <div><strong>Comprobante Pago:</strong> <span class="field-value" data-field="comprobante_pago"><img style="max-width:400px;" class="comprobante" src="../uploads/${usuario.comprobante_pago}" alt="Comprobante de Pago"></span><input type="text" class="field-input" value="${usuario.comprobante_pago}" data-field="comprobante_pago" data-id="${usuario.id}" style="display: none;"></div>
+
         <h2>Usuarios</h2>
         <div id="filtros">
             <h3>Selecciona los campos a mostrar:</h3>

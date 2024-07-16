@@ -1,48 +1,31 @@
+// sendform2.js
 function submitForm2() {
-    const form = document.getElementById('registerForm2Form');
+    const form = document.getElementById('registerForm'); // Referencia al formulario principal
+    console.log('Formulario obtenido:', form); // Depuración
+
+    if (!(form instanceof HTMLFormElement)) {
+        console.error('El formulario no es un HTMLFormElement');
+        return;
+    }
+
     const formData = new FormData(form);
+    
+    // Realiza validaciones aquí...
+    const fotoPerfil = document.getElementById('foto_perfil').files[0];
 
-    // Mostrar animación de carga y bloquear formulario
-    document.getElementById('loading').style.display = 'flex';
-    form.style.pointerEvents = 'none';
+    if (!fotoPerfil) {
+        document.getElementById('fotoPerfilError').textContent = 'Por favor, sube una foto de perfil.';
+        return;
+    }
 
-    const startTime = Date.now();
+    // Guardar datos localmente
+    const formDataObject = {
+        foto_perfil: fotoPerfil.name
+    };
+    localStorage.setItem('step2Data', JSON.stringify(formDataObject));
 
-    fetch('/register/step2', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => {
-        if (!response.ok) {
-            return response.json().then(err => { throw new Error(err.message); });
-        }
-        return response.json();
-    })
-    .then(data => {
-        if (data.message !== 'Foto de perfil actualizada exitosamente') {
-            document.getElementById('fotoPerfilError').textContent = data.message;
-        } else {
-            // Avanzar al siguiente paso
-            document.getElementById('registerForm2').style.display = 'none';
-            document.getElementById('registerForm3').style.display = 'block';
-            document.getElementById('userId3').value = document.getElementById('userId2').value; // Asignar el userId al tercer formulario
-           
-            // Actualizar barra de progreso
-            updateProgressBar(3); // Cambiar a 3 para el tercer paso
-        }
-    })
-    .catch(error => {
-        console.error('Error durante la subida de la foto de perfil:', error);
-        document.getElementById('fotoPerfilError').textContent = 'Error durante la subida de la foto de perfil';
-    })
-    .finally(() => {
-        const elapsedTime = Date.now() - startTime;
-        const remainingTime = 2000 - elapsedTime;
-
-        setTimeout(() => {
-            // Ocultar animación de carga y desbloquear formulario
-            document.getElementById('loading').style.display = 'none';
-            form.style.pointerEvents = 'auto';
-        }, remainingTime > 0 ? remainingTime : 0);
-    });
+    // Avanzar al siguiente paso
+    document.getElementById('registerForm2').style.display = 'none';
+    document.getElementById('registerForm3').style.display = 'block';
+    updateProgressBar(3);
 }

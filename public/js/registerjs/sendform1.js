@@ -1,106 +1,96 @@
-function submitForm() {
-    const nombre = document.getElementById('nombre').value;
-    const email = document.getElementById('email').value;
-    const telefono = document.getElementById('telefono').value;
-    const password = document.getElementById('password').value;
-    const confirm_password = document.getElementById('confirm_password').value;
-    const fecha_nacimiento = document.getElementById('fecha_nacimiento').value;
-    const genero = document.getElementById('genero').value;
+// sendform1.js
+function submitForm1() {
+    const form = document.getElementById('registerForm'); // Referencia al formulario principal
+    console.log('Formulario obtenido:', form); // Depuración
+
+    if (!(form instanceof HTMLFormElement)) {
+        console.error('El formulario no es un HTMLFormElement');
+        return;
+    }
+
+    const formData = new FormData(form);
+    
+    // Realiza validaciones aquí...
+    const nombre = formData.get('nombre');
+    const email = formData.get('email');
+    const telefono = formData.get('telefono');
+    const password = formData.get('password');
+    const confirm_password = formData.get('confirm_password');
+    const fecha_nacimiento = formData.get('fecha_nacimiento');
+    const genero = formData.get('genero');
+
+    // Variable para controlar si hay errores
+    let hasError = false;
+
+    // Limpiar mensajes de error anteriores
+    document.getElementById('nombreError').textContent = '';
+    document.getElementById('emailError').textContent = '';
+    document.getElementById('telefonoError').textContent = '';
+    document.getElementById('passwordError').textContent = '';
+    document.getElementById('confirmPasswordError').textContent = '';
+    document.getElementById('fechaNacimientoError').textContent = '';
+    document.getElementById('generoError').textContent = '';
 
     if (nombre.length < 3) {
         document.getElementById('nombreError').textContent = 'El nombre debe tener al menos 3 caracteres.';
-        return;
+        hasError = true;
     }
 
     const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
     if (!emailPattern.test(email)) {
         document.getElementById('emailError').textContent = 'Por favor, ingrese un email válido.';
-        return;
+        hasError = true;
     }
 
     if (telefono.length < 8) {
         document.getElementById('telefonoError').textContent = 'Por favor, ingrese un teléfono válido.';
-        return;
+        hasError = true;
     }
 
     if (password.length < 6) {
         document.getElementById('passwordError').textContent = 'La contraseña debe tener al menos 6 caracteres.';
-        return;
+        hasError = true;
     }
 
     if (password !== confirm_password) {
         document.getElementById('confirmPasswordError').textContent = 'Las contraseñas no coinciden.';
-        return;
+        hasError = true;
     }
 
     if (!fecha_nacimiento) {
         document.getElementById('fechaNacimientoError').textContent = 'Por favor, ingrese una fecha de nacimiento.';
-        return;
+        hasError = true;
     }
 
     const fechaPattern = /^\d{2}\/\d{2}\/\d{4}$/;
     if (!fechaPattern.test(fecha_nacimiento)) {
         document.getElementById('fechaNacimientoError').textContent = 'Por favor, ingrese una fecha de nacimiento válida (dd/mm/yyyy).';
-        return;
+        hasError = true;
     }
-
-    const [dia, mes, anio] = fecha_nacimiento.split('/');
-    const fechaISO = `${anio}-${mes}-${dia}`;
 
     if (!genero) {
         document.getElementById('generoError').textContent = 'Por favor, seleccione un género.';
+        hasError = true;
+    }
+
+    // Si hay errores, no continuar
+    if (hasError) {
         return;
     }
 
-    // Mostrar animación de carga y bloquear formulario
-    document.getElementById('loading').style.display = 'flex';
-    document.getElementById('registerForm1Form').style.pointerEvents = 'none';
+    // Guardar datos localmente
+    const formDataObject = {
+        nombre,
+        email,
+        telefono,
+        password,
+        fecha_nacimiento,
+        genero
+    };
+    localStorage.setItem('step1Data', JSON.stringify(formDataObject));
 
-    const startTime = Date.now();
-
-    fetch('/register/step1', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ nombre, email, telefono, password, fecha_nacimiento: fechaISO, genero })
-    })
-    .then(response => {
-        if (!response.ok) {
-            return response.json().then(err => {
-                console.log('Error del servidor:', err);
-                throw new Error(err.message);
-            });
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log('Respuesta del servidor:', data);
-        if (data.message !== 'Datos principales guardados exitosamente') {
-            document.getElementById('nombreError').textContent = data.message;
-        } else {
-            // Avanzar al siguiente paso
-            document.getElementById('registerForm1').style.display = 'none';
-            document.getElementById('registerForm2').style.display = 'block';
-            document.getElementById('userId2').value = data.userId; // Asignar el userId al segundo formulario
-            
-            // Actualizar barra de progreso
-            updateProgressBar(2); // Cambiar a 2 para el segundo paso
-            scrollToTop();
-        }
-    })
-    .catch(error => {
-        console.error('Error durante el registro:', error);
-        document.getElementById('nombreError').textContent = `Error durante el registro: ${error.message}`;
-    })
-    .finally(() => {
-        const elapsedTime = Date.now() - startTime;
-        const remainingTime = 2000 - elapsedTime;
-
-        setTimeout(() => {
-            // Ocultar animación de carga y desbloquear formulario
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('registerForm1Form').style.pointerEvents = 'auto';
-        }, remainingTime > 0 ? remainingTime : 0);
-    });
+    // Avanzar al siguiente paso
+    document.getElementById('registerForm1').style.display = 'none';
+    document.getElementById('registerForm2').style.display = 'block';
+    updateProgressBar(2);
 }

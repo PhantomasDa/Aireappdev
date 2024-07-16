@@ -207,5 +207,92 @@ router.post('/step6', upload.single('comprobante_pago'), [
 });
 
 
+router.post('/complete', upload.single('comprobante_pago'), [
+    body('nombre').isLength({ min: 3 }).trim().escape(),
+    body('email').isEmail().normalizeEmail(),
+    body('telefono').isLength({ min: 8 }).trim().escape(),
+    body('password').isLength({ min: 6 }),
+    body('fecha_nacimiento').isISO8601().toDate(),
+    body('genero').isIn(['hombre', 'mujer', 'otro']),
+    body('foto_perfil').optional().trim().escape(),
+    body('pregunta1').isIn(['si', 'no']),
+    body('pregunta2').isIn(['si', 'no']),
+    body('pregunta3').isIn(['si', 'no']),
+    body('pregunta4').isIn(['si', 'no']),
+    body('modalidad').isIn(['online', 'presencial']),
+    body('paquete').isIn(['Paquete básico', 'Paquete completo', 'Paquete premium']),
+    body('comprobante_pago').optional().trim().escape(),
+    body('lesiones').optional({ checkFalsy: true }).trim().escape(),
+    body('motivacion').isLength({ min: 1 }).trim().escape()
+], async (req, res) => {
+    console.log('Datos recibidos:', req.body);
+    console.log('Archivo recibido:', req.file);
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        console.log('Errores de validación:', errors.array());
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { nombre, email, telefono, password, fecha_nacimiento, genero, pregunta1, pregunta2, pregunta3, pregunta4, lesiones, motivacion, modalidad, paquete } = req.body;
+    const fotoPerfil = req.body.foto_perfil;
+    const comprobantePago = req.file ? req.file.filename : null;
+
+    if (!comprobantePago) {
+        return res.status(400).json({ message: 'Todos los campos son obligatorios' });
+    }
+
+    let clasesDisponibles, maxReagendamientos;
+    switch (paquete) {
+        case 'Paquete básico':
+            clasesDisponibles = 4;
+            maxReagendamientos = 1;
+            break;
+        case 'Paquete completo':
+            clasesDisponibles = 8;
+            maxReagendamientos = 3;
+            break;
+        case 'Paquete premium':
+            clasesDisponibles = 12;
+            maxReagendamientos = 4;
+            break;
+        default:
+            return res.status(400).json({ message: 'Paquete inválido' });
+    }
+
+    const fechaCompra = new Date();
+    const fechaActivacion = new Date(fechaCompra);
+    fechaActivacion.setDate(fechaActivacion.getDate() + 1);
+    const fechaExpiracion = new Date(fechaActivacion);
+    fechaExpiracion.setMonth(fechaExpiracion.getMonth() + 1);
+
+    try {
+        const hashedPassword = await bcrypt.hash(password, 8);
+
+        const [existingUser] = await db.execute('SELECT * FROM Usuarios WHERE email = ?', [email]);
+        if (existingUser.length > 0) {
+            return res.status(400).json({ message: 'El email ya está registrado' });
+        }
+
+        const [result] = await db.execute('INSERT INTO Usuarios (nombre, email, telefono, password, fecha_nacimiento, genero, foto_perfil, pregunta1, pregunta2, pregunta3, pregunta4, lesiones, motivacion, modalidad, paquete, comprobante_pago, clases_disponibles) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [nombre, email, telefono, hashedPassword, fecha_nacimiento, genero, fotoPerfil, pregunta1, pregunta2, pregunta3, pregunta4, lesiones, motivacion, modalidad, paquete, comprobantePago, clasesDisponibles]);
+
+        const userId = result.insertId;
+
+        await db.execute('INSERT INTO paquetes (usuario_id, fecha_compra, fecha_activacion, fecha_expiracion, max_reagendamientos, informacion_paquete) VALUES (?, ?, ?, ?, ?, ?)', 
+            [userId, fechaCompra, fechaActivacion, fechaExpiracion, maxReagendamientos, paquete]);
+
+        const [user] = await db.execute('SELECT email FROM Usuarios WHERE id = ?', [userId]);
+        const userEmail = user[0].email;
+        await sendRegistrationEmail(userEmail, 'Registro Exitoso en Aire Pilates', '¡Felicidades! Te has registrado exitosamente en Aire Pilates.');
+
+        res.status(201).json({ message: 'Registro completado exitosamente' });
+    } catch (error) {
+        console.error('Error al completar el registro:', error);
+        res.status(500).json({ message: 'Error al completar el registro' });
+    }
+});
+
+
+
 module.exports = sendRegistrationEmail;
 module.exports = router;

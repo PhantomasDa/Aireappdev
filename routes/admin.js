@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../database');
-// const { verifyToken } = require('../middleware/auth');
+const { body, validationResult } = require('express-validator');
 
 // Obtener clases y usuarios por día
-router.get('/clases-usuarios', /*verifyToken,*/ async (req, res) => {
+router.get('/clases-usuarios', async (req, res) => {
     const { fecha } = req.query;
 
     const queryClases = `
@@ -53,6 +53,30 @@ router.get('/usuarios-completos', async (req, res) => {
         res.json(usuarios);
     } catch (error) {
         console.error('Error al obtener usuarios completos:', error);
+        res.status(500).json({ message: 'Error en el servidor', error: error.message });
+    }
+});
+
+
+
+// Ruta para actualizar información de los usuarios
+router.post('/actualizar-usuarios', async (req, res) => {
+    console.log('Petición recibida para actualizar usuarios');
+    const { cambios } = req.body;
+    console.log('Datos recibidos:', cambios);
+
+    const queries = cambios.map(cambio => {
+        return db.execute(
+            `UPDATE Usuarios SET ${cambio.field} = ? WHERE id = ?`,
+            [cambio.value, cambio.id]
+        );
+    });
+
+    try {
+        await Promise.all(queries);
+        res.json({ message: 'Usuarios actualizados correctamente' });
+    } catch (error) {
+        console.error('Error al actualizar usuarios:', error);
         res.status(500).json({ message: 'Error en el servidor', error: error.message });
     }
 });

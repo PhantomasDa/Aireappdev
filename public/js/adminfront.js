@@ -60,6 +60,7 @@ function cargarClasesUsuarios() {
         .catch(error => console.error('Error al cargar clases y usuarios:', error));
 }
 
+
 function fetchData(url, options = {}) {
     const token = localStorage.getItem('token');
     console.log('Token:', token);  // Verificar si el token está presente
@@ -76,13 +77,21 @@ function fetchData(url, options = {}) {
                     localStorage.removeItem('token');
                     window.location.href = '/login';
                 }
-                return response.json().then(error => {
-                    throw new Error(error.message || 'Error desconocido');
+                return response.text().then(errorText => {
+                    try {
+                        const errorJson = JSON.parse(errorText);
+                        throw new Error(errorJson.message || 'Error desconocido');
+                    } catch (e) {
+                        console.error('Error en la respuesta del servidor (no JSON):', errorText);
+                        throw new Error('Respuesta del servidor no es JSON');
+                    }
                 });
             }
             return response.json();
         });
 }
+
+
 function cargarUsuarios() {
     fetchData('/admin/usuarios-completos')
         .then(usuarios => {
@@ -124,55 +133,56 @@ function cargarUsuarios() {
             });
 
             // Crear una tarjeta por usuario
-            Object.values(usuariosMap).forEach(usuario => {
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.id = `usuario-${usuario.id}`;
+Object.values(usuariosMap).forEach(usuario => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.id = `usuario-${usuario.id}`;
 
-                card.innerHTML = `
-                    <div><strong>Nombre:</strong> <span class="field-value">${usuario.nombre}</span><input type="text" class="field-input" value="${usuario.nombre}" data-field="nombre" data-id="${usuario.id}" style="display: none;"></div>
-                    <div><strong>Email:</strong> <span class="field-value">${usuario.email}</span><input type="text" class="field-input" value="${usuario.email}" data-field="email" data-id="${usuario.id}" style="display: none;"></div>
-                    <div><strong>Fecha Registro:</strong> <span class="field-value">${usuario.fecha_registro}</span><input type="text" class="field-input" value="${usuario.fecha_registro}" data-field="fecha_registro" data-id="${usuario.id}" style="display: none;"></div>
-                    <div><strong>Paquete:</strong> <span class="field-value">${usuario.paquete}</span><input type="text" class="field-input" value="${usuario.paquete}" data-field="paquete" data-id="${usuario.id}" style="display: none;"></div>
-                    <div><strong>Clases Disponibles:</strong> <span class="field-value">${usuario.clases_disponibles}</span><input type="text" class="field-input" value="${usuario.clases_disponibles}" data-field="clases_disponibles" data-id="${usuario.id}" style="display: none;"></div>
-                    <div><strong>Teléfono:</strong> <span class="field-value">${usuario.telefono}</span><input type="text" class="field-input" value="${usuario.telefono}" data-field="telefono" data-id="${usuario.id}" style="display: none;"></div>
-                    <div><strong>Motivación:</strong> <span class="field-value">${usuario.motivacion}</span><input type="text" class="field-input" value="${usuario.motivacion}" data-field="motivacion" data-id="${usuario.id}" style="display: none;"></div>
-                    <div><strong>Fecha Nacimiento:</strong> <span class="field-value">${usuario.fecha_nacimiento}</span><input type="text" class="field-input" value="${usuario.fecha_nacimiento}" data-field="fecha_nacimiento" data-id="${usuario.id}" style="display: none;"></div>
-                    <div><strong>Género:</strong> <span class="field-value">${usuario.genero}</span><input type="text" class="field-input" value="${usuario.genero}" data-field="genero" data-id="${usuario.id}" style="display: none;"></div>
-                    <div><strong>Comprobante Pago:</strong> <img style="max-width:400px;" class="comprobante" src="../uploads/${usuario.comprobante_pago}" alt="Comprobante de Pago"><input type="text" class="field-input" value="${usuario.comprobante_pago}" data-field="comprobante_pago" data-id="${usuario.id}" style="display: none;"></div>
-                    <div><strong>Rol:</strong> <span class="field-value">${usuario.rol}</span><input type="text" class="field-input" value="${usuario.rol}" data-field="rol" data-id="${usuario.id}" style="display: none;"></div>
-                    <div>
-                        <button onclick="togglePaqueteInfo(${usuario.id})">Mostrar más</button>
-                        <div id="paquete-info-${usuario.id}" style="display: none;">
-                            <h3>Información del Paquete</h3>
-                            ${usuario.paquetes.map(paquete => `
-                                <div><strong>Fecha de Compra:</strong> ${paquete.fecha_compra || 'N/A'}</div>
-                                <div><strong>Fecha de Activación:</strong> ${paquete.fecha_activacion || 'N/A'}</div>
-                                <div><strong>Fecha de Expiración:</strong> ${paquete.fecha_expiracion || 'N/A'}</div>
-                                <div><strong>Max Reagendamientos:</strong> ${paquete.max_reagendamientos || 'N/A'}</div>
-                                <div><strong>Reagendamientos Usados:</strong> ${paquete.reagendamientos_usados || 'N/A'}</div>
-                                <div><strong>Información del Paquete:</strong> ${paquete.informacion || 'N/A'}</div>
-                                <div><strong>Comprobante de Pago:</strong> <img class="comprobante" src="${paquete.comprobante_pago || ''}" alt="Comprobante de Pago"></div>
-                            `).join('')}
-                        </div>
-                    </div>
-                    <div>
-                        <button onclick="toggleReservaciones(${usuario.id})">Mostrar Reservaciones</button>
-                        <div id="reservaciones-info-${usuario.id}" style="display: none;">
-                            <h3>Reservaciones</h3>
-                            ${usuario.reservaciones.map(reserva => `
-                                <div><strong>Clase ID:</strong> ${reserva.clase_id || 'N/A'}</div>
-                                <div><strong>Fecha de Reserva:</strong> ${reserva.fecha_reserva || 'N/A'}</div>
-                                <div><strong>Reagendamientos:</strong> ${reserva.reagendamientos || 'N/A'}</div>
-                            `).join('')}
-                        </div>
-                    </div>
-                    <button onclick="editarUsuario(${usuario.id})">Editar</button>
-                    <button onclick="guardarCambiosUsuario(${usuario.id})" style="display: none;">Guardar</button>
-                `;
+    card.innerHTML = `
+        <div><strong>Nombre:</strong> <span class="field-value" data-field="nombre">${usuario.nombre}</span><input type="text" class="field-input" value="${usuario.nombre}" data-field="nombre" data-id="${usuario.id}" style="display: none;"></div>
+        <div><strong>Email:</strong> <span class="field-value" data-field="email">${usuario.email}</span><input type="text" class="field-input" value="${usuario.email}" data-field="email" data-id="${usuario.id}" style="display: none;"></div>
+        <div><strong>Fecha Registro:</strong> <span class="field-value" data-field="fecha_registro">${usuario.fecha_registro}</span><input type="text" class="field-input" value="${usuario.fecha_registro}" data-field="fecha_registro" data-id="${usuario.id}" style="display: none;"></div>
+        <div><strong>Paquete:</strong> <span class="field-value" data-field="paquete">${usuario.paquete}</span><input type="text" class="field-input" value="${usuario.paquete}" data-field="paquete" data-id="${usuario.id}" style="display: none;"></div>
+        <div><strong>Clases Disponibles:</strong> <span class="field-value" data-field="clases_disponibles">${usuario.clases_disponibles}</span><input type="text" class="field-input" value="${usuario.clases_disponibles}" data-field="clases_disponibles" data-id="${usuario.id}" style="display: none;"></div>
+        <div><strong>Teléfono:</strong> <span class="field-value" data-field="telefono">${usuario.telefono}</span><input type="text" class="field-input" value="${usuario.telefono}" data-field="telefono" data-id="${usuario.id}" style="display: none;"></div>
+        <div><strong>Motivación:</strong> <span class="field-value" data-field="motivacion">${usuario.motivacion}</span><input type="text" class="field-input" value="${usuario.motivacion}" data-field="motivacion" data-id="${usuario.id}" style="display: none;"></div>
+        <div><strong>Fecha Nacimiento:</strong> <span class="field-value" data-field="fecha_nacimiento">${usuario.fecha_nacimiento}</span><input type="text" class="field-input" value="${usuario.fecha_nacimiento}" data-field="fecha_nacimiento" data-id="${usuario.id}" style="display: none;"></div>
+        <div><strong>Género:</strong> <span class="field-value" data-field="genero">${usuario.genero}</span><input type="text" class="field-input" value="${usuario.genero}" data-field="genero" data-id="${usuario.id}" style="display: none;"></div>
+        <div><strong>Comprobante Pago:</strong> <img style="max-width:400px;" class="comprobante" src="../uploads/${usuario.comprobante_pago}" alt="Comprobante de Pago"><input type="text" class="field-input" value="${usuario.comprobante_pago}" data-field="comprobante_pago" data-id="${usuario.id}" style="display: none;"></div>
+        <div><strong>Rol:</strong> <span class="field-value" data-field="rol">${usuario.rol}</span><input type="text" class="field-input" value="${usuario.rol}" data-field="rol" data-id="${usuario.id}" style="display: none;"></div>
+        <div>
+            <button onclick="togglePaqueteInfo(${usuario.id})">Mostrar más</button>
+            <div id="paquete-info-${usuario.id}" style="display: none;">
+                <h3>Información del Paquete</h3>
+                ${usuario.paquetes.map(paquete => `
+                    <div><strong>Fecha de Compra:</strong> ${paquete.fecha_compra || 'N/A'}</div>
+                    <div><strong>Fecha de Activación:</strong> ${paquete.fecha_activacion || 'N/A'}</div>
+                    <div><strong>Fecha de Expiración:</strong> ${paquete.fecha_expiracion || 'N/A'}</div>
+                    <div><strong>Max Reagendamientos:</strong> ${paquete.max_reagendamientos || 'N/A'}</div>
+                    <div><strong>Reagendamientos Usados:</strong> ${paquete.reagendamientos_usados || 'N/A'}</div>
+                    <div><strong>Información del Paquete:</strong> ${paquete.informacion || 'N/A'}</div>
+                    <div><strong>Comprobante de Pago:</strong> <img class="comprobante" src="${paquete.comprobante_pago || ''}" alt="Comprobante de Pago"></div>
+                `).join('')}
+            </div>
+        </div>
+        <div>
+            <button onclick="toggleReservaciones(${usuario.id})">Mostrar Reservaciones</button>
+            <div id="reservaciones-info-${usuario.id}" style="display: none;">
+                <h3>Reservaciones</h3>
+                ${usuario.reservaciones.map(reserva => `
+                    <div><strong>Clase ID:</strong> ${reserva.clase_id || 'N/A'}</div>
+                    <div><strong>Fecha de Reserva:</strong> ${reserva.fecha_reserva || 'N/A'}</div>
+                    <div><strong>Reagendamientos:</strong> ${reserva.reagendamientos || 'N/A'}</div>
+                `).join('')}
+            </div>
+        </div>
+        <button onclick="editarUsuario(${usuario.id})">Editar</button>
+        <button onclick="guardarCambiosUsuario(${usuario.id})" style="display: none;">Guardar</button>
+    `;
 
-                contenedorUsuarios.appendChild(card);
-            });
+    contenedorUsuarios.appendChild(card);
+});
+
         })
         .catch(error => console.error('Error al cargar usuarios:', error));
 }
@@ -205,18 +215,49 @@ function editarUsuario(usuarioId) {
     card.querySelector('button[onclick^="guardarCambiosUsuario"]').style.display = 'inline-block';
 }
 
+
+
 function guardarCambiosUsuario(usuarioId) {
+    console.log('Iniciando guardarCambiosUsuario');
     const card = document.getElementById(`usuario-${usuarioId}`);
+    if (!card) {
+        console.error('No se encontró el elemento de la tarjeta del usuario');
+        return;
+    }
+
     const inputs = card.querySelectorAll('.field-input');
-    const cambios = Array.from(inputs).map(input => ({
-        id: input.getAttribute('data-id'),
-        field: input.getAttribute('data-field'),
-        value: input.value
-    }));
+    const cambios = Array.from(inputs).reduce((acc, input) => {
+        const id = parseInt(input.getAttribute('data-id'), 10);
+        const field = input.getAttribute('data-field');
+        const value = input.value;
+        const originalElement = card.querySelector(`.field-value[data-field="${field}"]`);
 
-    console.log('Cambios a enviar:', JSON.stringify({ cambios }));  // Agregar mensaje de depuración
+        if (!originalElement) {
+            console.error(`No se encontró el elemento original para el campo ${field}`);
+            return acc;
+        }
 
-    fetchData('/admin/actualizar-usuarios', {
+        let originalValue = originalElement.textContent.trim();
+        
+        // Para el caso específico de `comprobante_pago`
+        if (field === 'comprobante_pago' && originalElement.querySelector('img')) {
+            originalValue = originalElement.querySelector('img').getAttribute('src').split('/').pop();
+        }
+
+        if (value !== originalValue) {
+            acc.push({ id, field, value });
+        }
+        return acc;
+    }, []);
+
+    if (cambios.length === 0) {
+        console.log('No hay cambios para guardar');
+        return;
+    }
+
+    console.log('Cambios a enviar:', JSON.stringify({ cambios }));
+
+    fetch('http://localhost:3000/admin/actualizar-usuarios', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -224,22 +265,21 @@ function guardarCambiosUsuario(usuarioId) {
         body: JSON.stringify({ cambios })
     })
     .then(response => {
+        console.log('Respuesta del servidor:', response);
         if (response.ok) {
             return response.json();
         } else {
-            return response.json().then(error => {
-                throw new Error(error.message || 'Error desconocido');
-            });
+            throw new Error('Error en la respuesta del servidor');
         }
     })
     .then(data => {
-        console.log('Respuesta del servidor:', data); // Agregar mensaje de depuración
+        console.log('Datos recibidos del servidor:', data);
         alert('Cambios guardados correctamente');
-        cargarUsuarios(); // Recargar la tabla de usuarios
+        cargarUsuarios();
     })
     .catch(error => {
         console.error('Error al guardar cambios:', error);
-        alert('Error al guardar cambios');
+        alert('Error al guardar cambios: ' + error.message);
     });
 }
 

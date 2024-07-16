@@ -119,45 +119,41 @@
     <div id="loading" style="display:none;">
         <div class="spinner"></div>
     </div>
-    
     <div class="my-container-bg">
-        <!-- <button class="button" type="button" onclick="prevStep()">Anterior</button>
-        <button class="button" type="button" onclick="nextStep()">Siguiente</button> -->
-        <div class="form-section-bg" id="registerForm1">
-            <h2>Registro de Usuario</h2>
-            <form id="registerForm1Form">
-                <!-- Otros campos del formulario -->
-        
+        <form id="registerForm" enctype="multipart/form-data">
+            <!-- Sección 1: Registro de Usuario -->
+            <div class="form-section-bg" id="registerForm1">
+                <h2>Registro de Usuario</h2>
                 <label for="nombre">Nombre Completo:</label>
                 <input type="text" id="nombre" name="nombre" placeholder="Nombre Completo" required>
                 <span id="nombreError" class="error"></span>
-            
+    
                 <label for="email">Correo electrónico:</label>
                 <input type="email" id="email" name="email" placeholder="Correo electrónico" required>
                 <span id="emailError" class="error"></span>
-            
+    
                 <label for="telefono">Teléfono:</label>
                 <input type="tel" id="telefono" name="telefono" placeholder="Teléfono" required>
                 <span id="telefonoError" class="error"></span>
-        
+    
                 <label for="password">Contraseña:</label>
                 <div class="password-container">
                     <input type="password" id="password" name="password" placeholder="Contraseña" required>
                     <i class="fas fa-eye" id="togglePassword" onclick="togglePasswordVisibility('password', 'togglePassword')"></i>
                 </div>
                 <span id="passwordError" class="error"></span>
-        
+    
                 <label for="confirm_password">Confirmar Contraseña:</label>
                 <div class="password-container">
                     <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirmar Contraseña" required>
                     <i class="fas fa-eye" id="toggleConfirmPassword" onclick="togglePasswordVisibility('confirm_password', 'toggleConfirmPassword')"></i>
                 </div>
                 <span id="confirmPasswordError" class="error"></span>
-        
+    
                 <label for="fecha_nacimiento">Fecha de Nacimiento:</label>
                 <input type="text" id="fecha_nacimiento" name="fecha_nacimiento" placeholder="dd/mm/yyyy" required>
                 <span id="fechaNacimientoError" class="error"></span>
-        
+    
                 <label>Género:</label>
                 <div class="option-container">
                     <div class="option" id="option-hombre" onclick="selectGender('hombre')">
@@ -175,7 +171,7 @@
                 </div>
                 <input type="hidden" id="genero" name="genero" value="mujer">
                 <span id="generoError" class="error"></span>
-        
+    
                 <!-- Checkbox de términos y condiciones -->
                 <div class="checkbox-container">
                     <input type="checkbox" id="terms" name="terms">
@@ -184,73 +180,70 @@
                     </label>
                     <span id="termsError" class="error"></span>
                 </div>
-        
-                <button type="button" class="button" onclick="submitForm()">Completar</button>
-            </form>
-        </div>
-   
-        <div class="form-section-bg" id="registerForm2" style="display: none;">
-            <h2>Sube tu Foto de Perfil</h2>
-            <form id="registerForm2Form" enctype="multipart/form-data">
+    
+                <button type="button" class="button" onclick="submitForm1()">Continuar</button>
+            </div>
+    
+            <!-- Sección 2: Sube tu Foto de Perfil -->
+            <div class="form-section-bg" id="registerForm2" style="display: none;">
+                <h2>Sube tu Foto de Perfil</h2>
                 <input type="hidden" id="userId2" name="userId">
                 <label for="foto_perfil">Comparte una foto desde tu carrete o tómate una foto para tu perfil pilatero:</label>
                 <input type="file" id="foto_perfil" name="foto_perfil" required>
                 <span id="fotoPerfilError" class="error"></span>
                 
                 <button type="button" class="button" onclick="submitForm2()">Continuar</button>
-            </form>
-        </div>
-
-        <div class="form-section-bg" id="registerForm3" style="display: none;">
-            <h2>Cuestionario y Datos Relevantes</h2>
-            <form id="registerForm3Form">
+            </div>
+    
+            <!-- Sección 3: Cuestionario y Datos Relevantes -->
+            <div class="form-section-bg" id="registerForm3" style="display: none;">
+                <h2>Cuestionario y Datos Relevantes</h2>
                 <input type="hidden" id="userId3" name="userId">
-
+    
                 <label for="pregunta1">¿Has practicado Pilates antes?</label>
                 <select id="pregunta1" name="pregunta1" required>
                     <option value="">Seleccione</option>
                     <option value="si">Sí</option>
                     <option value="no">No</option>
                 </select>
-
+    
                 <label for="pregunta2">¿Tienes alguna lesión o condición médica que debamos conocer?</label>
                 <select id="pregunta2" name="pregunta2" onchange="toggleLesiones()" required>
                     <option value="">Seleccione</option>
                     <option value="si">Sí</option>
                     <option value="no">No</option>
                 </select>
-
+    
                 <div id="lesionesSection" style="display:none;">
                     <label for="lesiones">Si tienes alguna condición médica o algo que debamos saber, por favor escríbelo aquí:</label>
                     <textarea id="lesiones" name="lesiones" rows="4" cols="50"></textarea>
                 </div>
-
+    
                 <label for="pregunta3">¿Realizas ejercicio regularmente (al menos tres veces por semana)?</label>
                 <select id="pregunta3" name="pregunta3" required>
                     <option value="">Seleccione</option>
                     <option value="si">Sí</option>
                     <option value="no">No</option>
                 </select>
-
+    
                 <label for="pregunta4">¿Sigues algún plan de alimentación que debamos tener en cuenta para tu entrenamiento?</label>
                 <select id="pregunta4" name="pregunta4" required>
                     <option value="">Seleccione</option>
                     <option value="si">Sí</option>
                     <option value="no">No</option>
                 </select>
-
+    
                 <label for="motivacion">Cuéntanos un poco más sobre ti y por qué quieres practicar Pilates:</label>
                 <textarea id="motivacion" name="motivacion" rows="4" cols="50"></textarea>
                 
                 <span id="cuestionarioError" class="error"></span>
                         
                 <button type="button" class="button" onclick="submitForm3()">Continuar</button>
-            </form>
-        </div>
-        
-        <div class="form-section-bg" id="registerForm5" style="display: none;">
-            <h2>Cómo quieres Pilatear</h2>
-            <form id="registerForm5Form">
+            </div>
+    
+            <!-- Sección 4: Cómo quieres Pilatear -->
+            <div class="form-section-bg" id="registerForm5" style="display: none;">
+                <h2>Cómo quieres Pilatear</h2>
                 <input type="hidden" id="userId5" name="userId">
                 <input type="hidden" id="modalidad" name="modalidad" value="presencial">
                 
@@ -268,92 +261,67 @@
                 
                 <span id="modalidadError" class="error"></span>
                 <button type="button" class="button" onclick="submitForm5()">Continuar</button>
-            </form>
-        </div>
-
-        <div class="form-section-bg" id="registerForm6" style="display: none;">
-            <h2>Selección de Paquete</h2>
-            <label for="paquete">Paquete:</label>
-            <div class="option-container">
-                <div class="option" id="option-Paquete básico" onclick="selectPackage('Paquete básico')">
-                    <p>1 vez por semana</p>
-                </div>
-                <div class="option" id="option-Paquete completo" onclick="selectPackage('Paquete completo')">
-                    <p>2 veces por semana</p>
-                </div>
-                <div class="option" id="option-Paquete premium" onclick="selectPackage('Paquete premium')">
-                    <p>3 veces por semana</p>
-                </div>
             </div>
-            <input type="hidden" id="paquete" name="paquete" value="Paquete completo">
-            
-            <div id="packageDescription" class="info-box">
-                <h3>Descripción del Paquete</h3>
-                <ul id="packageDetails">
-                    <!-- Detalles del paquete se mostrarán aquí -->
-                </ul>
-                <p id="packageCost"></p>
-            </div>
-            
-            <div class="info-box">
-                <p style="color: black;">Información de cuenta:</p>
-                <ul>
-                    <li>N• 2204332302 ahorro</li>
-                    <li>1757209158</li>
-                    <li>Ariadna Labarca</li>
-                    <li>Pichincha</li>
-                    <li>ariadna2400@gmail.com</li>
-                </ul>
-                <div class="payment-icons">
-                    <i class="fas fa-credit-card" aria-hidden="true"></i>
-                    <i class="fas fa-money-bill-wave" aria-hidden="true"></i>
-                    <i class="fas fa-wallet" aria-hidden="true"></i>
+    
+            <!-- Sección 5: Selección de Paquete -->
+            <div class="form-section-bg" id="registerForm6" style="display: none;">
+                <h2>Selección de Paquete</h2>
+                <label for="paquete">Paquete:</label>
+                <div class="option-container">
+                    <div class="option" id="option-Paquete básico" onclick="selectPackage('Paquete básico')">
+                        <p>1 vez por semana</p>
+                    </div>
+                    <div class="option" id="option-Paquete completo" onclick="selectPackage('Paquete completo')">
+                        <p>2 veces por semana</p>
+                    </div>
+                    <div class="option" id="option-Paquete premium" onclick="selectPackage('Paquete premium')">
+                        <p>3 veces por semana</p>
+                    </div>
                 </div>
-                <p>Aceptamos todo tipo de pago.</p>
-            </div>
-        
-            <form id="registerForm6Form" enctype="multipart/form-data">
-                <input type="hidden" id="userId6" name="userId">
+                <input type="hidden" id="paquete" name="paquete" value="Paquete completo">
+                <span id="paqueteError" class="error"></span>
+    
+                <div id="packageDescription" class="info-box">
+                    <h3>Descripción del Paquete</h3>
+                    <ul id="packageDetails">
+                        <!-- Detalles del paquete se mostrarán aquí -->
+                    </ul>
+                    <p id="packageCost"></p>
+                </div>
+                
+                <div class="info-box">
+                    <p style="color: black;">Información de cuenta:</p>
+                    <ul>
+                        <li>N• 2204332302 ahorro</li>
+                        <li>1757209158</li>
+                        <li>Ariadna Labarca</li>
+                        <li>Pichincha</li>
+                        <li>ariadna2400@gmail.com</li>
+                    </ul>
+                    <div class="payment-icons">
+                        <i class="fas fa-credit-card" aria-hidden="true"></i>
+                        <i class="fas fa-money-bill-wave" aria-hidden="true"></i>
+                        <i class="fas fa-wallet" aria-hidden="true"></i>
+                    </div>
+                    <p>Aceptamos todo tipo de pago.</p>
+                </div>
+    
                 <label for="comprobante_pago">Compártenos una foto o screenshot de tu pago:</label>
                 <input type="file" id="comprobante_pago" name="comprobante_pago" required>
                 <span id="comprobantePagoError" class="error"></span>
-                <!-- <div class="cajaparadatosdefacturacion">
-                 <label for=""> Agregar datos de facturacion</label>
-                 <input type="checkbox" id="showBilling" onclick="toggleBillingForm()"> 
-                 </div> -->
-                <div id="billingForm" style="display: none;">
-                    <h2>Datos de Facturación</h2>
-                    <input type="hidden" id="usuario_id_billing" name="usuario_id">
-                    <label for="cedula_ruc">Cédula o RUC:</label>
-                    <input type="text" id="cedula_ruc" name="cedula_ruc" placeholder="Cedula o Ruc">
-                    
-                    <label for="direccion1">Dirección 1:</label>
-                    <input type="text" id="direccion1" name="direccion1" placeholder="Dirección">
-                    
-                    <label for="direccion2">Dirección 2:</label>
-                    <input type="text" id="direccion2" name="direccion2" placeholder="Dirección 2">
-                    
-                    <label for="telefono_billing">Teléfono:</label>
-                    <input type="text" id="telefono_billing" name="telefono" placeholder="Teléfono">
-                    
-                    <label for="nombre_completo">Nombre Completo:</label>
-                    <input type="text" id="nombre_completo" name="nombre_completo" placeholder="Nombre completo">
-                    
-                    <label for="razon_social">Razón Social:</label>
-                    <input type="text" id="razon_social" name="razon_social" placeholder="Razón Social">
-                    
-                </div>
-        
                 <button type="button" class="button" onclick="submitForm6()">Verificar Pago</button>
-            </form>
-        </div>
-
+            </div>
+        </form>
+    
+        <!-- Mensaje de éxito -->
         <div id="successMessage" style="display: none; color: green;">
             <h2>Te has registrado con éxito</h2>
             <p>Serás redirigido al inicio de sesión en 5 segundos...</p>
         </div>
     </div>
-        
+    
+    <div id="errorFinal" class="error"></div>
+
     <div id="footer"></div>
     <div id="sidebar-container"></div>
 <script>

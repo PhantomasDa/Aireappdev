@@ -221,3 +221,36 @@ body.modal-open {
     text-align: center;
     z-index: 1;
 }
+
+
+
+@media (min-width: 700px) {
+    .slider::before {
+        background-image: url('../content/carrusel2.png');
+    }
+    .reserve-button{
+        max-width: 200px;
+    }
+    .products{
+        padding: 20px;
+        background-color: #f9f9f9;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+    }
+    .about{
+        display: flex;
+    flex-direction: column;
+    align-items: center;
+    }
+    .blog-post img{
+        max-width: 54%;
+    }
+    .suscribete-responsive{
+        display: flex;
+    justify-content: space-around;
+    }
+    .about p{
+        max-width: 1000px;
+    }
+}
