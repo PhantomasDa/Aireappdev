@@ -183,7 +183,7 @@ function submitForm6() {
 
     // Detener la ejecución aquí para inspección
     console.log('Datos a enviar:', allData);
-    debugger;
+
 
     fetch('/register/complete', {
         method: 'POST',
