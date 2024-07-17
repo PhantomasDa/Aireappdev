@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Usuarios</title>
+    <link rel="stylesheet" href="style/style.css">
+    <link rel="stylesheet" href="style/register.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="./style/estilosformularios.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;700;800&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<style>
+    /* Asegura que los campos de entrada tengan un tamaño de fuente mínimo de 16px */
+    input, select, textarea, button {
+        font-size: 16px;
+    }
+    #loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.spinner {
+    border: 16px solid #f3f3f3;
+    border-top: 16px solid #3498db;
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.cajaparadatosdefacturacion {
+    display: flex;
+    align-items: center;
+    flex-direction: row-reverse;
+    justify-content: center;
+}
+
+.cajaparadatosdefacturacion input[type="checkbox"] {
+    margin-right: 20px;
+    max-width: 30px;
+}
+
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin: 20px 0;
+}
+
+.checkbox-container input[type="checkbox"] {
+    margin-right: 10px;
+    width: auto;
+}
+
+.checkbox-container label {
+    font-size: 14px;
+    line-height: 1.5;
+    display: flex;
+    align-items: center;
+}
+
+.checkbox-container a {
+    color: blue;
+    text-decoration: underline;
+}
+
+.checkbox-container .error {
+    display: block;
+    color: red;
+    margin-top: 10px;
+}
+
+@media not all and (min-resolution:.001dpcm) {
+    @supports (-webkit-appearance:none) {
+        .checkbox-container input[type="checkbox"] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border: 1px solid #aaa;
+            border-radius: 2px;
+            outline: none;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .checkbox-container input[type="checkbox"]:checked {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+    }
+}
+
+
+</style>
+<body>
+    <div id="menu"></div>
+    <div id="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+    <div id="loading" style="display:none;">
+        <div class="spinner"></div>
+    </div>
+    <div class="my-container-bg">
+        <form id="registerOnlineForm" enctype="multipart/form-data" action="/register_online_class" method="POST">
+            <div class="form-section-bg" id="registerOnlineForm1">
+                <h2>Registro de Clases Online</h2>
+                
+                <label for="nombre">Nombre Completo:</label>
+                <input type="text" id="nombre" name="nombre" placeholder="Nombre Completo" required>
+                <span id="nombreError" class="error"></span>
+
+                <label for="correo">Correo electrónico:</label>
+                <input type="email" id="correo" name="correo" placeholder="Correo electrónico" required>
+                <span id="correoError" class="error"></span>
+
+                <label for="telefono">Teléfono:</label>
+                <input type="tel" id="telefono" name="telefono" placeholder="Teléfono" required>
+                <span id="telefonoError" class="error"></span>
+
+                <label for="ciudad">Ciudad:</label>
+                <input type="text" id="ciudad" name="ciudad" placeholder="Ciudad" required>
+                <span id="ciudadError" class="error"></span>
+
+                <label for="horarios">Horario Preferido:</label>
+                <select id="horarios" name="horarios" required>
+                    <option value="">Seleccione</option>
+                    <option value="Mañana">Mañana</option>
+                    <option value="Tarde">Tarde</option>
+                </select>
+                <span id="horariosError" class="error"></span>
+
+                <button type="submit" class="button">Registrar</button>
+            </div>
+        </form>
+        <!-- Mensaje de éxito -->
+        <div id="successMessage" style="display: none; color: green;">
+            <h2>Te has registrado con éxito</h2>
+            <p>Serás redirigido al inicio en 5 segundos...</p>
+        </div>
+    </div>
+    
+    <div id="errorFinal" class="error"></div>
+
+    <div id="footer"></div>
+    <div id="sidebar-container"></div>
+
+    <script src="./js/registerjs/componente.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
+    <script src="./js/sidebar.js" defer></script>
+</body>
+</html>

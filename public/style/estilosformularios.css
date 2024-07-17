@@ -136,12 +136,18 @@ margin-left: 20px;
     top: 11px;
 
 }
+
 .option-container {
-    display: flex;
+    display: flex ;
     justify-content: center;
     gap: 20px;
     margin-bottom: 20px;
 }
+#onlineOptions{
+    margin-left: 32%;
+}
+
+
 
 .option {
     display: flex;

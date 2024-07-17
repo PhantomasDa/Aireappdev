@@ -6,10 +6,12 @@ function cargarNombreUsuario() {
     fetchData('/perfil/usuario')
         .then(usuario => {
             document.getElementById('user_name').textContent = `Holis, ${usuario.nombre}`;
+            // Asegúrate de que la URL sea correcta
             document.getElementById('profile_picture').src = usuario.foto_perfil;
         })
         .catch(error => console.error('Error al cargar el nombre del usuario:', error));
 }
+
 function cargarProximasClases() {
     fetchData('/perfil/proximas-clases')
         .then(clases => {

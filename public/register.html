@@ -263,54 +263,60 @@
                 <button type="button" class="button" onclick="submitForm5()">Continuar</button>
             </div>
     
-            <!-- Sección 5: Selección de Paquete -->
-            <div class="form-section-bg" id="registerForm6" style="display: none;">
-                <h2>Selección de Paquete</h2>
-                <label for="paquete">Paquete:</label>
-                <div class="option-container">
-                    <div class="option" id="option-Paquete básico" onclick="selectPackage('Paquete básico')">
-                        <p>1 vez por semana</p>
-                    </div>
-                    <div class="option" id="option-Paquete completo" onclick="selectPackage('Paquete completo')">
-                        <p>2 veces por semana</p>
-                    </div>
-                    <div class="option" id="option-Paquete premium" onclick="selectPackage('Paquete premium')">
-                        <p>3 veces por semana</p>
-                    </div>
-                </div>
-                <input type="hidden" id="paquete" name="paquete" value="Paquete completo">
-                <span id="paqueteError" class="error"></span>
+           <!-- Sección 5: Selección de Paquete -->
+<div class="form-section-bg" id="registerForm6" style="display: none;">
+    <h2 id="paqueteTitle">Selección de Paquete</h2>
+    <label for="paquete">Paquete:</label>
+    <div class="option-container" id="presencialOptions">
+        <div class="option" id="option-Paquete básico" onclick="selectPackage('Paquete básico')">
+            <p>1 vez por semana</p>
+        </div>
+        <div class="option" id="option-Paquete completo" onclick="selectPackage('Paquete completo')">
+            <p>2 veces por semana</p>
+        </div>
+        <div class="option" id="option-Paquete premium" onclick="selectPackage('Paquete premium')">
+            <p>3 veces por semana</p>
+        </div>
+    </div>
+    <div class="option-container" id="onlineOptions" style="display: none;">
+        <div class="option selected" id="option-Paquete online" onclick="selectPackage('Paquete online')">
+            <p>8 clases por mes</p>
+        </div>
+    </div>
+    <input type="hidden" id="paquete" name="paquete" value="Paquete completo">
+    <span id="paqueteError" class="error"></span>
+
+    <div id="packageDescription" class="info-box">
+        <h3>Descripción del Paquete</h3>
+        <ul id="packageDetails">
+            <!-- Detalles del paquete se mostrarán aquí -->
+        </ul>
+        <p id="packageCost"></p>
+    </div>
     
-                <div id="packageDescription" class="info-box">
-                    <h3>Descripción del Paquete</h3>
-                    <ul id="packageDetails">
-                        <!-- Detalles del paquete se mostrarán aquí -->
-                    </ul>
-                    <p id="packageCost"></p>
-                </div>
-                
-                <div class="info-box">
-                    <p style="color: black;">Información de cuenta:</p>
-                    <ul>
-                        <li>N• 2204332302 ahorro</li>
-                        <li>1757209158</li>
-                        <li>Ariadna Labarca</li>
-                        <li>Pichincha</li>
-                        <li>ariadna2400@gmail.com</li>
-                    </ul>
-                    <div class="payment-icons">
-                        <i class="fas fa-credit-card" aria-hidden="true"></i>
-                        <i class="fas fa-money-bill-wave" aria-hidden="true"></i>
-                        <i class="fas fa-wallet" aria-hidden="true"></i>
-                    </div>
-                    <p>Aceptamos todo tipo de pago.</p>
-                </div>
-    
-                <label for="comprobante_pago">Compártenos una foto o screenshot de tu pago:</label>
-                <input type="file" id="comprobante_pago" name="comprobante_pago" required>
-                <span id="comprobantePagoError" class="error"></span>
-                <button type="button" class="button" onclick="submitForm6()">Verificar Pago</button>
-            </div>
+    <div class="info-box">
+        <p style="color: black;">Información de cuenta:</p>
+        <ul>
+            <li>N• 2204332302 ahorro</li>
+            <li>1757209158</li>
+            <li>Ariadna Labarca</li>
+            <li>Pichincha</li>
+            <li>ariadna2400@gmail.com</li>
+        </ul>
+        <div class="payment-icons">
+            <i class="fas fa-credit-card" aria-hidden="true"></i>
+            <i class="fas fa-money-bill-wave" aria-hidden="true"></i>
+            <i class="fas fa-wallet" aria-hidden="true"></i>
+        </div>
+        <p>Aceptamos todo tipo de pago.</p>
+    </div>
+
+    <label for="comprobante_pago">Compártenos una foto o screenshot de tu pago:</label>
+    <input type="file" id="comprobante_pago" name="comprobante_pago" required>
+    <span id="comprobantePagoError" class="error"></span>
+    <button type="button" class="button" onclick="submitForm6()">Verificar Pago</button>
+</div>
+
         </form>
     
         <!-- Mensaje de éxito -->
@@ -319,9 +325,9 @@
             <p>Serás redirigido al inicio de sesión en 5 segundos...</p>
         </div>
     </div>
-    
     <div id="errorFinal" class="error"></div>
 
+        
     <div id="footer"></div>
     <div id="sidebar-container"></div>
 <script>

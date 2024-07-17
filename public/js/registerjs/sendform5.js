@@ -4,67 +4,88 @@
     selectPackage('completo');
 });
 
+function selectOption(modalidad) {
+    document.getElementById('modalidad').value = modalidad;
 
-function selectPackage(paquete) {
-const paqueteInput = document.getElementById('paquete');
-const selectedOption = document.getElementById(`option-${paquete}`);
+    const options = document.querySelectorAll('.option-container .option');
+    options.forEach(option => option.classList.remove('selected'));
 
-// Verificar si los elementos existen
-if (!paqueteInput) {
-    console.error('No se encontró el input hidden para el paquete.');
-    return;
+    const selectedOption = document.getElementById(`option-${modalidad}`);
+    selectedOption.classList.add('selected');
+
+    updatePackageOptions(modalidad);
 }
+function updatePackageOptions(modalidad) {
+    const presencialOptions = document.getElementById('presencialOptions');
+    const onlineOptions = document.getElementById('onlineOptions');
+    const paqueteTitle = document.getElementById('paqueteTitle');
+    
+    if (modalidad === 'online') {
+        presencialOptions.style.display = 'none';
+        onlineOptions.style.display = 'block';
+        paqueteTitle.textContent = 'Modalidad Online: Paquete Completo Online';
+        selectPackage('Paquete online');
+    } else {
+        presencialOptions.style.display = 'flex';
+        onlineOptions.style.display = 'none';
+        paqueteTitle.textContent = 'Selección de Paquete';
+        selectPackage('Paquete completo');
+    }
+}function selectPackage(paquete) {
+    document.getElementById('paquete').value = paquete;
 
-if (!selectedOption) {
-    console.error(`No se encontró el elemento para el paquete: ${paquete}`);
-    return;
-}
+    const options = document.querySelectorAll('.option-container .option');
+    options.forEach(option => option.classList.remove('selected'));
 
-paqueteInput.value = paquete;
+    const selectedOption = document.getElementById(`option-${paquete}`);
+    selectedOption.classList.add('selected');
 
-const options = document.querySelectorAll('.option');
-options.forEach(option => option.classList.remove('selected'));
+    const packageDetails = document.getElementById('packageDetails');
+    const packageCost = document.getElementById('packageCost');
 
-selectedOption.classList.add('selected');
-
-const packageDetails = document.getElementById('packageDetails');
-const packageCost = document.getElementById('packageCost');
-
-switch(paquete) {
-    case 'Paquete básico':
-        packageDetails.innerHTML = `
-            <li>4 clases por mes</li>
-            <li>Duración de un mes</li>
-            <li>Acceso a contenido exclusivo online</li>
-        `;
-        packageCost.textContent = "Valor: $50";
-        break;
-    case 'Paquete completo':
-        packageDetails.innerHTML = `
-            <li>8 clases por mes</li>
-            <li>Duración de un mes</li>
-            <li>Acceso a contenido exclusivo online</li>
-            <li>Soporte personalizado</li>
-        `;
-        packageCost.textContent = "Valor: $75";
-        break;
-    case 'Paquete premium':
-        packageDetails.innerHTML = `
-            <li>12 clases por mes</li>
-            <li>Duración de un mes</li>
-            <li>Acceso a contenido exclusivo online</li>
-            <li>Soporte personalizado</li>
-            <li>Sesiones adicionales de coaching</li>
-        `;
-        packageCost.textContent = "Valor: $100";
-        break;
-    default:
-        packageDetails.innerHTML = '';
-        packageCost.textContent = '';
-}
+    switch(paquete) {
+        case 'Paquete básico':
+            packageDetails.innerHTML = `
+                <li>4 clases por mes</li>
+                <li>Duración de un mes</li>
+                <li>Acceso a contenido exclusivo online</li>
+            `;
+            packageCost.textContent = "Valor: $50";
+            break;
+        case 'Paquete completo':
+            packageDetails.innerHTML = `
+                <li>8 clases por mes</li>
+                <li>Duración de un mes</li>
+                <li>Acceso a contenido exclusivo online</li>
+                <li>Soporte personalizado</li>
+            `;
+            packageCost.textContent = "Valor: $75";
+            break;
+        case 'Paquete premium':
+            packageDetails.innerHTML = `
+                <li>12 clases por mes</li>
+                <li>Duración de un mes</li>
+                <li>Acceso a contenido exclusivo online</li>
+                <li>Soporte personalizado</li>
+                <li>Sesiones adicionales de coaching</li>
+            `;
+            packageCost.textContent = "Valor: $100";
+            break;
+        case 'Paquete online':
+            packageDetails.innerHTML = `
+                <li>8 clases por mes</li>
+                <li>Duración de un mes</li>
+                <li>Acceso a todas las clases online</li>
+            `;
+            packageCost.textContent = "Valor: $50";
+            break;
+        default:
+            packageDetails.innerHTML = '';
+            packageCost.textContent = '';
+    }
 }
 function submitForm6() {
-    const form = document.getElementById('registerForm'); // Referencia al formulario principal
+    const form = document.getElementById('registerForm');
     console.log('Formulario obtenido:', form); // Depuración
 
     if (!(form instanceof HTMLFormElement)) {
@@ -73,7 +94,7 @@ function submitForm6() {
     }
 
     const formData = new FormData(form);
-    
+
     // Obtener valores de los campos
     const paquete = formData.get('paquete');
     const comprobantePago = document.getElementById('comprobante_pago').files[0];
@@ -106,6 +127,15 @@ function submitForm6() {
         return;
     }
 
+    // Convertir la fecha de nacimiento al formato yyyy-mm-dd
+    let fechaNacimiento = formData.get('fecha_nacimiento');
+    if (fechaNacimiento) {
+        const [day, month, year] = fechaNacimiento.split('/');
+        fechaNacimiento = `${year}-${month}-${day}`;
+        formData.set('fecha_nacimiento', fechaNacimiento);
+    }
+    console.log('Fecha de nacimiento formateada:', fechaNacimiento); // Depuración
+
     // Guardar datos localmente
     const formDataObject = {
         paquete,
@@ -116,56 +146,48 @@ function submitForm6() {
     // Imprimir datos guardados en localStorage para depuración
     console.log('Datos de step6Data:', formDataObject);
 
-    // Enviar todos los datos al servidor
-    submitFinalForm();
-}
-
-
-function submitFinalForm() {
+    // Asegurarse de que todos los datos están siendo capturados correctamente
     const step1Data = JSON.parse(localStorage.getItem('step1Data'));
     const step2Data = JSON.parse(localStorage.getItem('step2Data'));
     const step3Data = JSON.parse(localStorage.getItem('step3Data'));
     const step5Data = JSON.parse(localStorage.getItem('step5Data'));
-    const step6Data = JSON.parse(localStorage.getItem('step6Data'));
-
-    console.log('Datos de step1Data:', step1Data);
-    console.log('Datos de step2Data:', step2Data);
-    console.log('Datos de step3Data:', step3Data);
-    console.log('Datos de step5Data:', step5Data);
-    console.log('Datos de step6Data:', step6Data);
-
-    // Convertir fecha_nacimiento al formato ISO 8601
-    if (step1Data.fecha_nacimiento) {
-        const [day, month, year] = step1Data.fecha_nacimiento.split('/');
-        step1Data.fecha_nacimiento = `${year}-${month}-${day}`;
-    }
 
     const allData = {
         ...step1Data,
         ...step2Data,
         ...step3Data,
         ...step5Data,
-        ...step6Data,
+        ...formDataObject,
     };
 
-    console.log('Datos enviados al servidor:', allData); // Depuración
+    // Asegúrate de convertir la fecha de nuevo antes de enviar al servidor
+    if (allData.fecha_nacimiento) {
+        const [day, month, year] = allData.fecha_nacimiento.split('/');
+        allData.fecha_nacimiento = `${year}-${month}-${day}`;
+    }
 
-    const formData = new FormData();
-
+    const completeFormData = new FormData();
     for (const key in allData) {
         if (allData.hasOwnProperty(key)) {
-            formData.append(key, allData[key]);
+            completeFormData.append(key, allData[key]);
         }
     }
 
-    const comprobantePagoFile = document.getElementById('comprobante_pago').files[0];
-    if (comprobantePagoFile) {
-        formData.append('comprobante_pago', comprobantePagoFile);
+    if (comprobantePago) {
+        completeFormData.append('comprobante_pago', comprobantePago);
     }
+
+    if (step2Data && step2Data.foto_perfil) {
+        completeFormData.append('foto_perfil_nombre', step2Data.foto_perfil);
+    }
+
+    // Detener la ejecución aquí para inspección
+    console.log('Datos a enviar:', allData);
+    debugger;
 
     fetch('/register/complete', {
         method: 'POST',
-        body: formData
+        body: completeFormData
     })
     .then(response => {
         if (!response.ok) {
@@ -182,7 +204,6 @@ function submitFinalForm() {
                 console.error('El elemento errorFinal no existe en el HTML');
             }
         } else {
-            // Redirigir al usuario a la página de login
             window.location.href = '/login';
         }
     })
@@ -195,5 +216,3 @@ function submitFinalForm() {
         }
     });
 }
-
-

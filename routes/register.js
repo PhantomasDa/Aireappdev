@@ -9,24 +9,66 @@ const nodemailer = require('nodemailer');
 const sendRegistrationEmail = require('./email');
 
 
-// Configurar multer para almacenar archivos
+
+
+// Configuración de multer
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
+        console.log('destination callback');
         cb(null, 'uploads/');
     },
     filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname));
+        console.log('filename callback');
+        console.log('req.body:', req.body);
+        console.log('file:', file);
+        
+        // Usar el nombre de archivo enviado desde el frontend
+        const filename = req.body.foto_perfil || `${Date.now()}-${file.originalname}`;
+        console.log('Generated filename:', filename);
+        cb(null, filename);
     }
 });
+
 const upload = multer({ storage: storage });
 
+// Configuración para manejar múltiples campos
+const uploadFields = upload.fields([
+    { name: 'foto_perfil', maxCount: 1 },
+    { name: 'comprobante_pago', maxCount: 1 }
+]);
+
+router.post('/register/complete', uploadFields, async (req, res) => {
+    console.log('Datos recibidos en /register/complete:', req.body);
+    console.log('Archivos recibidos:', req.files);
+
+    try {
+        const { userId, paquete, fechaActivacion, fechaExpiracion } = req.body;
+        const comprobantePago = req.files['comprobante_pago'] ? req.files['comprobante_pago'][0].filename : null;
+        const fotoPerfil = req.files['foto_perfil'] ? req.files['foto_perfil'][0].filename : null;
+
+        if (!comprobantePago || !fotoPerfil) {
+            return res.status(400).json({ message: 'Todos los campos son obligatorios' });
+        }
+
+        // Inserta los datos en la base de datos
+        await db.execute(
+            'INSERT INTO renovaciones (usuario_id, paquete, comprobante_pago, fecha_compra, fecha_activacion, fecha_expiracion, max_reagendamientos, num_clases, activado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [userId, paquete, comprobantePago, new Date(), fechaActivacion, fechaExpiracion, 4, 12, 0]
+        );
+
+        res.status(200).json({ message: 'Registro completado exitosamente', savedFilename: comprobantePago });
+    } catch (error) {
+        console.error('Error al registrar el paquete:', error);
+        res.status(500).json({ message: 'Error al registrar el paquete', error: error.message });
+    }
+});
 // Paso 1: Guardar Datos Principales
 router.post('/step1', [
     body('nombre').isLength({ min: 3 }).trim().escape(),
     body('email').isEmail().normalizeEmail(),
     body('telefono').isLength({ min: 8 }).trim().escape(),
     body('password').isLength({ min: 6 }),
-    body('fecha_nacimiento').isDate(),
+    body('fecha_nacimiento').matches(/^\d{2}\/\d{2}\/\d{4}$/).withMessage('Fecha de nacimiento inválida'),
     body('genero').isIn(['hombre', 'mujer', 'otro'])
 ], async (req, res) => {
     const errors = validationResult(req);
@@ -36,6 +78,10 @@ router.post('/step1', [
 
     const { nombre, email, telefono, password, fecha_nacimiento, genero } = req.body;
 
+    // Convertir la fecha de nacimiento al formato yyyy-mm-dd
+    const [day, month, year] = fecha_nacimiento.split('/');
+    const formattedFechaNacimiento = `${year}-${month}-${day}`;
+
     try {
         const [existingUser] = await db.execute('SELECT * FROM Usuarios WHERE email = ?', [email]);
         if (existingUser.length > 0) {
@@ -44,7 +90,7 @@ router.post('/step1', [
 
         const hashedPassword = await bcrypt.hash(password, 8);
 
-        const [result] = await db.execute('INSERT INTO Usuarios (nombre, email, telefono, password, fecha_nacimiento, genero) VALUES (?, ?, ?, ?, ?, ?)', [nombre, email, telefono, hashedPassword, fecha_nacimiento, genero]);
+        const [result] = await db.execute('INSERT INTO Usuarios (nombre, email, telefono, password, fecha_nacimiento, genero) VALUES (?, ?, ?, ?, ?, ?)', [nombre, email, telefono, hashedPassword, formattedFechaNacimiento, genero]);
 
         res.status(201).json({ message: 'Datos principales guardados exitosamente', userId: result.insertId });
     } catch (error) {
@@ -206,22 +252,19 @@ router.post('/step6', upload.single('comprobante_pago'), [
     }
 });
 
-
 router.post('/complete', upload.single('comprobante_pago'), [
     body('nombre').isLength({ min: 3 }).trim().escape(),
     body('email').isEmail().normalizeEmail(),
     body('telefono').isLength({ min: 8 }).trim().escape(),
     body('password').isLength({ min: 6 }),
-    body('fecha_nacimiento').isISO8601().toDate(),
+    body('fecha_nacimiento').isISO8601().toDate(), // Verifica que se está validando como fecha ISO 8601
     body('genero').isIn(['hombre', 'mujer', 'otro']),
-    body('foto_perfil').optional().trim().escape(),
     body('pregunta1').isIn(['si', 'no']),
     body('pregunta2').isIn(['si', 'no']),
     body('pregunta3').isIn(['si', 'no']),
     body('pregunta4').isIn(['si', 'no']),
     body('modalidad').isIn(['online', 'presencial']),
-    body('paquete').isIn(['Paquete básico', 'Paquete completo', 'Paquete premium']),
-    body('comprobante_pago').optional().trim().escape(),
+    body('paquete').isIn(['Paquete básico', 'Paquete completo', 'Paquete premium', 'Paquete online']), // Asegúrate de que 'Paquete online' esté incluido
     body('lesiones').optional({ checkFalsy: true }).trim().escape(),
     body('motivacion').isLength({ min: 1 }).trim().escape()
 ], async (req, res) => {
@@ -239,7 +282,7 @@ router.post('/complete', upload.single('comprobante_pago'), [
     const comprobantePago = req.file ? req.file.filename : null;
 
     if (!comprobantePago) {
-        return res.status(400).json({ message: 'Todos los campos son obligatorios' });
+        return res.status(400).json({ message: 'El comprobante de pago es obligatorio.' });
     }
 
     let clasesDisponibles, maxReagendamientos;
@@ -255,6 +298,10 @@ router.post('/complete', upload.single('comprobante_pago'), [
         case 'Paquete premium':
             clasesDisponibles = 12;
             maxReagendamientos = 4;
+            break;
+        case 'Paquete online':
+            clasesDisponibles = 8; // Añade la lógica específica para 'Paquete online'
+            maxReagendamientos = 3;
             break;
         default:
             return res.status(400).json({ message: 'Paquete inválido' });

@@ -13,6 +13,8 @@ const session = require('express-session');
 const flash = require('connect-flash');
 const app = express();
 const homeRoutes = require('./routes/home');
+const onlineClassesRoutes = require('./routes/onlineClasses');
+
 
 require('dotenv').config();
 
@@ -29,6 +31,11 @@ app.use(session({
   // Configuración de flash middleware (opcional)
   app.use(flash());
   
+
+  app.use(express.urlencoded({ extended: true }));
+
+  app.use(onlineClassesRoutes);
+
   // Middleware para hacer la sesión disponible en las vistas
   app.use((req, res, next) => {
     res.locals.session = req.session;

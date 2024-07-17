@@ -8,18 +8,35 @@ const path = require('path'); // Añadir esta línea para importar path
 const { body, validationResult } = require('express-validator'); // Importar body y validationResult desde express-validator
 
 
-
-
-// Configurar multer para almacenar archivos
+// Configuración de multer
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
+        console.log('destination callback');
         cb(null, 'uploads/');
     },
     filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname));
+        console.log('filename callback');
+        console.log('req.body:', req.body);
+        console.log('file:', file);
+        
+        // Usar el nombre de archivo enviado desde el frontend
+        const filename = req.body.foto_perfil || `${Date.now()}-${file.originalname}`;
+        console.log('Generated filename:', filename);
+        cb(null, filename);
     }
 });
+
 const upload = multer({ storage: storage });
+
+// Configuración para manejar múltiples campos
+const uploadFields = upload.fields([
+    { name: 'foto_perfil', maxCount: 1 },
+    { name: 'comprobante_pago', maxCount: 1 }
+]);
+
+
+
+
 // Middleware para verificar el token
 function verifyToken(req, res, next) {
     const token = req.headers.authorization?.split(' ')[1];
@@ -58,7 +75,7 @@ router.get('/usuario', verifyToken, (req, res) => {
     executeQuery(query, params, res, (result) => {
         if (result.length > 0) {
             const usuario = result[0];
-            // Prepend the base URL to the photo path
+            // Verifica la ruta base de la imagen
             usuario.foto_perfil = `/uploads/${usuario.foto_perfil}`;
             res.json(usuario);
         } else {
@@ -66,6 +83,7 @@ router.get('/usuario', verifyToken, (req, res) => {
         }
     });
 });
+
 
 
 
@@ -428,6 +446,7 @@ router.post('/validar-fecha', verifyToken, (req, res) => {
         res.json({ message: 'Fecha válida' });
     });
 });
+
 
 
 module.exports = router;
