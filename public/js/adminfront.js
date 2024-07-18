@@ -53,6 +53,10 @@ function cargarClasesUsuariosMes(fecha) {
 
             for (let dia = 1; dia <= diasDelMes; dia++) {
                 const fechaCompleta = new Date(ano, mes - 1, dia);
+                const diaSemana = fechaCompleta.getDay();
+                if (diaSemana < 1 || diaSemana > 4) { // Mostrar solo de lunes (1) a jueves (4)
+                    continue;
+                }
                 const nombreDia = fechaCompleta.toLocaleString('default', { weekday: 'long' });
                 const diaContainer = document.createElement('div');
                 diaContainer.className = 'calendar-day';
@@ -83,7 +87,13 @@ function cargarClasesUsuariosMes(fecha) {
             }
         })
         .catch(error => console.error('Error al cargar clases y usuarios:', error));
-}function guardarCambiosUsuario() {
+}
+
+
+
+
+
+function guardarCambiosUsuario() {
     const usuarioId = parseInt(document.getElementById('popup_usuario_id').value, 10);
     const nombre = document.getElementById('popup_nombre').value;
     const email = document.getElementById('popup_email').value;
@@ -176,7 +186,11 @@ function fetchData(url, options = {}) {
             }
             return response.json();
         });
-}function mostrarFichaUsuario(usuario) {
+}
+
+
+
+function mostrarFichaUsuario(usuario, claseId) {
     console.log('Usuario seleccionado:', usuario);
 
     const usuarioIdElement = document.getElementById('popup_usuario_id');
@@ -189,13 +203,14 @@ function fetchData(url, options = {}) {
     const fotoPerfilElement = document.getElementById('popup_foto_perfil');
 
     usuarioIdElement.value = usuario.usuario_id; 
+    usuarioIdElement.dataset.claseId = claseId; // Guardar claseId
     nombreElement.value = usuario.nombre;
     emailElement.value = usuario.email;
     telefonoElement.value = usuario.telefono;
-    clasesDisponiblesElement.value = usuario.clases_disponibles || '';  // Ajustar si el valor es undefined
+    clasesDisponiblesElement.value = usuario.clases_disponibles || '';
     fechaActivacionElement.value = usuario.fecha_activacion ? usuario.fecha_activacion.split('T')[0] : '';
     fechaExpiracionElement.value = usuario.fecha_expiracion ? usuario.fecha_expiracion.split('T')[0] : '';
-    fotoPerfilElement.src = usuario.foto_perfil || 'ruta_a_imagen_default.jpg';  // Ajustar si el valor es undefined
+    fotoPerfilElement.src = usuario.foto_perfil || 'ruta_a_imagen_default.jpg';
 
     document.getElementById('popup').style.display = 'flex';
 
@@ -207,7 +222,8 @@ function fetchData(url, options = {}) {
         clases_disponibles: clasesDisponiblesElement.value,
         fecha_activacion: fechaActivacionElement.value,
         fecha_expiracion: fechaExpiracionElement.value,
-        foto_perfil: fotoPerfilElement.src
+        foto_perfil: fotoPerfilElement.src,
+        clase_id: claseId
     });
 }
 
@@ -218,3 +234,37 @@ document.addEventListener("DOMContentLoaded", function() {
     // Otros inicializadores
     document.querySelector('.close-button').addEventListener('click', cerrarPopup);
 });
+
+function eliminarClaseUsuario() {
+    const usuarioId = parseInt(document.getElementById('popup_usuario_id').value, 10);
+    const claseId = parseInt(document.getElementById('popup_usuario_id').dataset.claseId, 10);
+
+    if (!usuarioId || !claseId) {
+        alert('ID de usuario o clase no encontrado');
+        return;
+    }
+
+    const data = { usuarioId, claseId };
+
+    fetch(`/admin/eliminar-clase-usuario`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (response.ok) {
+            cerrarPopup();
+            cargarClasesUsuariosMes(new Date());
+        } else {
+            return response.json().then(error => {
+                throw new Error(error.message);
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error al eliminar la clase:', error);
+        alert('Error al eliminar la clase: ' + error.message);
+    });
+}

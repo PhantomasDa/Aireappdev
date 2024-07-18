@@ -6,6 +6,8 @@ router.get('/profile', verifyToken, (req, res) => {
     res.render('profile', { user: req.user });
 });
 
+
+
 // Reagendar clase
 router.post('/reagendar', verifyToken, async (req, res) => {
     const { claseId, nuevaFecha } = req.body;
@@ -64,6 +66,5 @@ router.post('/reagendar', verifyToken, async (req, res) => {
         res.status(500).send({ message: 'Error en el servidor', error: error.message });
     }
 });
-
 
 module.exports = router;

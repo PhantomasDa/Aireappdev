@@ -11,36 +11,45 @@
     <style>
         .calendar {
             display: grid;
-            grid-template-columns: repeat(7, 1fr);
+            grid-template-columns: repeat(4, 1fr); /* Mostrar 4 días por fila */
             gap: 10px;
         }
         .calendar-day {
-    border: 1px solid #ccc;
-    margin: 5px;
-    padding: 10px;
-}
-
-.clase-container {
-    margin-top: 5px;
-    padding: 5px;
-    border: 1px solid #ddd;
-    background-color: #f9f9f9;
-}
-
-.clase-container strong {
-    display: block;
-    margin-bottom: 5px;
-    font-size: 0.9em;
-}
-
-.user {
-    padding: 3px;
-    cursor: pointer;
-}
-
-.user:hover {
-    background-color: #e0e0e0;
-}
+            border: 1px solid #ccc;
+            margin: 5px;
+            padding: 10px;
+            min-height: 100px;
+            position: relative;
+            background-color: #fff;
+        }
+        .calendar-week {
+            display: flex;
+            justify-content: space-between;
+        }
+        .clase-container {
+            margin-top: 5px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+        }
+        .clase-container strong {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+        .user {
+            padding: 3px;
+            cursor: pointer;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            margin-bottom: 5px;
+        }
+        .user:hover {
+            background-color: #e0e0e0;
+        }
+        .user.dragging {
+            opacity: 0.5;
+        }
         .month-nav {
             display: flex;
             justify-content: space-between;
@@ -65,7 +74,7 @@
             background: white;
             padding: 20px;
             border-radius: 8px;
-            width: 300px;
+            width: 400px;
             max-width: 90%;
         }
         .popup-content h3 {
@@ -77,11 +86,20 @@
             float: right;
             font-size: 20px;
         }
-        .popup-content input[type="text"], .popup-content input[type="email"], .popup-content input[type="tel"] {
+        .popup-content input[type="text"], .popup-content input[type="email"], .popup-content input[type="tel"], .popup-content input[type="date"], .popup-content input[type="number"] {
             width: 100%;
             margin-bottom: 10px;
             padding: 8px;
             box-sizing: border-box;
+        }
+        .popup-content button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #7F5B41;
+            color: white;
+            border: none;
+            cursor: pointer;
         }
         @media (max-width: 768px) {
             .calendar {
@@ -93,7 +111,7 @@
 <body>
     <div id="menu"></div>
     <div class="container-bg">
-        <h1>Panel de Administración</h1>
+        <h1>Panel de Administración <span id="contador_usuarios" style="font-size: 0.5em;"></span></h1>
         <div class="month-nav">
             <button onclick="cambiarMes(-1)">&#8592; Anterior</button>
             <h2 id="nombre_mes"></h2>
@@ -104,7 +122,7 @@
     <div id="popup" class="popup">
         <div class="popup-content">
             <span class="close-button" onclick="cerrarPopup()">&times;</span>
-            <!-- Aquí van los campos del formulario de edición -->
+            <h3>Editar Usuario</h3>
             <input type="hidden" id="popup_usuario_id">
             <label for="popup_nombre">Nombre:</label>
             <input type="text" id="popup_nombre">
@@ -115,7 +133,7 @@
             <label for="popup_telefono">Teléfono:</label>
             <input type="text" id="popup_telefono">
     
-            <label for="popup_clases_disponibles">Clases Disponibles:</label>
+            <label for="popup_clases_disponibles">Actualizar número de clases:</label>
             <input type="number" id="popup_clases_disponibles">
     
             <label for="popup_fecha_activacion">Fecha de Activación:</label>
@@ -125,9 +143,11 @@
             <input type="date" id="popup_fecha_expiracion">
     
             <label for="popup_foto_perfil">Foto de Perfil:</label>
-            <img id="popup_foto_perfil" src="" alt="Foto de perfil" style="width: 50px; height: 50px;">
+            <img id="popup_foto_perfil" src="" alt="Foto de perfil" style="width: 50px; height: 50px; display: none;">
     
             <button onclick="guardarCambiosUsuario()">Guardar</button>
+            <button onclick="eliminarClaseUsuario()">Eliminar Clase</button>
+            <button onclick="reagendarClaseUsuario()">Reagendar Clase</button>
         </div>
     </div>
         

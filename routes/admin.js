@@ -102,5 +102,29 @@ router.post('/actualizar-usuario', async (req, res) => {
 
 
 
+router.post('/eliminar-clase-usuario', async (req, res) => {
+    const { usuarioId, claseId } = req.body;
+
+    if (!usuarioId || !claseId) {
+        return res.status(400).json({ message: 'Datos incompletos' });
+    }
+
+    try {
+        const [result] = await db.execute(
+            'DELETE FROM Reservas WHERE usuario_id = ? AND clase_id = ?',
+            [usuarioId, claseId]
+        );
+
+        if (result.affectedRows > 0) {
+            res.json({ message: 'Clase eliminada correctamente' });
+        } else {
+            res.status(404).json({ message: 'Reserva no encontrada' });
+        }
+    } catch (error) {
+        console.error('Error al eliminar la clase:', error);
+        res.status(500).json({ message: 'Error en el servidor', error: error.message });
+    }
+});
+
 
 module.exports = router;
