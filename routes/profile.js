@@ -36,6 +36,19 @@ const uploadFields = upload.fields([
 
 
 
+// Obtener modalidad del usuario
+router.get('/modalidad', verifyToken, (req, res) => {
+    const query = 'SELECT modalidad FROM Usuarios WHERE id = ?';
+    const params = [req.user.id];
+    executeQuery(query, params, res, (result) => {
+        if (result.length > 0) {
+            res.json({ modalidad: result[0].modalidad });
+        } else {
+            res.status(404).send({ message: 'Modalidad no encontrada para este usuario' });
+        }
+    });
+});
+
 
 // Middleware para verificar el token
 function verifyToken(req, res, next) {
@@ -70,7 +83,7 @@ async function executeQuery(query, params, res, successCallback) {
 
 // Obtener información del usuario
 router.get('/usuario', verifyToken, (req, res) => {
-    const query = 'SELECT nombre, foto_perfil FROM Usuarios WHERE id = ?';
+    const query = 'SELECT nombre, foto_perfil, modalidad FROM Usuarios WHERE id = ?';
     const params = [req.user.id];
     executeQuery(query, params, res, (result) => {
         if (result.length > 0) {

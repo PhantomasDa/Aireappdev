@@ -1,10 +1,11 @@
-function sendConfirmationEmail(userId) {
+function sendConfirmationEmail(userId, modalidad) {
+    console.log('Enviando correo de confirmación con userId:', userId, 'y modalidad:', modalidad); // Depuración
     fetch('/send-confirmation-email', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userId })
+        body: JSON.stringify({ userId, modalidad })
     })
     .then(response => {
         if (!response.ok) {
@@ -22,7 +23,3 @@ function sendConfirmationEmail(userId) {
         console.error('Error al enviar el correo de confirmación:', error);
     });
 }
-
-
-
-

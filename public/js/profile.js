@@ -6,11 +6,24 @@ function cargarNombreUsuario() {
     fetchData('/perfil/usuario')
         .then(usuario => {
             document.getElementById('user_name').textContent = `Holis, ${usuario.nombre}`;
+            document.getElementById('user_modalidad').textContent = `Modalidad: ${usuario.modalidad}` ;
+
             // Asegúrate de que la URL sea correcta
             document.getElementById('profile_picture').src = usuario.foto_perfil;
+
+            const modalidad= usuario.modalidad;
+            if (modalidad === 'online') {
+                document.getElementById('presencialContent').style.display = 'none';
+                document.getElementById('onlineContent').style.display = 'block';
+            } else {
+                document.getElementById('presencialContent').style.display = 'block';
+                document.getElementById('onlineContent').style.display = 'none';
+            }
         })
         .catch(error => console.error('Error al cargar el nombre del usuario:', error));
 }
+
+
 
 function cargarProximasClases() {
     fetchData('/perfil/proximas-clases')
@@ -222,5 +235,7 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM fully loaded and parsed');
     actualizarFechaExpiracionPaquete();
 });
+
+
 
 

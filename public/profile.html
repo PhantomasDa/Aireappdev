@@ -55,6 +55,8 @@
 
         <div class="toggle-header" onclick="togglePackageInfo()">Mostrar  paquete</div>
         <div id="packageInfo" class="toggle-content">
+                        <span id="user_modalidad"></span>
+
             
             <div>            <p style="color: black;">Estado: <span id="estadodelpaquete"></span></p>
 
@@ -130,6 +132,10 @@
 
 
         </div>
+
+        <div id="presencialContent">
+
+        
         <h2 class="color-ajuste margin-ajuste">Tus Horarios Disponibles</h2>
         <div id="calendar-legend">
             <div class="legend-item">
@@ -151,7 +157,7 @@
         
         <h2 class="color-ajuste margin-ajuste">Tus Próximas Clases</h2>
         <div id="proximas_clases" class="toggle-content active"></div>
-
+    </div>
         <div id="reservaPopup" class="popup desktop-popup">
             <div class="popup-content">
                 <button onclick="cerrarPopup()" class="close-button">&times;</button>
@@ -245,7 +251,10 @@
     </div>
 </div>
 
-        
+        <!-- Contenedor para modalidad online -->
+        <div id="onlineContent" style="display: none;">
+            <button class="my-button-reservas" onclick="verClases()">Ver Clases</button>
+        </div>
     </div>
     <div id="footer"></div>
     <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/min/moment.min.js"></script>
