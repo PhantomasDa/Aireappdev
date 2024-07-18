@@ -19,47 +19,123 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    document.querySelector('#guardar-cambios-usuarios-btn').addEventListener('click', guardarCambiosUsuarios);
+    let fechaActual = new Date();
+    cargarClasesUsuariosMes(fechaActual);
+
+    window.cambiarMes = function (incremento) {
+        fechaActual.setMonth(fechaActual.getMonth() + incremento);
+        cargarClasesUsuariosMes(fechaActual);
+    };
 });
 
+function cargarClasesUsuariosMes(fecha) {
+    const mes = fecha.getMonth() + 1; // Mes actual (1-12)
+    const ano = fecha.getFullYear(); // Año actual
+    const nombreMes = fecha.toLocaleString('default', { month: 'long', year: 'numeric' });
 
+    document.getElementById('nombre_mes').innerText = nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1);
 
-function cargarClasesUsuarios() {
-    const fecha = document.getElementById('fecha_clases').value;
-    fetchData(`/admin/clases-usuarios?fecha=${fecha}`)
+    fetchData(`/admin/clases-usuarios-mes?mes=${mes}&ano=${ano}`)
         .then(clasesConUsuarios => {
             const contenedor = document.getElementById('clases_usuarios');
-            contenedor.innerHTML = clasesConUsuarios.map(clase => `
-                <div class="class-container">
-                    <h2>Clase: ${new Date(clase.fecha_hora).toLocaleString()}</h2>
-                    <p>Cupos Disponibles: ${clase.cupos_disponibles}</p>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Nombre</th>
-                                <th>Email</th>
-                                <th>Teléfono</th>
-                                <th>Asistencia</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${clase.usuarios.map(usuario => `
-                                <tr>
-                                    <td>${usuario.nombre}</td>
-                                    <td>${usuario.email}</td>
-                                    <td>${usuario.telefono}</td>
-                                    <td><input type="checkbox" name="asistencia_${usuario.id}" data-usuario-id="${usuario.id}" data-clase-id="${clase.id}"></td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                    <button onclick="enviarAsistencia(${clase.id})">Enviar Asistencia</button>
-                </div>
-            `).join('');
+            contenedor.innerHTML = '';
+
+            const diasDelMes = new Date(ano, mes, 0).getDate(); // Número de días en el mes
+            const clasesPorDia = {};
+
+            clasesConUsuarios.forEach(clase => {
+                const dia = new Date(clase.fecha_hora).getDate();
+                if (!clasesPorDia[dia]) {
+                    clasesPorDia[dia] = [];
+                }
+                clasesPorDia[dia].push(clase);
+            });
+
+            for (let dia = 1; dia <= diasDelMes; dia++) {
+                const diaContainer = document.createElement('div');
+                diaContainer.className = 'calendar-day';
+                diaContainer.innerHTML = `<h3>${dia}</h3>`;
+
+                if (clasesPorDia[dia]) {
+                    clasesPorDia[dia].forEach(clase => {
+                        clase.usuarios.forEach(usuario => {
+                            const userElement = document.createElement('div');
+                            userElement.className = 'user';
+                            userElement.innerHTML = usuario.nombre;
+                            userElement.onclick = () => mostrarFichaUsuario(usuario);
+                            diaContainer.appendChild(userElement);
+                        });
+                    });
+                } else {
+                    diaContainer.innerHTML += '<p>No hay clases</p>';
+                }
+
+                contenedor.appendChild(diaContainer);
+            }
         })
         .catch(error => console.error('Error al cargar clases y usuarios:', error));
 }
+function guardarCambiosUsuario() {
+    const usuarioId = parseInt(document.getElementById('popup_usuario_id').value, 10);
+    const nombre = document.getElementById('popup_nombre').value;
+    const email = document.getElementById('popup_email').value;
+    const telefono = document.getElementById('popup_telefono').value;
 
+    // Validar que el ID esté presente
+    if (!usuarioId) {
+        alert('ID de usuario no encontrado');
+        return;
+    }
+
+    // Crear un objeto con los cambios
+    const cambios = {};
+    if (nombre) cambios.nombre = nombre;
+    if (email) cambios.email = email;
+    if (telefono) cambios.telefono = telefono;
+
+    // Agregar el ID del usuario al objeto de cambios
+    cambios.id = usuarioId;
+
+    // Log adicional antes de enviar
+    console.log('Datos a enviar:', JSON.stringify(cambios));
+
+    fetch(`/admin/actualizar-usuario`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(cambios)
+    })
+    .then(response => {
+        if (response.ok) {
+            cerrarPopup();
+            cargarClasesUsuariosMes(new Date());
+        } else {
+            return response.json().then(error => {
+                throw new Error(error.message);
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error al guardar los cambios:', error);
+        alert('Error al guardar los cambios: ' + error.message);
+    });
+}
+
+function loadComponent(id, url, callback) {
+    fetch(url)
+        .then(response => response.text())
+        .then(data => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.innerHTML = data;
+                if (callback) callback();
+            } else {
+                console.error(`Elemento con id "${id}" no encontrado.`);
+            }
+        })
+        .catch(error => console.error('Error loading component:', error));
+}
 
 function fetchData(url, options = {}) {
     const token = localStorage.getItem('token');
@@ -91,210 +167,31 @@ function fetchData(url, options = {}) {
         });
 }
 
+function mostrarFichaUsuario(usuario) {
+    console.log('Usuario seleccionado:', usuario);
 
-function cargarUsuarios() {
-    fetchData('/admin/usuarios-completos')
-        .then(usuarios => {
-            const contenedorUsuarios = document.getElementById('usuarios');
-            contenedorUsuarios.innerHTML = '';
+    const usuarioIdElement = document.getElementById('popup_usuario_id');
+    const nombreElement = document.getElementById('popup_nombre');
+    const emailElement = document.getElementById('popup_email');
+    const telefonoElement = document.getElementById('popup_telefono');
 
-            const usuariosMap = {};
-
-            // Agrupar información por usuario
-            usuarios.forEach(usuario => {
-                if (!usuariosMap[usuario.id]) {
-                    usuariosMap[usuario.id] = {
-                        ...usuario,
-                        paquetes: [],
-                        reservaciones: []
-                    };
-                }
-
-                // Agregar información de paquetes y reservaciones
-                if (usuario.paquete_fecha_compra) {
-                    usuariosMap[usuario.id].paquetes.push({
-                        fecha_compra: usuario.paquete_fecha_compra,
-                        fecha_activacion: usuario.paquete_fecha_activacion,
-                        fecha_expiracion: usuario.paquete_fecha_expiracion,
-                        max_reagendamientos: usuario.paquete_max_reagendamientos,
-                        reagendamientos_usados: usuario.paquete_reagendamientos_usados,
-                        informacion: usuario.paquete_informacion,
-                        comprobante_pago: usuario.paquete_comprobante_pago
-                    });
-                }
-
-                if (usuario.reserva_clase_id) {
-                    usuariosMap[usuario.id].reservaciones.push({
-                        clase_id: usuario.reserva_clase_id,
-                        fecha_reserva: usuario.reserva_fecha_reserva,
-                        reagendamientos: usuario.reserva_reagendamientos
-                    });
-                }
-            });
-
-            // Crear una tarjeta por usuario
-Object.values(usuariosMap).forEach(usuario => {
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.id = `usuario-${usuario.id}`;
-
-    card.innerHTML = `
-        <div><strong>Nombre:</strong> <span class="field-value" data-field="nombre">${usuario.nombre}</span><input type="text" class="field-input" value="${usuario.nombre}" data-field="nombre" data-id="${usuario.id}" style="display: none;"></div>
-        <div><strong>Email:</strong> <span class="field-value" data-field="email">${usuario.email}</span><input type="text" class="field-input" value="${usuario.email}" data-field="email" data-id="${usuario.id}" style="display: none;"></div>
-        <div><strong>Fecha Registro:</strong> <span class="field-value" data-field="fecha_registro">${usuario.fecha_registro}</span><input type="text" class="field-input" value="${usuario.fecha_registro}" data-field="fecha_registro" data-id="${usuario.id}" style="display: none;"></div>
-        <div><strong>Paquete:</strong> <span class="field-value" data-field="paquete">${usuario.paquete}</span><input type="text" class="field-input" value="${usuario.paquete}" data-field="paquete" data-id="${usuario.id}" style="display: none;"></div>
-        <div><strong>Clases Disponibles:</strong> <span class="field-value" data-field="clases_disponibles">${usuario.clases_disponibles}</span><input type="text" class="field-input" value="${usuario.clases_disponibles}" data-field="clases_disponibles" data-id="${usuario.id}" style="display: none;"></div>
-        <div><strong>Teléfono:</strong> <span class="field-value" data-field="telefono">${usuario.telefono}</span><input type="text" class="field-input" value="${usuario.telefono}" data-field="telefono" data-id="${usuario.id}" style="display: none;"></div>
-        <div><strong>Motivación:</strong> <span class="field-value" data-field="motivacion">${usuario.motivacion}</span><input type="text" class="field-input" value="${usuario.motivacion}" data-field="motivacion" data-id="${usuario.id}" style="display: none;"></div>
-        <div><strong>Fecha Nacimiento:</strong> <span class="field-value" data-field="fecha_nacimiento">${usuario.fecha_nacimiento}</span><input type="text" class="field-input" value="${usuario.fecha_nacimiento}" data-field="fecha_nacimiento" data-id="${usuario.id}" style="display: none;"></div>
-        <div><strong>Género:</strong> <span class="field-value" data-field="genero">${usuario.genero}</span><input type="text" class="field-input" value="${usuario.genero}" data-field="genero" data-id="${usuario.id}" style="display: none;"></div>
-        <div><strong>Comprobante Pago:</strong> <img style="max-width:400px;" class="comprobante" src="../uploads/${usuario.comprobante_pago}" alt="Comprobante de Pago"><input type="text" class="field-input" value="${usuario.comprobante_pago}" data-field="comprobante_pago" data-id="${usuario.id}" style="display: none;"></div>
-        <div><strong>Rol:</strong> <span class="field-value" data-field="rol">${usuario.rol}</span><input type="text" class="field-input" value="${usuario.rol}" data-field="rol" data-id="${usuario.id}" style="display: none;"></div>
-        <div>
-            <button onclick="togglePaqueteInfo(${usuario.id})">Mostrar más</button>
-            <div id="paquete-info-${usuario.id}" style="display: none;">
-                <h3>Información del Paquete</h3>
-                ${usuario.paquetes.map(paquete => `
-                    <div><strong>Fecha de Compra:</strong> ${paquete.fecha_compra || 'N/A'}</div>
-                    <div><strong>Fecha de Activación:</strong> ${paquete.fecha_activacion || 'N/A'}</div>
-                    <div><strong>Fecha de Expiración:</strong> ${paquete.fecha_expiracion || 'N/A'}</div>
-                    <div><strong>Max Reagendamientos:</strong> ${paquete.max_reagendamientos || 'N/A'}</div>
-                    <div><strong>Reagendamientos Usados:</strong> ${paquete.reagendamientos_usados || 'N/A'}</div>
-                    <div><strong>Información del Paquete:</strong> ${paquete.informacion || 'N/A'}</div>
-                    <div><strong>Comprobante de Pago:</strong> <img class="comprobante" src="${paquete.comprobante_pago || ''}" alt="Comprobante de Pago"></div>
-                `).join('')}
-            </div>
-        </div>
-        <div>
-            <button onclick="toggleReservaciones(${usuario.id})">Mostrar Reservaciones</button>
-            <div id="reservaciones-info-${usuario.id}" style="display: none;">
-                <h3>Reservaciones</h3>
-                ${usuario.reservaciones.map(reserva => `
-                    <div><strong>Clase ID:</strong> ${reserva.clase_id || 'N/A'}</div>
-                    <div><strong>Fecha de Reserva:</strong> ${reserva.fecha_reserva || 'N/A'}</div>
-                    <div><strong>Reagendamientos:</strong> ${reserva.reagendamientos || 'N/A'}</div>
-                `).join('')}
-            </div>
-        </div>
-        <button onclick="editarUsuario(${usuario.id})">Editar</button>
-        <button onclick="guardarCambiosUsuario(${usuario.id})" style="display: none;">Guardar</button>
-    `;
-
-    contenedorUsuarios.appendChild(card);
-});
-
-        })
-        .catch(error => console.error('Error al cargar usuarios:', error));
-}
-
-function togglePaqueteInfo(usuarioId) {
-    const paqueteInfo = document.getElementById(`paquete-info-${usuarioId}`);
-    if (paqueteInfo.style.display === 'none') {
-        paqueteInfo.style.display = 'block';
-    } else {
-        paqueteInfo.style.display = 'none';
-    }
-}
-
-function toggleReservaciones(usuarioId) {
-    const reservacionesInfo = document.getElementById(`reservaciones-info-${usuarioId}`);
-    if (reservacionesInfo.style.display === 'none') {
-        reservacionesInfo.style.display = 'block';
-    } else {
-        reservacionesInfo.style.display = 'none';
-    }
-}
-
-
-
-function editarUsuario(usuarioId) {
-    const card = document.getElementById(`usuario-${usuarioId}`);
-    card.querySelectorAll('.field-value').forEach(span => span.style.display = 'none');
-    card.querySelectorAll('.field-input').forEach(input => input.style.display = 'inline-block');
-    card.querySelector('button[onclick^="editarUsuario"]').style.display = 'none';
-    card.querySelector('button[onclick^="guardarCambiosUsuario"]').style.display = 'inline-block';
-}
-
-
-
-function guardarCambiosUsuario(usuarioId) {
-    console.log('Iniciando guardarCambiosUsuario');
-    const card = document.getElementById(`usuario-${usuarioId}`);
-    if (!card) {
-        console.error('No se encontró el elemento de la tarjeta del usuario');
-        return;
-    }
-
-    const inputs = card.querySelectorAll('.field-input');
-    const cambios = Array.from(inputs).reduce((acc, input) => {
-        const id = parseInt(input.getAttribute('data-id'), 10);
-        const field = input.getAttribute('data-field');
-        const value = input.value;
-        const originalElement = card.querySelector(`.field-value[data-field="${field}"]`);
-
-        if (!originalElement) {
-            console.error(`No se encontró el elemento original para el campo ${field}`);
-            return acc;
-        }
-
-        let originalValue = originalElement.textContent.trim();
-        
-        // Para el caso específico de `comprobante_pago`
-        if (field === 'comprobante_pago' && originalElement.querySelector('img')) {
-            originalValue = originalElement.querySelector('img').getAttribute('src').split('/').pop();
-        }
-
-        if (value !== originalValue) {
-            acc.push({ id, field, value });
-        }
-        return acc;
-    }, []);
-
-    if (cambios.length === 0) {
-        console.log('No hay cambios para guardar');
-        return;
-    }
-
-    console.log('Cambios a enviar:', JSON.stringify({ cambios }));
-
-    fetch('http://localhost:3000/admin/actualizar-usuarios', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ cambios })
-    })
-    .then(response => {
-        console.log('Respuesta del servidor:', response);
-        if (response.ok) {
-            return response.json();
-        } else {
-            throw new Error('Error en la respuesta del servidor');
-        }
-    })
-    .then(data => {
-        console.log('Datos recibidos del servidor:', data);
-        alert('Cambios guardados correctamente');
-        cargarUsuarios();
-    })
-    .catch(error => {
-        console.error('Error al guardar cambios:', error);
-        alert('Error al guardar cambios: ' + error.message);
+    console.log('Elementos del popup:', {
+        usuarioIdElement,
+        nombreElement,
+        emailElement,
+        telefonoElement
     });
-}
 
+    usuarioIdElement.value = usuario.usuario_id; // Cambiado de usuario.id a usuario.usuario_id
+    nombreElement.value = usuario.nombre;
+    emailElement.value = usuario.email;
+    telefonoElement.value = usuario.telefono;
+    document.getElementById('popup').style.display = 'flex';
 
-function loadComponent(id, url, callback) {
-    fetch(url)
-        .then(response => response.text())
-        .then(data => {
-            const element = document.getElementById(id);
-            if (element) {
-                element.innerHTML = data;
-                if (callback) callback();
-            } else {
-                console.error(`Elemento con id "${id}" no encontrado.`);
-            }
-        })
-        .catch(error => console.error('Error loading component:', error));
+    console.log('Valores asignados:', {
+        id: usuarioIdElement.value,
+        nombre: nombreElement.value,
+        email: emailElement.value,
+        telefono: telefonoElement.value
+    });
 }

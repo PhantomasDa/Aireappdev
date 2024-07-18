@@ -3,25 +3,27 @@ const router = express.Router();
 const db = require('../database');
 const { body, validationResult } = require('express-validator');
 
-// Obtener clases y usuarios por día
-router.get('/clases-usuarios', async (req, res) => {
-    const { fecha } = req.query;
+router.get('/clases-usuarios-mes', async (req, res) => {
+    const { mes, ano } = req.query;
+
+    const inicioMes = new Date(ano, mes - 1, 1);
+    const finMes = new Date(ano, mes, 0);
 
     const queryClases = `
         SELECT c.id, c.fecha_hora, c.cupos_max, c.cupos_disponibles
         FROM Clases c
-        WHERE DATE(c.fecha_hora) = ?
+        WHERE c.fecha_hora BETWEEN ? AND ?
     `;
     const queryUsuarios = `
         SELECT r.clase_id, u.id AS usuario_id, u.nombre, u.email, u.telefono
         FROM Reservas r
         JOIN Usuarios u ON r.usuario_id = u.id
-        WHERE r.clase_id IN (SELECT id FROM Clases WHERE DATE(fecha_hora) = ?)
+        WHERE r.clase_id IN (SELECT id FROM Clases WHERE fecha_hora BETWEEN ? AND ?)
     `;
 
     try {
-        const [clases] = await db.execute(queryClases, [fecha]);
-        const [usuarios] = await db.execute(queryUsuarios, [fecha]);
+        const [clases] = await db.execute(queryClases, [inicioMes, finMes]);
+        const [usuarios] = await db.execute(queryUsuarios, [inicioMes, finMes]);
 
         const clasesConUsuarios = clases.map(clase => {
             return {
@@ -37,50 +39,58 @@ router.get('/clases-usuarios', async (req, res) => {
     }
 });
 
-// Obtener todos los usuarios con sus paquetes y reservaciones
-router.get('/usuarios-completos', async (req, res) => {
-    const queryUsuarios = `
-        SELECT u.id, u.nombre, u.email, u.fecha_registro, u.foto_perfil, u.paquete, u.clases_disponibles, u.telefono, u.lesiones, u.motivacion, u.pregunta1, u.pregunta2, u.pregunta3, u.pregunta4, u.fecha_nacimiento, u.genero, u.comprobante_pago, u.rol,
-               p.fecha_compra AS paquete_fecha_compra, p.fecha_activacion AS paquete_fecha_activacion, p.fecha_expiracion AS paquete_fecha_expiracion, p.max_reagendamientos AS paquete_max_reagendamientos, p.reagendamientos_usados AS paquete_reagendamientos_usados, p.informacion_paquete AS paquete_informacion, p.comprobante_pago AS paquete_comprobante_pago,
-               r.clase_id AS reserva_clase_id, r.fecha_reserva AS reserva_fecha_reserva, r.reagendamientos AS reserva_reagendamientos
-        FROM Usuarios u
-        LEFT JOIN Paquetes p ON u.id = p.usuario_id
-        LEFT JOIN Reservas r ON u.id = r.usuario_id
+
+
+
+router.post('/actualizar-usuario', async (req, res) => {
+    const { id, nombre, email, telefono } = req.body;
+
+    // Log para verificar los datos recibidos
+    console.log('Datos recibidos en el servidor:', req.body);
+
+    if (!id) {
+        return res.status(400).json({ message: 'ID de usuario es obligatorio' });
+    }
+
+    const campos = [];
+    const valores = [];
+
+    if (nombre) {
+        campos.push('nombre = ?');
+        valores.push(nombre);
+    }
+    if (email) {
+        campos.push('email = ?');
+        valores.push(email);
+    }
+    if (telefono) {
+        campos.push('telefono = ?');
+        valores.push(telefono);
+    }
+
+    if (campos.length === 0) {
+        return res.status(400).json({ message: 'No hay cambios para actualizar' });
+    }
+
+    valores.push(id);
+
+    const query = `
+        UPDATE Usuarios 
+        SET ${campos.join(', ')}
+        WHERE id = ?
     `;
 
+    console.log('Query:', query);
+    console.log('Valores:', valores);
+
     try {
-        const [usuarios] = await db.execute(queryUsuarios);
-        res.json(usuarios);
+        await db.execute(query, valores);
+        res.json({ message: 'Usuario actualizado correctamente' });
     } catch (error) {
-        console.error('Error al obtener usuarios completos:', error);
+        console.error('Error al actualizar usuario:', error);
         res.status(500).json({ message: 'Error en el servidor', error: error.message });
     }
 });
-
-
-
-// Ruta para actualizar información de los usuarios
-router.post('/actualizar-usuarios', async (req, res) => {
-    console.log('Petición recibida para actualizar usuarios');
-    const { cambios } = req.body;
-    console.log('Datos recibidos:', cambios);
-
-    const queries = cambios.map(cambio => {
-        return db.execute(
-            `UPDATE Usuarios SET ${cambio.field} = ? WHERE id = ?`,
-            [cambio.value, cambio.id]
-        );
-    });
-
-    try {
-        await Promise.all(queries);
-        res.json({ message: 'Usuarios actualizados correctamente' });
-    } catch (error) {
-        console.error('Error al actualizar usuarios:', error);
-        res.status(500).json({ message: 'Error en el servidor', error: error.message });
-    }
-});
-
 
 
 module.exports = router;

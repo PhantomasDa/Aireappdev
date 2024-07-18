@@ -7,51 +7,103 @@
     <link rel="stylesheet" href="style/admin.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;700;800&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <title>Document</title>
+    <title>Panel de Administración</title>
+    <style>
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+        }
+        .calendar-day {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            min-height: 100px;
+        }
+        .calendar-day h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+        .calendar-day .user {
+            cursor: pointer;
+            color: blue;
+        }
+        .month-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .month-nav h2 {
+            margin: 0;
+        }
+        .popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .popup-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 300px;
+            max-width: 90%;
+        }
+        .popup-content h3 {
+            margin-top: 0;
+        }
+        .popup-content .close {
+            cursor: pointer;
+            color: red;
+            float: right;
+            font-size: 20px;
+        }
+        .popup-content input[type="text"], .popup-content input[type="email"], .popup-content input[type="tel"] {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        @media (max-width: 768px) {
+            .calendar {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
     <div id="menu"></div>
     <div class="container-bg">
         <h1>Panel de Administración</h1>
-        <label for="fecha_clases">Selecciona una fecha:</label>
-        <input type="date" id="fecha_clases" />
-        <button onclick="cargarClasesUsuarios()">Cargar Clases</button>
-        <div id="clases_usuarios"></div>
-        <div><strong>Comprobante Pago:</strong> <span class="field-value" data-field="comprobante_pago"><img style="max-width:400px;" class="comprobante" src="../uploads/${usuario.comprobante_pago}" alt="Comprobante de Pago"></span><input type="text" class="field-input" value="${usuario.comprobante_pago}" data-field="comprobante_pago" data-id="${usuario.id}" style="display: none;"></div>
-
-        <h2>Usuarios</h2>
-        <div id="filtros">
-            <h3>Selecciona los campos a mostrar:</h3>
-            <div>
-                <label><input type="checkbox" value="nombre" checked> Nombre</label>
-                <label><input type="checkbox" value="email" checked> Email</label>
-                <label><input type="checkbox" value="fecha_registro"> Fecha Registro</label>
-                <label><input type="checkbox" value="paquete"> Paquete</label>
-                <label><input type="checkbox" value="clases_disponibles"> Clases Disponibles</label>
-                <label><input type="checkbox" value="telefono"> Teléfono</label>
-                <label><input type="checkbox" value="motivacion"> Motivación</label>
-                <label><input type="checkbox" value="fecha_nacimiento"> Fecha Nacimiento</label>
-                <label><input type="checkbox" value="genero"> Género</label>
-                <label><input type="checkbox" value="comprobante_pago"> Comprobante Pago</label>
-                <label><input type="checkbox" value="rol"> Rol</label>
-            </div>
+        <div class="month-nav">
+            <button onclick="cambiarMes(-1)">&#8592; Anterior</button>
+            <h2 id="nombre_mes"></h2>
+            <button onclick="cambiarMes(1)">Siguiente &#8594;</button>
         </div>
-        <button onclick="cargarUsuarios()">Cargar Usuarios</button>
-        <div id="usuarios">
-            <table id="tabla_usuarios">
-                <thead>
-                    <tr id="tabla_cabecera">
-                        <!-- Aquí se insertarán los encabezados de la tabla -->
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Aquí se insertarán las filas de usuarios -->
-                </tbody>
-            </table>
+        <div id="clases_usuarios" class="calendar"></div>
+    </div>
+    <div id="popup" class="popup">
+        <div class="popup-content">
+            <span class="close" onclick="cerrarPopup()">&times;</span>
+            <h3>Ficha del Usuario</h3>
+            <input type="hidden" id="popup_usuario_id">
+            <label for="popup_nombre">Nombre:</label>
+            <input type="text" id="popup_nombre">
+            <label for="popup_email">Email:</label>
+            <input type="email" id="popup_email">
+            <label for="popup_telefono">Teléfono:</label>
+            <input type="tel" id="popup_telefono">
+            <button onclick="guardarCambiosUsuario()">Guardar Cambios</button>
         </div>
     </div>
     <div id="footer"></div>
     <script src="./js/adminfront.js"></script>
-
 </body>
 </html>
