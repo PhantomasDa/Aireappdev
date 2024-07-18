@@ -27,7 +27,6 @@ document.addEventListener("DOMContentLoaded", function() {
         cargarClasesUsuariosMes(fechaActual);
     };
 });
-
 function cargarClasesUsuariosMes(fecha) {
     const mes = fecha.getMonth() + 1; // Mes actual (1-12)
     const ano = fecha.getFullYear(); // Año actual
@@ -58,13 +57,20 @@ function cargarClasesUsuariosMes(fecha) {
 
                 if (clasesPorDia[dia]) {
                     clasesPorDia[dia].forEach(clase => {
+                        const horaClase = new Date(clase.fecha_hora).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        const claseContainer = document.createElement('div');
+                        claseContainer.className = 'clase-container';
+                        claseContainer.innerHTML = `<strong>${horaClase}</strong>`;
+
                         clase.usuarios.forEach(usuario => {
                             const userElement = document.createElement('div');
                             userElement.className = 'user';
                             userElement.innerHTML = usuario.nombre;
                             userElement.onclick = () => mostrarFichaUsuario(usuario);
-                            diaContainer.appendChild(userElement);
+                            claseContainer.appendChild(userElement);
                         });
+
+                        diaContainer.appendChild(claseContainer);
                     });
                 } else {
                     diaContainer.innerHTML += '<p>No hay clases</p>';
@@ -75,6 +81,7 @@ function cargarClasesUsuariosMes(fecha) {
         })
         .catch(error => console.error('Error al cargar clases y usuarios:', error));
 }
+
 function guardarCambiosUsuario() {
     const usuarioId = parseInt(document.getElementById('popup_usuario_id').value, 10);
     const nombre = document.getElementById('popup_nombre').value;
