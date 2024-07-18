@@ -39,13 +39,9 @@ router.get('/clases-usuarios-mes', async (req, res) => {
     }
 });
 
-
-
-
 router.post('/actualizar-usuario', async (req, res) => {
-    const { id, nombre, email, telefono } = req.body;
+    const { id, nombre, email, telefono, clases_disponibles, fecha_activacion, fecha_expiracion } = req.body;
 
-    // Log para verificar los datos recibidos
     console.log('Datos recibidos en el servidor:', req.body);
 
     if (!id) {
@@ -66,6 +62,18 @@ router.post('/actualizar-usuario', async (req, res) => {
     if (telefono) {
         campos.push('telefono = ?');
         valores.push(telefono);
+    }
+    if (clases_disponibles) {
+        campos.push('clases_disponibles = ?');
+        valores.push(clases_disponibles);
+    }
+    if (fecha_activacion) {
+        campos.push('fecha_activacion = ?');
+        valores.push(fecha_activacion);
+    }
+    if (fecha_expiracion) {
+        campos.push('fecha_expiracion = ?');
+        valores.push(fecha_expiracion);
     }
 
     if (campos.length === 0) {
@@ -91,6 +99,8 @@ router.post('/actualizar-usuario', async (req, res) => {
         res.status(500).json({ message: 'Error en el servidor', error: error.message });
     }
 });
+
+
 
 
 module.exports = router;

@@ -103,18 +103,34 @@
     </div>
     <div id="popup" class="popup">
         <div class="popup-content">
-            <span class="close" onclick="cerrarPopup()">&times;</span>
-            <h3>Ficha del Usuario</h3>
+            <span class="close-button" onclick="cerrarPopup()">&times;</span>
+            <!-- Aquí van los campos del formulario de edición -->
             <input type="hidden" id="popup_usuario_id">
             <label for="popup_nombre">Nombre:</label>
             <input type="text" id="popup_nombre">
+            
             <label for="popup_email">Email:</label>
             <input type="email" id="popup_email">
+            
             <label for="popup_telefono">Teléfono:</label>
-            <input type="tel" id="popup_telefono">
-            <button onclick="guardarCambiosUsuario()">Guardar Cambios</button>
+            <input type="text" id="popup_telefono">
+    
+            <label for="popup_clases_disponibles">Clases Disponibles:</label>
+            <input type="number" id="popup_clases_disponibles">
+    
+            <label for="popup_fecha_activacion">Fecha de Activación:</label>
+            <input type="date" id="popup_fecha_activacion">
+    
+            <label for="popup_fecha_expiracion">Fecha de Expiración:</label>
+            <input type="date" id="popup_fecha_expiracion">
+    
+            <label for="popup_foto_perfil">Foto de Perfil:</label>
+            <img id="popup_foto_perfil" src="" alt="Foto de perfil" style="width: 50px; height: 50px;">
+    
+            <button onclick="guardarCambiosUsuario()">Guardar</button>
         </div>
     </div>
+        
     <div id="footer"></div>
     <script src="./js/adminfront.js"></script>
 </body>

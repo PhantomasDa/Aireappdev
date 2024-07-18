@@ -27,6 +27,7 @@ document.addEventListener("DOMContentLoaded", function() {
         cargarClasesUsuariosMes(fechaActual);
     };
 });
+
 function cargarClasesUsuariosMes(fecha) {
     const mes = fecha.getMonth() + 1; // Mes actual (1-12)
     const ano = fecha.getFullYear(); // Año actual
@@ -51,9 +52,11 @@ function cargarClasesUsuariosMes(fecha) {
             });
 
             for (let dia = 1; dia <= diasDelMes; dia++) {
+                const fechaCompleta = new Date(ano, mes - 1, dia);
+                const nombreDia = fechaCompleta.toLocaleString('default', { weekday: 'long' });
                 const diaContainer = document.createElement('div');
                 diaContainer.className = 'calendar-day';
-                diaContainer.innerHTML = `<h3>${dia}</h3>`;
+                diaContainer.innerHTML = `<h3>${nombreDia.charAt(0).toUpperCase() + nombreDia.slice(1)} ${dia}</h3>`;
 
                 if (clasesPorDia[dia]) {
                     clasesPorDia[dia].forEach(clase => {
@@ -80,30 +83,30 @@ function cargarClasesUsuariosMes(fecha) {
             }
         })
         .catch(error => console.error('Error al cargar clases y usuarios:', error));
-}
-
-function guardarCambiosUsuario() {
+}function guardarCambiosUsuario() {
     const usuarioId = parseInt(document.getElementById('popup_usuario_id').value, 10);
     const nombre = document.getElementById('popup_nombre').value;
     const email = document.getElementById('popup_email').value;
     const telefono = document.getElementById('popup_telefono').value;
+    const clasesDisponibles = parseInt(document.getElementById('popup_clases_disponibles').value, 10);
+    const fechaActivacion = document.getElementById('popup_fecha_activacion').value;
+    const fechaExpiracion = document.getElementById('popup_fecha_expiracion').value;
 
-    // Validar que el ID esté presente
     if (!usuarioId) {
         alert('ID de usuario no encontrado');
         return;
     }
 
-    // Crear un objeto con los cambios
-    const cambios = {};
-    if (nombre) cambios.nombre = nombre;
-    if (email) cambios.email = email;
-    if (telefono) cambios.telefono = telefono;
+    const cambios = {
+        id: usuarioId,
+        nombre: nombre || undefined,
+        email: email || undefined,
+        telefono: telefono || undefined,
+        clases_disponibles: clasesDisponibles || undefined,
+        fecha_activacion: fechaActivacion || undefined,
+        fecha_expiracion: fechaExpiracion || undefined
+    };
 
-    // Agregar el ID del usuario al objeto de cambios
-    cambios.id = usuarioId;
-
-    // Log adicional antes de enviar
     console.log('Datos a enviar:', JSON.stringify(cambios));
 
     fetch(`/admin/actualizar-usuario`, {
@@ -128,6 +131,7 @@ function guardarCambiosUsuario() {
         alert('Error al guardar los cambios: ' + error.message);
     });
 }
+
 
 function loadComponent(id, url, callback) {
     fetch(url)
@@ -172,33 +176,45 @@ function fetchData(url, options = {}) {
             }
             return response.json();
         });
-}
-
-function mostrarFichaUsuario(usuario) {
+}function mostrarFichaUsuario(usuario) {
     console.log('Usuario seleccionado:', usuario);
 
     const usuarioIdElement = document.getElementById('popup_usuario_id');
     const nombreElement = document.getElementById('popup_nombre');
     const emailElement = document.getElementById('popup_email');
     const telefonoElement = document.getElementById('popup_telefono');
+    const clasesDisponiblesElement = document.getElementById('popup_clases_disponibles');
+    const fechaActivacionElement = document.getElementById('popup_fecha_activacion');
+    const fechaExpiracionElement = document.getElementById('popup_fecha_expiracion');
+    const fotoPerfilElement = document.getElementById('popup_foto_perfil');
 
-    console.log('Elementos del popup:', {
-        usuarioIdElement,
-        nombreElement,
-        emailElement,
-        telefonoElement
-    });
-
-    usuarioIdElement.value = usuario.usuario_id; // Cambiado de usuario.id a usuario.usuario_id
+    usuarioIdElement.value = usuario.usuario_id; 
     nombreElement.value = usuario.nombre;
     emailElement.value = usuario.email;
     telefonoElement.value = usuario.telefono;
+    clasesDisponiblesElement.value = usuario.clases_disponibles || '';  // Ajustar si el valor es undefined
+    fechaActivacionElement.value = usuario.fecha_activacion ? usuario.fecha_activacion.split('T')[0] : '';
+    fechaExpiracionElement.value = usuario.fecha_expiracion ? usuario.fecha_expiracion.split('T')[0] : '';
+    fotoPerfilElement.src = usuario.foto_perfil || 'ruta_a_imagen_default.jpg';  // Ajustar si el valor es undefined
+
     document.getElementById('popup').style.display = 'flex';
 
     console.log('Valores asignados:', {
         id: usuarioIdElement.value,
         nombre: nombreElement.value,
         email: emailElement.value,
-        telefono: telefonoElement.value
+        telefono: telefonoElement.value,
+        clases_disponibles: clasesDisponiblesElement.value,
+        fecha_activacion: fechaActivacionElement.value,
+        fecha_expiracion: fechaExpiracionElement.value,
+        foto_perfil: fotoPerfilElement.src
     });
 }
+
+function cerrarPopup() {
+    document.getElementById('popup').style.display = 'none';
+}
+document.addEventListener("DOMContentLoaded", function() {
+    // Otros inicializadores
+    document.querySelector('.close-button').addEventListener('click', cerrarPopup);
+});
