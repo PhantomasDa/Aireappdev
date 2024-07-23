@@ -36,14 +36,15 @@
     <div id="sidebar-container"></div>
     <div class="my-container-bg-2">
         <div class="container-data">
-            <!-- <div id="informacion_extra" style="font-size: 10px; margin-top: 10px;"></div> -->
-
-            <h1 id="user_name">Holis, [Nombre del Usuario]</h1>
+ <div id="informacion_extra" style="font-size: 10px; margin-top: 10px;"></div>
+           
             <a id="logout" href="#" onclick="logout()">Logout</a>
             <div id="profile-picture-container">
-                <img id="profile_picture" src="" alt="Foto de perfil">
+                <img id="4profile_picture" src="./content/user-circle-icon-png.png" alt="Foto de perfil">
             </div>
+            
         </div>
+        <div> <h1 id="user_name">Holis, [Nombre del Usuario]</h1></div>
 
         <div id="horariosPopup" class="popup desktop-popup">
             <div class="popup-content">
@@ -233,14 +234,8 @@
     </div>
 </div>
 
-<div id="confirmacionReagendarPopup" class="modal">
-    <div class="modal-content">
-        <button onclick="cerrarConfirmacionReagendarPopup()" class="close-button">&times;</button>
-        <h2>Confirmar Reagendamiento</h2>
-        <div id="confirmacionReagendarMensaje" style="margin-bottom: 20px;"></div>
-        <button onclick="confirmarReagendarDefinitivo()">Confirmar Reagendar</button>
-    </div>
-</div>
+
+
 
 <div id="exitoReagendarPopup" class="modal">
     <div class="modal-content">
@@ -255,6 +250,42 @@
         <div id="onlineContent" style="display: none;">
             <button class="my-button-reservas" onclick="verClases()">Ver Clases</button>
         </div>
+
+
+        <div id="reagendarPopup" class="modal">
+            <div class="modal-content">
+                <button onclick="cerrarReagendarPopup()" class="close-button">&times;</button>
+                <h2>Reagendar Clase</h2>
+                <div id="clasesDisponibles">Reservas disponibles: 2</div>
+                <div id="claseActualMensaje" style="margin-bottom: 20px;"></div>
+                <div id="fechasReagendar"></div>
+            </div>
+        </div>
+
+       
+
+        <div id="exitoReagendarPopup" class="modal">
+            <div class="modal-content">
+                <button onclick="cerrarExitoReagendarPopup()" class="close-button">&times;</button>
+                <h2>¡Felicitaciones!</h2>
+                <p style="color: black;">Haz reagendado tu clase con éxito.</p>
+                <button onclick="cerrarExitoReagendarPopup()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+    <div id="confirmacionReagendarPopup" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="cerrarModal('confirmacionReagendarPopup')">&times;</span>
+            <p id="confirmacionReagendarMensaje"></p>
+            <h3>Selecciona un día para reagendar</h3>
+            <div id="calendarioReagendar" class="calendario-popup"></div>
+            <div id="horariosDisponibles" class="horarios-disponibles"></div>
+            <button onclick="confirmarReagendarDefinitivo()">Confirmar</button>
+        </div>
+    </div>
+    
+    
+
     </div>
     <div id="footer"></div>
     <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/min/moment.min.js"></script>

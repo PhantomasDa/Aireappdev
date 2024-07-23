@@ -1,4 +1,3 @@
-// sendform1.js
 function submitForm1() {
     const form = document.getElementById('registerForm'); // Referencia al formulario principal
     console.log('Formulario obtenido:', form); // Depuración
@@ -31,6 +30,7 @@ function submitForm1() {
     document.getElementById('fechaNacimientoError').textContent = '';
     document.getElementById('generoError').textContent = '';
 
+    // Validaciones
     if (nombre.length < 3) {
         document.getElementById('nombreError').textContent = 'El nombre debe tener al menos 3 caracteres.';
         hasError = true;
@@ -75,6 +75,7 @@ function submitForm1() {
 
     // Si hay errores, no continuar
     if (hasError) {
+        console.log('Se encontraron errores en el formulario');
         return;
     }
 
@@ -89,8 +90,12 @@ function submitForm1() {
     };
     localStorage.setItem('step1Data', JSON.stringify(formDataObject));
 
+    console.log('Datos guardados localmente:', formDataObject);
+
     // Avanzar al siguiente paso
     document.getElementById('registerForm1').style.display = 'none';
-    document.getElementById('registerForm2').style.display = 'block';
+    document.getElementById('registerForm3').style.display = 'block'; // Cambiar al siguiente paso directamente después de eliminar el paso 2
     updateProgressBar(2);
+
+    console.log('Avanzando al siguiente paso');
 }

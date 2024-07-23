@@ -1,12 +1,12 @@
 // horarios.js
 
-// Mostrar modal de error con un mensaje específico
 function mostrarErrorFechaModal(mensaje) {
     const errorFechaModal = document.getElementById('errorFechaModal');
     const errorFechaText = document.getElementById('errorFechaText');
     errorFechaText.textContent = mensaje;
     errorFechaModal.style.display = 'block';
 }
+
 function cargarHorarios(fecha) {
     if (!validarFechaSeleccionada(fecha)) {
         console.log('Fecha seleccionada no válida.');
@@ -61,7 +61,6 @@ function cargarHorarios(fecha) {
         })
         .catch(error => console.error('Error al cargar los horarios:', error));
 }
-
 
 function cerrarHorariosPopup() {
     document.getElementById('horariosPopup').classList.remove('active');

@@ -5,17 +5,22 @@
 function cargarNombreUsuario() {
     fetchData('/perfil/usuario')
         .then(usuario => {
+            console.log('Usuario recibido:', usuario); // Verificar los datos recibidos
+
             document.getElementById('user_name').textContent = `Holis, ${usuario.nombre}`;
-            document.getElementById('user_modalidad').textContent = `Modalidad: ${usuario.modalidad}` ;
+            document.getElementById('user_modalidad').textContent = `Modalidad: ${usuario.modalidad}`;
 
             // Asegúrate de que la URL sea correcta
-            document.getElementById('profile_picture').src = usuario.foto_perfil;
 
-            const modalidad= usuario.modalidad;
+            const modalidad = usuario.modalidad;
+            console.log('Modalidad del usuario:', modalidad); // Verificar el valor de modalidad
+
             if (modalidad === 'online') {
+                console.log('Mostrando contenido online');
                 document.getElementById('presencialContent').style.display = 'none';
                 document.getElementById('onlineContent').style.display = 'block';
             } else {
+                console.log('Mostrando contenido presencial');
                 document.getElementById('presencialContent').style.display = 'block';
                 document.getElementById('onlineContent').style.display = 'none';
             }
@@ -56,7 +61,7 @@ function cargarProximasClases() {
                                 ${fechaFormateada} a las ${horaFormateada}
                             </div>
                             <div class="card-footer">
-                                ${botonReagendar}
+                                
                             </div>
                         </div>`;
                 }).join('');

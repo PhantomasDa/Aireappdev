@@ -6,6 +6,7 @@ const { isAuthenticated } = require('../middleware/auth');
 const multer = require('multer'); // Añadir esta línea para importar multer
 const path = require('path'); // Añadir esta línea para importar path
 const { body, validationResult } = require('express-validator'); // Importar body y validationResult desde express-validator
+const pool = require('../database'); // Asegúrate de importar el pool correctamente
 
 
 // Configuración de multer
@@ -97,20 +98,24 @@ router.get('/usuario', verifyToken, (req, res) => {
     });
 });
 
-
-
-
 // Reagendar clase
 router.post('/reagendar', verifyToken, async (req, res) => {
-    const { claseId, nuevaFecha } = req.body;
-    console.log('Datos recibidos para reagendar:', { claseId, nuevaFecha });
+    const { claseId, nuevaClaseId, nuevaFecha } = req.body;
+    console.log('Datos recibidos para reagendar:', { claseId, nuevaClaseId, nuevaFecha });
 
-    if (!claseId || !nuevaFecha) {
+    if (!claseId || !nuevaClaseId || !nuevaFecha) {
         console.log('Datos incompletos');
         return res.status(400).send({ message: 'Datos incompletos' });
     }
 
     const nuevaFechaObj = new Date(nuevaFecha);
+    if (isNaN(nuevaFechaObj.getTime())) {
+        console.log('Fecha inválida:', nuevaFecha);
+        return res.status(400).send({ message: 'Fecha inválida' });
+    }
+
+    console.log(`Fecha recibida y convertida: ${nuevaFechaObj.toISOString()}`);
+
     const ahora = new Date();
     const diferenciaHoras = (nuevaFechaObj - ahora) / (1000 * 60 * 60);
 
@@ -119,46 +124,63 @@ router.post('/reagendar', verifyToken, async (req, res) => {
         return res.status(400).send({ message: 'Lo sentimos, pero solo puedes reservar clases con un mínimo de 18 horas de anticipación.' });
     }
 
+    const nuevaFechaMysql = nuevaFechaObj.toISOString().slice(0, 19).replace('T', ' ');
+    console.log(`Fecha formateada para MySQL: ${nuevaFechaMysql}`);
+
+    let connection;
+
     try {
-        const [claseData] = await db.execute('SELECT fecha_hora FROM Clases WHERE id = ?', [claseId]);
-        if (claseData.length === 0) {
-            console.log('Clase no encontrada');
-            return res.status(400).send({ message: 'Clase no encontrada' });
+        connection = await pool.getConnection();
+        console.log('Conexión a la base de datos establecida');
+
+        await connection.beginTransaction();
+        console.log('Transacción iniciada');
+
+        // Incrementar cupos disponibles en la clase original
+        const [claseData] = await connection.execute('UPDATE Clases SET cupos_disponibles = cupos_disponibles + 1 WHERE id = ?', [claseId]);
+        console.log('Clase original actualizada:', claseData);
+
+        if (claseData.affectedRows === 0) {
+            console.log('Clase no encontrada o sin cupos para liberar');
+            await connection.rollback();
+            console.log('Transacción revertida');
+            return res.status(400).send({ message: 'Clase no encontrada o sin cupos para liberar' });
         }
 
-        const [checkSameDay] = await db.execute(
-            'SELECT COUNT(*) as count FROM Reservas r JOIN Clases c ON r.clase_id = c.id WHERE r.usuario_id = ? AND DATE(c.fecha_hora) = DATE(?)',
-            [req.user.id, nuevaFechaObj]
-        );
+        // Decrementar cupos disponibles en la nueva clase
+        const [nuevaClaseData] = await connection.execute('UPDATE Clases SET cupos_disponibles = cupos_disponibles - 1 WHERE id = ? AND cupos_disponibles > 0', [nuevaClaseId]);
+        console.log('Nueva clase actualizada:', nuevaClaseData);
 
-        if (checkSameDay[0].count > 0) {
-            console.log('Ya tienes una clase registrada en esta fecha');
-            return res.status(400).send({ message: 'Ya tienes una clase registrada en esta fecha' });
+        if (nuevaClaseData.affectedRows === 0) {
+            console.log('No hay cupos disponibles en la nueva clase');
+            await connection.rollback();
+            console.log('Transacción revertida');
+            return res.status(400).send({ message: 'No hay cupos disponibles en la nueva clase' });
         }
 
-        const [result] = await db.execute(
-            'UPDATE Clases SET cupos_disponibles = cupos_disponibles - 1 WHERE id = ? AND cupos_disponibles > 0',
-            [claseId]
-        );
+        // Actualizar la reserva con la nueva clase y fecha
+        await connection.execute('UPDATE Reservas SET clase_id = ?, fecha_reserva = ? WHERE usuario_id = ? AND clase_id = ?', [nuevaClaseId, nuevaFechaMysql, req.user.id, claseId]);
+        console.log('Reserva actualizada');
 
-        if (result.affectedRows > 0) {
-            await db.execute(
-                'UPDATE Reservas SET clase_id = ?, fecha_reserva = NOW() WHERE usuario_id = ? AND clase_id = ?',
-                [claseId, req.user.id, claseId]
-            );
+        await connection.commit();
+        console.log('Transacción confirmada');
 
-            console.log('Clase reagendada exitosamente');
-            res.json({ message: 'Clase reagendada exitosamente', fecha: claseData[0].fecha_hora });
-        } else {
-            console.log('No hay cupos disponibles');
-            res.status(400).send({ message: 'No hay cupos disponibles' });
-        }
+        console.log('Clase reagendada exitosamente');
+        res.json({ message: 'Clase reagendada exitosamente' });
     } catch (error) {
+        if (connection) {
+            await connection.rollback();
+            console.log('Transacción revertida debido a un error');
+        }
         console.error('Error durante el reagendamiento:', error);
         res.status(500).send({ message: 'Error en el servidor', error: error.message });
+    } finally {
+        if (connection) {
+            connection.release();
+            console.log('Conexión liberada');
+        }
     }
 });
-
 
 // Obtener horarios disponibles filtrados por fecha
 router.get('/horarios', verifyToken, (req, res) => {

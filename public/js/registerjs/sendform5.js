@@ -84,6 +84,7 @@ function updatePackageOptions(modalidad) {
             packageCost.textContent = '';
     }
 }
+
 function submitForm6() {
     const form = document.getElementById('registerForm');
     console.log('Formulario obtenido:', form); // Depuración
@@ -98,6 +99,8 @@ function submitForm6() {
     // Obtener valores de los campos
     const paquete = formData.get('paquete');
     const comprobantePago = document.getElementById('comprobante_pago').files[0];
+    console.log('Paquete:', paquete);
+    console.log('Comprobante de Pago:', comprobantePago);
 
     // Variable para controlar si hay errores
     let hasError = false;
@@ -124,6 +127,7 @@ function submitForm6() {
 
     // Si hay errores, no continuar
     if (hasError) {
+        console.log('Errores encontrados:', hasError);
         return;
     }
 
@@ -142,23 +146,25 @@ function submitForm6() {
         comprobante_pago: comprobantePago.name
     };
     localStorage.setItem('step6Data', JSON.stringify(formDataObject));
-
-    // Imprimir datos guardados en localStorage para depuración
-    console.log('Datos de step6Data:', formDataObject);
+    console.log('Datos guardados en localStorage:', formDataObject);
 
     // Asegurarse de que todos los datos están siendo capturados correctamente
     const step1Data = JSON.parse(localStorage.getItem('step1Data'));
-    const step2Data = JSON.parse(localStorage.getItem('step2Data'));
     const step3Data = JSON.parse(localStorage.getItem('step3Data'));
     const step5Data = JSON.parse(localStorage.getItem('step5Data'));
 
+    console.log('step1Data:', step1Data);
+    console.log('step3Data:', step3Data);
+    console.log('step5Data:', step5Data);
+
     const allData = {
         ...step1Data,
-        ...step2Data,
         ...step3Data,
         ...step5Data,
         ...formDataObject,
     };
+
+    console.log('Datos combinados:', allData);
 
     // Asegúrate de convertir la fecha de nuevo antes de enviar al servidor
     if (allData.fecha_nacimiento) {
@@ -177,25 +183,25 @@ function submitForm6() {
         completeFormData.append('comprobante_pago', comprobantePago);
     }
 
-    if (step2Data && step2Data.foto_perfil) {
-        completeFormData.append('foto_perfil_nombre', step2Data.foto_perfil);
-    }
-
     // Detener la ejecución aquí para inspección
-    console.log('Datos a enviar:', allData);
+    console.log('Datos a enviar:', Array.from(completeFormData.entries()));
 
-
-    fetch('/register/complete', {
+    fetch('register/complete', { // Usar la URL completa
         method: 'POST',
         body: completeFormData
     })
     .then(response => {
-        if (!response.ok) {
-            return response.json().then(err => { throw new Error(err.message); });
+        console.log('Estado de la respuesta:', response.status); // Depuración
+        console.log('Encabezados de la respuesta:', response.headers); // Depuración
+        // Asegurarse de que la respuesta es JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            throw new TypeError("Respuesta inesperada del servidor, no es JSON");
         }
         return response.json();
     })
     .then(data => {
+        console.log('Respuesta del servidor:', data);
         if (data.message !== 'Registro completado exitosamente') {
             const errorFinalElement = document.getElementById('errorFinal');
             if (errorFinalElement) {
@@ -208,6 +214,7 @@ function submitForm6() {
         }
     })
     .catch(error => {
+        console.error('Error en la solicitud:', error);
         const errorFinalElement = document.getElementById('errorFinal');
         if (errorFinalElement) {
             errorFinalElement.textContent = `Error: ${error.message}`;
