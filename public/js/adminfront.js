@@ -27,7 +27,6 @@ document.addEventListener("DOMContentLoaded", function() {
         cargarClasesUsuariosMes(fechaActual);
     };
 });
-
 function cargarClasesUsuariosMes(fecha) {
     const mes = fecha.getMonth() + 1; // Mes actual (1-12)
     const ano = fecha.getFullYear(); // Año actual
@@ -73,7 +72,7 @@ function cargarClasesUsuariosMes(fecha) {
                             const userElement = document.createElement('div');
                             userElement.className = 'user';
                             userElement.innerHTML = usuario.nombre;
-                            userElement.onclick = () => mostrarFichaUsuario(usuario);
+                            userElement.onclick = () => mostrarFichaUsuario(usuario, clase.id); // Asegurarse de pasar el clase.id
                             claseContainer.appendChild(userElement);
                         });
 
@@ -186,12 +185,9 @@ function fetchData(url, options = {}) {
             }
             return response.json();
         });
-}
-
-
-
-function mostrarFichaUsuario(usuario, claseId) {
+}function mostrarFichaUsuario(usuario, claseId) {
     console.log('Usuario seleccionado:', usuario);
+    console.log('Clase ID seleccionado:', claseId);
 
     const usuarioIdElement = document.getElementById('popup_usuario_id');
     const nombreElement = document.getElementById('popup_nombre');
@@ -207,7 +203,7 @@ function mostrarFichaUsuario(usuario, claseId) {
     nombreElement.value = usuario.nombre;
     emailElement.value = usuario.email;
     telefonoElement.value = usuario.telefono;
-    clasesDisponiblesElement.value = usuario.clases_disponibles || '';
+    clasesDisponiblesElement.value = usuario.clases_disponibles || '0'; // Asignar clases disponibles
     fechaActivacionElement.value = usuario.fecha_activacion ? usuario.fecha_activacion.split('T')[0] : '';
     fechaExpiracionElement.value = usuario.fecha_expiracion ? usuario.fecha_expiracion.split('T')[0] : '';
     fotoPerfilElement.src = usuario.foto_perfil || 'ruta_a_imagen_default.jpg';
@@ -226,20 +222,14 @@ function mostrarFichaUsuario(usuario, claseId) {
         clase_id: claseId
     });
 }
-
-function cerrarPopup() {
-    document.getElementById('popup').style.display = 'none';
-}
-document.addEventListener("DOMContentLoaded", function() {
-    // Otros inicializadores
-    document.querySelector('.close-button').addEventListener('click', cerrarPopup);
-});
-
 function eliminarClaseUsuario() {
     const usuarioId = parseInt(document.getElementById('popup_usuario_id').value, 10);
     const claseId = parseInt(document.getElementById('popup_usuario_id').dataset.claseId, 10);
 
-    if (!usuarioId || !claseId) {
+    console.log('Usuario ID:', usuarioId);
+    console.log('Clase ID:', claseId);
+
+    if (!usuarioId || isNaN(claseId)) {
         alert('ID de usuario o clase no encontrado');
         return;
     }
@@ -255,6 +245,7 @@ function eliminarClaseUsuario() {
     })
     .then(response => {
         if (response.ok) {
+            alert('Clase eliminada y cupos actualizados correctamente');
             cerrarPopup();
             cargarClasesUsuariosMes(new Date());
         } else {
@@ -268,3 +259,14 @@ function eliminarClaseUsuario() {
         alert('Error al eliminar la clase: ' + error.message);
     });
 }
+
+
+function cerrarPopup() {
+    document.getElementById('popup').style.display = 'none';
+}
+document.addEventListener("DOMContentLoaded", function() {
+    // Otros inicializadores
+    document.querySelector('.close-button').addEventListener('click', cerrarPopup);
+});
+
+

@@ -15,9 +15,10 @@ router.get('/clases-usuarios-mes', async (req, res) => {
         WHERE c.fecha_hora BETWEEN ? AND ?
     `;
     const queryUsuarios = `
-        SELECT r.clase_id, u.id AS usuario_id, u.nombre, u.email, u.telefono
+        SELECT r.clase_id, u.id AS usuario_id, u.nombre, u.email, u.telefono, u.clases_disponibles, p.fecha_activacion, p.fecha_expiracion
         FROM Reservas r
         JOIN Usuarios u ON r.usuario_id = u.id
+        LEFT JOIN Paquetes p ON u.id = p.usuario_id
         WHERE r.clase_id IN (SELECT id FROM Clases WHERE fecha_hora BETWEEN ? AND ?)
     `;
 
@@ -38,7 +39,6 @@ router.get('/clases-usuarios-mes', async (req, res) => {
         res.status(500).json({ message: 'Error en el servidor', error: error.message });
     }
 });
-
 router.post('/actualizar-usuario', async (req, res) => {
     const { id, nombre, email, telefono, clases_disponibles, fecha_activacion, fecha_expiracion } = req.body;
 
@@ -48,59 +48,68 @@ router.post('/actualizar-usuario', async (req, res) => {
         return res.status(400).json({ message: 'ID de usuario es obligatorio' });
     }
 
-    const campos = [];
-    const valores = [];
+    const camposUsuario = [];
+    const valoresUsuario = [];
 
     if (nombre) {
-        campos.push('nombre = ?');
-        valores.push(nombre);
+        camposUsuario.push('nombre = ?');
+        valoresUsuario.push(nombre);
     }
     if (email) {
-        campos.push('email = ?');
-        valores.push(email);
+        camposUsuario.push('email = ?');
+        valoresUsuario.push(email);
     }
     if (telefono) {
-        campos.push('telefono = ?');
-        valores.push(telefono);
+        camposUsuario.push('telefono = ?');
+        valoresUsuario.push(telefono);
     }
     if (clases_disponibles) {
-        campos.push('clases_disponibles = ?');
-        valores.push(clases_disponibles);
+        camposUsuario.push('clases_disponibles = ?');
+        valoresUsuario.push(clases_disponibles);
     }
+
+    const camposPaquete = [];
+    const valoresPaquete = [];
+
     if (fecha_activacion) {
-        campos.push('fecha_activacion = ?');
-        valores.push(fecha_activacion);
+        camposPaquete.push('fecha_activacion = ?');
+        valoresPaquete.push(fecha_activacion);
     }
     if (fecha_expiracion) {
-        campos.push('fecha_expiracion = ?');
-        valores.push(fecha_expiracion);
+        camposPaquete.push('fecha_expiracion = ?');
+        valoresPaquete.push(fecha_expiracion);
     }
 
-    if (campos.length === 0) {
-        return res.status(400).json({ message: 'No hay cambios para actualizar' });
-    }
+    valoresUsuario.push(id);
 
-    valores.push(id);
-
-    const query = `
+    const queryUsuario = `
         UPDATE Usuarios 
-        SET ${campos.join(', ')}
+        SET ${camposUsuario.join(', ')}
         WHERE id = ?
     `;
 
-    console.log('Query:', query);
-    console.log('Valores:', valores);
+    const queryPaquete = `
+        UPDATE Paquetes 
+        SET ${camposPaquete.join(', ')}
+        WHERE usuario_id = ?
+    `;
 
     try {
-        await db.execute(query, valores);
+        if (camposUsuario.length > 0) {
+            await db.execute(queryUsuario, valoresUsuario);
+        }
+
+        if (camposPaquete.length > 0) {
+            valoresPaquete.push(id);
+            await db.execute(queryPaquete, valoresPaquete);
+        }
+
         res.json({ message: 'Usuario actualizado correctamente' });
     } catch (error) {
         console.error('Error al actualizar usuario:', error);
         res.status(500).json({ message: 'Error en el servidor', error: error.message });
     }
 });
-
-
 
 router.post('/eliminar-clase-usuario', async (req, res) => {
     const { usuarioId, claseId } = req.body;
@@ -109,22 +118,52 @@ router.post('/eliminar-clase-usuario', async (req, res) => {
         return res.status(400).json({ message: 'Datos incompletos' });
     }
 
+    const connection = await db.getConnection(); // Obtener una conexión de la base de datos
+
     try {
-        const [result] = await db.execute(
+        await connection.beginTransaction(); // Iniciar una transacción
+
+        // Eliminar la reserva
+        const [deleteResult] = await connection.execute(
             'DELETE FROM Reservas WHERE usuario_id = ? AND clase_id = ?',
             [usuarioId, claseId]
         );
 
-        if (result.affectedRows > 0) {
-            res.json({ message: 'Clase eliminada correctamente' });
-        } else {
-            res.status(404).json({ message: 'Reserva no encontrada' });
+        if (deleteResult.affectedRows === 0) {
+            throw new Error('Reserva no encontrada');
         }
+
+        // Actualizar el cupo disponible en la tabla Clases
+        const [updateClassResult] = await connection.execute(
+            'UPDATE Clases SET cupos_disponibles = cupos_disponibles + 1 WHERE id = ?',
+            [claseId]
+        );
+
+        if (updateClassResult.affectedRows === 0) {
+            throw new Error('Clase no encontrada');
+        }
+
+        // Aumentar el número de clases disponibles del usuario
+        const [updateUserResult] = await connection.execute(
+            'UPDATE Usuarios SET clases_disponibles = clases_disponibles + 1 WHERE id = ?',
+            [usuarioId]
+        );
+
+        if (updateUserResult.affectedRows === 0) {
+            throw new Error('Usuario no encontrado');
+        }
+
+        await connection.commit(); // Confirmar la transacción
+
+        res.json({ message: 'Clase eliminada y cupos actualizados correctamente' });
     } catch (error) {
+        await connection.rollback(); // Revertir la transacción en caso de error
         console.error('Error al eliminar la clase:', error);
         res.status(500).json({ message: 'Error en el servidor', error: error.message });
+    } finally {
+        connection.release(); // Liberar la conexión
     }
 });
 
-
 module.exports = router;
+
