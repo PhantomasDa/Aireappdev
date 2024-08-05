@@ -232,12 +232,6 @@ function actualizarEstadoDelPaquete() {
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM fully loaded and parsed');
-    actualizarEstadoDelPaquete();
-});
-
-
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM fully loaded and parsed');
     actualizarFechaExpiracionPaquete();
 });
 
