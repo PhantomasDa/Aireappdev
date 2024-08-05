@@ -18,7 +18,7 @@ router.get('/clases-usuarios-mes', async (req, res) => {
         SELECT r.clase_id, u.id AS usuario_id, u.nombre, u.email, u.telefono, u.clases_disponibles, p.fecha_activacion, p.fecha_expiracion
         FROM Reservas r
         JOIN Usuarios u ON r.usuario_id = u.id
-        LEFT JOIN Paquetes p ON u.id = p.usuario_id
+        LEFT JOIN paquetes p ON u.id = p.usuario_id
         WHERE r.clase_id IN (SELECT id FROM Clases WHERE fecha_hora BETWEEN ? AND ?)
     `;
 
@@ -164,6 +164,81 @@ router.post('/eliminar-clase-usuario', async (req, res) => {
         connection.release(); // Liberar la conexión
     }
 });
+router.post('/crear-clase', async (req, res) => {
+    const { usuarioId, claseId } = req.body;
+
+    if (!usuarioId || !claseId) {
+        return res.status(400).json({ message: 'Datos incompletos' });
+    }
+
+    const connection = await db.getConnection(); // Obtener una conexión de la base de datos
+
+    try {
+        await connection.beginTransaction(); // Iniciar una transacción
+
+        // Verificar disponibilidad
+        const [clase] = await connection.execute(
+            'SELECT id, cupos_disponibles FROM Clases WHERE id = ? AND cupos_disponibles > 0',
+            [claseId]
+        );
+
+        if (clase.length === 0) {
+            throw new Error('No hay cupos disponibles para esta clase');
+        }
+
+        // Hacer la reserva
+        await connection.execute(
+            'INSERT INTO Reservas (usuario_id, clase_id, fecha_reserva) VALUES (?, ?, NOW())',
+            [usuarioId, claseId]
+        );
+
+        // Actualizar cupos disponibles
+        await connection.execute(
+            'UPDATE Clases SET cupos_disponibles = cupos_disponibles - 1 WHERE id = ? AND cupos_disponibles > 0',
+            [claseId]
+        );
+
+        // Descontar una clase disponible en la tabla de Usuarios
+        await connection.execute(
+            'UPDATE Usuarios SET clases_disponibles = clases_disponibles - 1 WHERE id = ? AND clases_disponibles > 0',
+            [usuarioId]
+        );
+
+        await connection.commit(); // Confirmar la transacción
+
+        res.json({ message: 'Clase creada correctamente' });
+    } catch (error) {
+        await connection.rollback(); // Revertir la transacción en caso de error
+        console.error('Error al crear la clase:', error);
+        res.status(500).json({ message: 'Error en el servidor', error: error.message });
+    } finally {
+        connection.release(); // Liberar la conexión
+    }
+});
+
+
+// Ruta para obtener la lista de usuarios
+router.get('/lista-usuarios', async (req, res) => {
+    try {
+        const [usuarios] = await db.execute('SELECT id, nombre FROM Usuarios');
+        res.json(usuarios);
+    } catch (error) {
+        console.error('Error al obtener la lista de usuarios:', error);
+        res.status(500).json({ message: 'Error en el servidor', error: error.message });
+    }
+});
+router.get('/clases-disponibles', async (req, res) => {
+    try {
+        const [clases] = await db.execute('SELECT id, fecha_hora, cupos_disponibles FROM Clases WHERE cupos_disponibles > 0');
+        res.json(clases);
+    } catch (error) {
+        console.error('Error al obtener las clases disponibles:', error);
+        res.status(500).json({ message: 'Error en el servidor', error: error.message });
+    }
+});
+
+
+
 
 module.exports = router;
 
