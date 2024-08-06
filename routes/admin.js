@@ -89,7 +89,7 @@ router.post('/actualizar-usuario', async (req, res) => {
     `;
 
     const queryPaquete = `
-        UPDATE Paquetes 
+        UPDATE paquetes 
         SET ${camposPaquete.join(', ')}
         WHERE usuario_id = ?
     `;
