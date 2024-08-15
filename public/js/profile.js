@@ -5,7 +5,7 @@
 function cargarNombreUsuario() {
     fetchData('/perfil/usuario')
         .then(usuario => {
-            console.log('Usuario recibido:', usuario); // Verificar los datos recibidos
+            // console.log('Usuario recibido:', usuario); // Verificar los datos recibidos
 
             document.getElementById('user_name').textContent = `Holis, ${usuario.nombre}`;
             document.getElementById('user_modalidad').textContent = `Modalidad: ${usuario.modalidad}`;
@@ -13,10 +13,10 @@ function cargarNombreUsuario() {
             // Asegúrate de que la URL sea correcta
 
             const modalidad = usuario.modalidad;
-            console.log('Modalidad del usuario:', modalidad); // Verificar el valor de modalidad
+            // console.log('Modalidad del usuario:', modalidad); // Verificar el valor de modalidad
 
             if (modalidad === 'online') {
-                console.log('Mostrando contenido online');
+                // console.log('Mostrando contenido online');
                 document.getElementById('presencialContent').style.display = 'none';
                 document.getElementById('onlineContent').style.display = 'block';
             } else {
@@ -70,7 +70,7 @@ function cargarProximasClases() {
 }
 
 function actualizarClasesDisponibles() {
-    console.log('Función actualizarClasesDisponibles iniciada.');
+    // console.log('Función actualizarClasesDisponibles iniciada.');
 
     fetchData('/perfil/clases-disponibles')
         .then(data => {
@@ -84,7 +84,7 @@ function actualizarClasesDisponibles() {
 
             const clasesDisponibles = data.clases_disponibles;
             clasesDisponiblesElement.textContent = `${clasesDisponibles}`;
-            console.log('Clases disponibles actualizadas:', clasesDisponibles);
+            // console.log('Clases disponibles actualizadas:', clasesDisponibles);
 
             const informacionExtraElement = document.getElementById('informacion_extra');
             if (!informacionExtraElement) {
@@ -98,7 +98,7 @@ function actualizarClasesDisponibles() {
             const fechaFormateada = ahora.toLocaleDateString('es-ES', opcionesFecha);
             const horaFormateada = ahora.toLocaleTimeString('es-ES', opcionesHora);
             informacionExtraElement.textContent = `Hoy ${fechaFormateada}, ${horaFormateada} :)`;
-            console.log('Información extra actualizada:', informacionExtraElement.textContent);
+            // console.log('Información extra actualizada:', informacionExtraElement.textContent);
         })
         .catch(error => {
             console.error('Error al cargar las clases disponibles:', error);
@@ -130,7 +130,7 @@ function manejarErrorReserva(error) {
 
 function confirmarReserva() {
     const claseId = document.getElementById('claseId').value;
-    console.log('Intentando reservar la clase con ID:', claseId); // Agrega esto para depurar
+    // console.log('Intentando reservar la clase con ID:', claseId); // Agrega esto para depurar
 
     fetchData('/perfil/reservar', {
         method: 'POST',
@@ -205,11 +205,20 @@ function actualizarFechaExpiracionPaquete() {
         });
 }
 
-function actualizarEstadoDelPaquete() {
+
+
+
     fetchData('/perfil/estado-paquete')
         .then(data => {
+            console.log('Datos del paquete:', data); // Añade este log para depuración
             const estadoDelPaqueteElement = document.getElementById('estadodelpaquete');
+            console.log('Elemento estadoDelPaquete:', estadoDelPaqueteElement); // Añade este log para depuración
             
+            if (!estadoDelPaqueteElement) {
+                console.error('Elemento estadoDelPaquete no encontrado en el DOM');
+                return;
+            }
+
             if (data.estado === 'Activo') {
                 estadoDelPaqueteElement.textContent = 'Activo';
                 estadoDelPaqueteElement.style.color = 'green';
@@ -223,15 +232,19 @@ function actualizarEstadoDelPaquete() {
         })
         .catch(error => {
             console.error('Error al cargar el estado del paquete:', error);
-            document.getElementById('estadodelpaquete').textContent = 'Error al cargar el estado del paquete';
-            document.getElementById('estadodelpaquete').style.color = 'grey';
+            const estadoDelPaqueteElement = document.getElementById('estadodelpaquete');
+            if (estadoDelPaqueteElement) {
+                estadoDelPaqueteElement.textContent = 'Error al cargar el estado del paquete';
+                estadoDelPaqueteElement.style.color = 'grey';
+            }
         });
-}
+
+
 
 
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM fully loaded and parsed');
+    // console.log('DOM fully loaded and parsed');
     actualizarFechaExpiracionPaquete();
 });
 
